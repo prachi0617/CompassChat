@@ -6,10 +6,8 @@ import java.util.List;
 
 public abstract class BaseService<T extends AuditableEntity, ID> {
 
-    /** protected = me and my children can touch it; strangers can't. */
     protected final BaseRepository<T, ID> repository;
 
-    /** Friendly name for error messages ("Message", "Channel"...). */
     protected final String entityName;
 
     protected BaseService(BaseRepository<T, ID> repository, String entityName) {
