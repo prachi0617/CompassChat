@@ -1,4 +1,4 @@
-package com.compasschat.notification;
+package com.compasschat.mention;
 
 public class MentionService {
     
