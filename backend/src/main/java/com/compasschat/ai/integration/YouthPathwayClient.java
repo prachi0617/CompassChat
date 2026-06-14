@@ -1,4 +1,4 @@
-package com.compasschat.integration;
+package com.compasschat.ai.integration;
 
 public class YouthPathwayClient {
     

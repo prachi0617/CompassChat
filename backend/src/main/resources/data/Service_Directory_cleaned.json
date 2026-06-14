@@ -295,7 +295,7 @@
       "typeOfService": "BEFORE/AFTER SCHOOL CARE",
       "organizationName": "West End Neighborhood House - Childcare Center",
       "servicesDescription": "Offers before care, after care and virtual learning support for children. Before Care program hours are from 6:30 a.m. to 9:00 a.m. and include breakfast, games, physical education and student bus stop support. After Care program hours are from 2:30 p.m. to 5:30 p.m. and include academic enrichment homework assistance, physical education, games, a light snack and monthly field trips. They partner with various organizations to offer reading, sports and recreation activities, culinary classes, music and movement, and more. Staff members have each taken the necessary classes through Delaware's Institute for Excellence in Early Childhood and are position-qualified through Delaware's Department of Education.",
-      "populationServed": "Ages 5 - 12",
+      "populationServed": "Ages 5-12",
       "fullAddress": "710 N Lincoln Street Wilmington , DE 19805",
       "phone": "302-658-4171",
       "countyServed": "NCC",
@@ -309,7 +309,7 @@
       "fullAddress": "4001 North Market Street Wilmington, DE 19802",
       "phone": "302-764-7162",
       "countyServed": "NCC",
-      "website": NaN
+      "website": null
     },
     {
       "typeOfService": "CHILD CARE",
@@ -339,7 +339,7 @@
       "fullAddress": "2511 West 4th Street Wilmington, DE 19805",
       "phone": "302-656-8785",
       "countyServed": "NCC",
-      "website": NaN
+      "website": null
     },
     {
       "typeOfService": "CHILD CARE",
@@ -546,7 +546,7 @@
       "organizationName": "Early Learning Center - Newark",
       "servicesDescription": "Early Learning Center-Newark child care and education facility provides a research, teaching and practicum site for faculty and students, serving up to 16 NDEHS children in an integrated center-based child care partnership with NDEHS in the Newark area. The Early Learning Center is a teaching and practicum site for faculty, students and community providers. NDEHS provides the family support component placing a family advocate at the site full time. In collaboration with classroom staff, the family advocate provides home visits. Home visits are based on a traditional home-based visit, providing the child and family with additional supports and focusing on the parent as the child's most important teacher. These visits occur in the home and at the child care center.",
       "populationServed": "All",
-      "fullAddress": NaN,
+      "fullAddress": null,
       "phone": "302-831-6205",
       "countyServed": "NCC",
       "website": "https://www.elc.udel.edu/"
@@ -589,7 +589,7 @@
       "fullAddress": "2511 West 4th Street Wilmington, DE 19805",
       "phone": "302-656-8785",
       "countyServed": "NCC",
-      "website": NaN
+      "website": null
     },
     {
       "typeOfService": "EARLY CHILDHOOD/PRE-K",
@@ -607,7 +607,7 @@
       "servicesDescription": "NDEHS is a program serving pregnant women and families with children birth to age three in New Castle and Kent Counties who meet the income and eligibility guidelines. The mission of the program is to support families in promoting the healthy development of Infants and toddlers. Both the home-based and center-based programs offer family education and support services, health and nutrition education, and referral services",
       "populationServed": "All",
       "fullAddress": "1218 B Street, Wilmington, DE 19801",
-      "phone": NaN,
+      "phone": null,
       "countyServed": "NCC",
       "website": "https://www.ndehs.udel.edu/"
     },
@@ -666,8 +666,8 @@
       "organizationName": "Auto Zone Rising Stars Program",
       "servicesDescription": "We welcome young talent to our organization. If you are 16 or 17 years old, our Rising Star program is the perfect opportunity to kick-start your career in retail. As a part-time Retail Sales Associate, you play a crucial role in creating an exceptional shopping experience for our customers. You'll help drive sales through delivering WOW! Customer service by going the extra mile though understanding customer needs and solving their problems.",
       "populationServed": "Ages 16-17",
-      "fullAddress": NaN,
-      "phone": NaN,
+      "fullAddress": null,
+      "phone": null,
       "countyServed": "NCC",
       "website": "https://www.careers.autozone.com/jobs/USA5985S139P"
     },
@@ -766,8 +766,8 @@
       "organizationName": "Futures First Gaming - Workforce Development",
       "servicesDescription": "Partners with DHSS to provide a 6-month program to learn employable skills in the fields of coding, programming and game design with a paid internship.",
       "populationServed": "Grades 9-12",
-      "fullAddress": NaN,
-      "phone": NaN,
+      "fullAddress": null,
+      "phone": null,
       "countyServed": "NCC",
       "website": "https://www.futuresfirstgaming.com/workforce"
     },
@@ -927,7 +927,7 @@
       "servicesDescription": "Offers a number of developmental programs to create specialists in every aspect of pro wrestling and event production, including being a professional wrestler, referee, announcer or sports agent. RCP is selective about program acceptance and space is very limited.",
       "populationServed": "Ages 12-18",
       "fullAddress": "109 Glasgow Drive Newark, DE 19702",
-      "phone": NaN,
+      "phone": null,
       "countyServed": "NCC",
       "website": "https://www.rightcoastpro.com"
     },
@@ -1086,7 +1086,7 @@
       "organizationName": "YouthBuild",
       "servicesDescription": "Wilmington Housing Authority's YouthBuild Program provides youth and young adults with educational opportunities and job training in green energy, technology, and construction. Earn your GED high school equivalency from state certified instructors and receive work readiness training to enhance your resume.",
       "populationServed": "Ages 16-24",
-      "fullAddress": NaN,
+      "fullAddress": null,
       "phone": "302-429-6700",
       "countyServed": "NCC",
       "website": "https://www.WHADELAWARE.ORG/ABOUT-WHA/EMPLOYMENTOPPORTUNITIES- AND-TRAINING-PROGRAMS/YOUTHBUILD"
@@ -1227,7 +1227,7 @@
       "servicesDescription": "Habitat for Humanity Restore recently partnered with ReEmployeAbility to assist injured or disabled employees get back to work while they recover.",
       "populationServed": "Age 18 and older",
       "fullAddress": "3312 Seminole Avenue Wilmington, DE 19808",
-      "phone": NaN,
+      "phone": null,
       "countyServed": "NCC",
       "website": "https://www.habitatncc.org/restore/"
     },
@@ -1237,7 +1237,7 @@
       "servicesDescription": "Habitat for Humanity Restore recently partnered with ReEmployeAbility to assist injured or disabled employees get back to work while they recover.",
       "populationServed": "Age 18 and older",
       "fullAddress": "600 North Broad Street Middletown, DE 19709",
-      "phone": NaN,
+      "phone": null,
       "countyServed": "NCC",
       "website": "https://www.habitatncc.org/restore/"
     },
@@ -1346,7 +1346,7 @@
       "organizationName": "YouthBuild",
       "servicesDescription": "Wilmington Housing Authority's YouthBuild Program provides youth and young adults with educational opportunities and job training in green energy, technology, and construction. Gain a professional certificate through hands-on career development training and mentorship in the fields of construction, CDL, medical, culinary, warehouse (forklift), IT, peer counseling.",
       "populationServed": "Ages 16-24",
-      "fullAddress": NaN,
+      "fullAddress": null,
       "phone": "302-429-6700",
       "countyServed": "NCC",
       "website": "https://www.WHADELAWARE.ORG/ABOUT-WHA/EMPLOYMENTOPPORTUNITIES- AND-TRAINING-PROGRAMS/YOUTHBUILD"
@@ -1406,15 +1406,15 @@
       "organizationName": "Delaware Today Magazine - Event Calendar",
       "servicesDescription": "Website that provides information on events going on in the community.",
       "populationServed": "All",
-      "fullAddress": NaN,
-      "phone": NaN,
+      "fullAddress": null,
+      "phone": null,
       "countyServed": "NCC",
       "website": "http://www.delawaretoday.com/Delaware-Today/Calendar/"
     },
     {
       "typeOfService": "ENTERTAINMENT",
       "organizationName": "Festival of Trees",
-      "servicesDescription": "The Festival of Trees is an annual event run by Delaware Hospice to usher in the holiday season. The Festival features a magnificent display of decorated trees and wreaths and a market shop to buy holiday décor and remembrance trees.",
+      "servicesDescription": "The Festival of Trees is an annual event run by Delaware Hospice to usher in the holiday season. The Festival features a magnificent display of decorated trees and wreaths and a market shop to buy holiday decor and remembrance trees.",
       "populationServed": "All",
       "fullAddress": "600 Rockland Road Wilmington, DE 19803",
       "phone": "302-478-5088",
@@ -1679,7 +1679,7 @@
       "fullAddress": "510 N Duncan Road Wilmington, DE 19809",
       "phone": "302-395-5555",
       "countyServed": "NCC",
-      "website": NaN
+      "website": null
     },
     {
       "typeOfService": "FOOD PROGRAM",
@@ -1866,8 +1866,8 @@
       "organizationName": "Lasagna Love",
       "servicesDescription": "Feeding families, spreading kindness, and strengthening communities. Volunteer opportunities and/or request for a homecooked lasagna for a person/family in need.",
       "populationServed": "All",
-      "fullAddress": NaN,
-      "phone": NaN,
+      "fullAddress": null,
+      "phone": null,
       "countyServed": "NCC",
       "website": "https://www.lasagnaloveportal.org (online submission) and https://www.lasagnalove.org/ (organization's website)"
     },
@@ -1994,7 +1994,7 @@
     {
       "typeOfService": "FOOD PROGRAM",
       "organizationName": "Saint Anne's Episcopal Church",
-      "servicesDescription": "Every Friday, Our Daily Bread distributes bags of food to the community. Saint Anne's has partnered with Our Daily Bread to provide food items for the food bags. We collect the food on Sundays at worship and during the week from Monday thru Thursday, 9:00 AM to 4:00 PM. A volunteer from Saint Anne's delivers the food to Our Daily Bread once a week. Food items collected include: ½ gallon of milk, 1-pound packages of ground beef or chicken, bread, apples, oranges, personal wipes, vegetables, and canned protein (tuna or chicken) and fruits and vegetables.",
+      "servicesDescription": "Every Friday, Our Daily Bread distributes bags of food to the community. Saint Anne's has partnered with Our Daily Bread to provide food items for the food bags. We collect the food on Sundays at worship and during the week from Monday thru Thursday, 9:00 AM to 4:00 PM. A volunteer from Saint Anne's delivers the food to Our Daily Bread once a week. Food items collected include: 1/2 gallon of milk, 1-pound packages of ground beef or chicken, bread, apples, oranges, personal wipes, vegetables, and canned protein (tuna or chicken) and fruits and vegetables.",
       "populationServed": "Families, individuals, children",
       "fullAddress": "15 East Green Street, Middletown, DE 19709",
       "phone": "302-378-2401",
@@ -2009,7 +2009,7 @@
       "fullAddress": "109 Broad Street, St. Georges, DE 19733",
       "phone": "302-834-4749",
       "countyServed": "NCC",
-      "website": NaN
+      "website": null
     },
     {
       "typeOfService": "FOOD PROGRAM",
@@ -2069,12 +2069,12 @@
       "fullAddress": "1919 W 4th Street Wilmington, DE 19805",
       "phone": "302-658-2529",
       "countyServed": "NCC",
-      "website": NaN
+      "website": null
     },
     {
       "typeOfService": "FURNITURE & HOUSEHOLD ITEMS",
       "organizationName": "Habitat for Humanity - Restore",
-      "servicesDescription": "A thrift store that sells new and gently used furniture, appliances, home décor and building supplies. Also offered is a refrigerator replacement program for qualifying families. All items are donated by businesses, building contractors, suppliers, and individuals, and are available for sale to the public.",
+      "servicesDescription": "A thrift store that sells new and gently used furniture, appliances, home decor and building supplies. Also offered is a refrigerator replacement program for qualifying families. All items are donated by businesses, building contractors, suppliers, and individuals, and are available for sale to the public.",
       "populationServed": "All",
       "fullAddress": "3312 Seminole Avenue Wilmington, DE 19808",
       "phone": "302-652-5181",
@@ -2084,7 +2084,7 @@
     {
       "typeOfService": "FURNITURE & HOUSEHOLD ITEMS",
       "organizationName": "Habitat for Humanity - Restore",
-      "servicesDescription": "A thrift store that sells new and gently used furniture, appliances, home décor and building supplies. Also offered is a refrigerator replacement program for qualifying families. All items are donated by businesses, building contractors, suppliers, and individuals, and are available for sale to the public.",
+      "servicesDescription": "A thrift store that sells new and gently used furniture, appliances, home decor and building supplies. Also offered is a refrigerator replacement program for qualifying families. All items are donated by businesses, building contractors, suppliers, and individuals, and are available for sale to the public.",
       "populationServed": "All",
       "fullAddress": "600 North Broad Street Middletown, DE 19709",
       "phone": "302-449-1414",
@@ -2356,7 +2356,7 @@
       "organizationName": "Child Inc - Domestic Violence Shelters",
       "servicesDescription": "Shelters for women or men that are victims of domestic violence. Children are also allowed. Emergency hotel placements may be an option, based on funding available and safety needs. Length of stay can vary. Locations are secure and confidential. Safety planning, advocacy, case management and supportive services are provided.",
       "populationServed": "All",
-      "fullAddress": NaN,
+      "fullAddress": null,
       "phone": "302-762-6110",
       "countyServed": "NCC",
       "website": "https://www.childinc.com/domestic-violence-services/shelters/"
@@ -2429,7 +2429,7 @@
       "fullAddress": "225 King Street Wilmington, DE 19801",
       "phone": "302-658-7161",
       "countyServed": "NCC",
-      "website": NaN
+      "website": null
     },
     {
       "typeOfService": "HOUSING",
@@ -2485,7 +2485,7 @@
       "typeOfService": "HOUSING",
       "organizationName": "Mother Mary of Hope House II (Ministry of Caring)",
       "servicesDescription": "Emergency housing for 30-45 days for homeless women with children. Case management included with stay.",
-      "populationServed": "Women and Children",
+      "populationServed": "Women and children",
       "fullAddress": "121 N Jackson Street Wilmington, DE 19801",
       "phone": "302-652-1935",
       "countyServed": "NCC",
@@ -2495,7 +2495,7 @@
       "typeOfService": "HOUSING",
       "organizationName": "Mother Mary of Hope House III (Ministry of Caring)",
       "servicesDescription": "Emergency housing for 30-45 days for homeless women with children. Case management included with stay.",
-      "populationServed": "Women and Children",
+      "populationServed": "Women and children",
       "fullAddress": "515 North Broom Street Wilmington, DE 19805",
       "phone": "302-652-0970",
       "countyServed": "NCC",
@@ -2626,7 +2626,7 @@
       "organizationName": "Oxford Houses of Delaware",
       "servicesDescription": "Self-run sober living home for individuals in recovery. Individuals pay rent and share expenses. Women with children eligible.",
       "populationServed": "All",
-      "fullAddress": NaN,
+      "fullAddress": null,
       "phone": "301-587-2916",
       "countyServed": "NCC",
       "website": "https://oxfordhouse.org/"
@@ -2686,7 +2686,7 @@
       "organizationName": "Supportive Transitional & Emergency Housing Ministry (STEHM) - Martha House I & II",
       "servicesDescription": "Provides long-term transitional housing for women and their children, fostering the goal of independent living through counseling and life skills training in a safe, supportive environment. Going beyond mere shelter, this program seeks to address many of the fundamental causes of homelessness, poverty, joblessness, and inability to find and maintain affordable housing, and to build foundations that will prevent their recurrence.",
       "populationServed": "Women and children",
-      "fullAddress": NaN,
+      "fullAddress": null,
       "phone": "302-655-5568",
       "countyServed": "NCC",
       "website": "https://stehm.org/newsite/2021/martha-house/"
@@ -2696,7 +2696,7 @@
       "organizationName": "Supportive Transitional & Emergency Housing Ministry (STEHM) - Motel Ministry",
       "servicesDescription": "Provides short-term emergency housing for individuals in need or displaced persons. Referrals for this program are accepted from social service agencies, schools, hospitals, prison outreach, churches and others for placement of individuals in approved motels for short-term stays, usually for a duration of one week. Clients can qualify for a one-week stay only once in a calendar year.",
       "populationServed": "All",
-      "fullAddress": NaN,
+      "fullAddress": null,
       "phone": "302-655-5568",
       "countyServed": "NCC",
       "website": "https://stehm.org/newsite/2021/motel-ministry/"
@@ -2756,7 +2756,7 @@
       "organizationName": "YWCA Delaware - \"SCHE\" Joint Transitional Housing and Rapid Re-housing",
       "servicesDescription": "YWCA Delaware's \"SCHE\" (Safe, Compassion, Heal, Empower) Joint Transitional Housing and Rapid Re-Housing program offers survivors of domestic violence, sexual assault, stalking and dating violence with personalized service plans and resources to achieve housing stability. YWCA works to rapidly re-house homeless women and families and provides financial assistance, comprehensive case management, and support services to assist women and families in becoming economically and residentially stable and self-sufficient in permanent housing. Services may include but are not limited to community housing, case management, access to food, wellness and nutrition workshops, and clothing, workforce readiness training, medical/legal accompaniment, financial housing assistance, financial coaching, therapeutic services, access to legal, medical and mental health services, and transportation services. YW assists in developing tailored Housing Service Plans that offer financial resources and internal/external support services, including searching for safe and affordable housing, employment, life skills and enrichment training, and participating in state-sponsored training programs. RRH participants also receive evaluations for benefits and housing, including purchase of care - early childhood and after-school education, Temporary Assistance for Needy Families (TANF), Medicare, and SNAP. \"SCHE\" Joint Transitional and Rapid Re-Housing program participants are responsible for contributing financially to their households while maintaining continued access to YW's support services.",
       "populationServed": "Women",
-      "fullAddress": NaN,
+      "fullAddress": null,
       "phone": "302-658-7110",
       "countyServed": "NCC",
       "website": "https://www.ywcade.org/what-we-do/housing/"
@@ -2789,7 +2789,7 @@
       "fullAddress": "1201 N King Street Suite A Wilmington, DE 19801",
       "phone": "302-652-7900",
       "countyServed": "NCC",
-      "website": NaN
+      "website": null
     },
     {
       "typeOfService": "LEGAL",
@@ -2886,7 +2886,7 @@
       "organizationName": "Girl's Academy",
       "servicesDescription": "A 6-week program that aims to enhance the overall well-being of teenage girls grade 8-11. This program magnifies inner strengths, educates and spreads awareness on the importance of healthy relationships, future goal planning, self awareness and positive esteem.",
       "populationServed": "Grades 8-11 (female)",
-      "fullAddress": NaN,
+      "fullAddress": null,
       "phone": "302-956-9188",
       "countyServed": "NCC",
       "website": "https://www.lavantedorsey.com/events"
@@ -2956,7 +2956,7 @@
       "organizationName": "Teens in Perspective",
       "servicesDescription": "Teens In Perspective (T.I.P.) is a leadership development program. T.I.P. is committed to working with young girls for the duration of their high school years to teach them life skills, including confidence and self-esteem building, how to deal with peer pressure/bullying and healthy relationships. Also offers group mentoring.",
       "populationServed": "Ages 12-17",
-      "fullAddress": NaN,
+      "fullAddress": null,
       "phone": "302-836-8034",
       "countyServed": "NCC",
       "website": "https://www.teensinperspective.org"
@@ -3186,7 +3186,7 @@
       "organizationName": "Hand in Hand Counseling Services",
       "servicesDescription": "Parent classes, parent child interactive therapy, stress management, workshops, etc. to serve individuals and families by guiding, assisting and strengthening them during the trials of life through counseling, coaching, teaching, and support.",
       "populationServed": "Ages 5-18",
-      "fullAddress": NaN,
+      "fullAddress": null,
       "phone": "302-219-3053",
       "countyServed": "NCC",
       "website": "https://www.handinhandcs.com"
@@ -3276,7 +3276,7 @@
       "organizationName": "Lighthouse Therapeutic Mentoring & Counseling Services, LLC",
       "servicesDescription": "Offers counseling for individuals, groups, families and couples. Therapeutic mentoring is also available for youth that are enrolled in counseling services. Offers the S.A.F.E. House program, which are enrichment workshops that address safety, academic support, financial literacy and enrichment through the arts to empower youth.",
       "populationServed": "All",
-      "fullAddress": NaN,
+      "fullAddress": null,
       "phone": "302-419-7343",
       "countyServed": "NCC",
       "website": "https://lighthousetmcs.com/"
@@ -3479,7 +3479,7 @@
       "fullAddress": "5157 W Woodmill Rd Suite 16 Wilmington, DE 19808",
       "phone": "302-691-5658",
       "countyServed": "NCC",
-      "website": NaN
+      "website": null
     },
     {
       "typeOfService": "MENTAL HEALTH",
@@ -3505,7 +3505,7 @@
       "typeOfService": "MENTAL HEALTH",
       "organizationName": "Terry Children's Center",
       "servicesDescription": "Provides residential and crisis stabilization treatment services to youth and their families referred to the programs. Residential based treatment services for a maximum of 10 children ranging in age from 6 - 13 years. Bed-based crisis stabilization services for up to 6 children ranging in age from 6 - 17 years. The services provided are multi-faceted, utilizing a variety of modalities to serve youth and their families. Services include: individual, family, and group therapy components; regular psychiatric consultation and intervention; and a milieu management program based upon cognitive-behavioral modification principles. Admission to any of the programs occurs in a coordinated fashion with the Division of Prevention and Behavioral Health Services (DPBHS). Contact the Division's Intake unit at (302) 633-2571 for more information.",
-      "populationServed": "Ages 6 -17",
+      "populationServed": "Ages 6-17",
       "fullAddress": "10 Central Avenue New Castle, DE 19720",
       "phone": "302-577-4270",
       "countyServed": "NCC",
@@ -3615,8 +3615,8 @@
       "typeOfService": "MENTOR",
       "organizationName": "Duffy's Hope Inc.",
       "servicesDescription": "Programs offered: Duffy's Hope, Inc. provides intellectual, emotional and interpersonal growth opportunities for youth and their families through advocacy, education, mentoring and community outreach. Duffy's Hope uses a HOLISTIC approach that includes 10 Core Components that not only determine the root causes of problems in the lives of at-risk youth but also address - and more importantly - help to rectify those issues. The 10 Core components to Duffy's Hope programming are: One-on-One mentoring with Parent & Family Participation and School & Home Visits, \"Reality Check\" Day Trips, Tutoring, Educational & Enrichment Trips, Guest Speakers to Speak to the Youth, Financial Literacy, Group Discussions, and Etiquette Training. County or Service Area: New Castle County - Wilmington Area Summary of Target Population: At-risk and hard-to-reach youth ages 12-17 with documented proof of success Contact Info and Name of the Lead Contact for the Mentoring Program: Allen 'Duffy' Samuels; 302-652-3532 How to Make a Referral: Contact Mr. Duffy",
-      "populationServed": "ages 12-17",
-      "fullAddress": NaN,
+      "populationServed": "Ages 12-17",
+      "fullAddress": null,
       "phone": "302-652-3532",
       "countyServed": "NCC",
       "website": "https://www.duffyshopeinc.org/main/"
@@ -3627,7 +3627,7 @@
       "servicesDescription": "Get A GRIP (Girls Reaching their Ideal Potential) is a mentoring and leadership development organization enriching and empowering the lives of teens in our community. There is a $50 membership fee to join.",
       "populationServed": "Ages 13-18 (female)",
       "fullAddress": "Wilmington, DE 19850",
-      "phone": NaN,
+      "phone": null,
       "countyServed": "NCC",
       "website": "https://www.getagrip.info/"
     },
@@ -3636,7 +3636,7 @@
       "organizationName": "Girl's Academy",
       "servicesDescription": "A 6-week program that aims to enhance the overall well-being of teenage girls grade 8-11. This program magnifies inner strengths, educates and spreads awareness on the importance of healthy relationships, future goal planning, self awareness and positive esteem.",
       "populationServed": "Grades 8-11 (female)",
-      "fullAddress": NaN,
+      "fullAddress": null,
       "phone": "302-956-9188",
       "countyServed": "NCC",
       "website": "https://www.lavantedorsey.com/events"
@@ -3686,7 +3686,7 @@
       "organizationName": "Lighthouse Therapeutic Mentoring & Counseling Services, LLC",
       "servicesDescription": "Offers counseling for individuals, groups, families and couples. Therapeutic mentoring is also available for youth that are enrolled in counseling services. Offers the S.A.F.E. House program, which are enrichment workshops that address safety, academic support, financial literacy and enrichment through the arts to empower youth.",
       "populationServed": "All",
-      "fullAddress": NaN,
+      "fullAddress": null,
       "phone": "302-419-7343",
       "countyServed": "NCC",
       "website": "https://lighthousetmcs.com/"
@@ -3736,7 +3736,7 @@
       "organizationName": "Teens in Perspective",
       "servicesDescription": "Teens In Perspective (T.I.P.) is a leadership development program. T.I.P. is committed to working with young girls for the duration of their high school years to teach them life skills, including confidence and self-esteem building, how to deal with peer pressure/bullying and healthy relationships. Also offers group mentoring.",
       "populationServed": "Ages 12-17",
-      "fullAddress": NaN,
+      "fullAddress": null,
       "phone": "302-836-8034",
       "countyServed": "NCC",
       "website": "https://www.teensinperspective.org"
@@ -3756,7 +3756,7 @@
       "organizationName": "Unique Butterflies",
       "servicesDescription": "Programs offered: Unique Butterflies are a group of young ladies committed to spreading awareness of people with special needs. The program currently has two adult Mentors, both female. The program's goal is to help raise empathy and compassion through mentoring. The program also focuses on teaching daily life skills, what peer pressure is and how to respond, potential dangers in society, the risks of drug use, how to have healthy relationships, learning about careers and becoming career-ready, as well as raising financial literacy related to understanding how to save money and build credit. The group meets weekly on Wednesdays at 6 p.m. during the School Year and at noon on Wednesdays in the summer at the Unique Butterflies offices. Contact by the mentors to the mentees via texting or phone can occur between meetings as approved by a parent. With parental approval, the young ladies also go on outings to local parks, participating in volunteerism and community activities. Contact Info and Name of the Lead Contact for the Mentoring Program: Diamond Doran; 302-766-2135. This number will also accept text messages. How to Make a Referral: Use the \"Register as a Butterfly\" on the Unique Butterflies Website; https://www.theuniquebutterflies.org/register-as-butterfly-dragonfly County or Service Area: New Castle County Only Summary of Target Population: Girls ages 10-18",
       "populationServed": "Ages 10-18 (female)",
-      "fullAddress": NaN,
+      "fullAddress": null,
       "phone": "302-766-2135",
       "countyServed": "NCC",
       "website": "https://www.theuniquebutterflies.org/"
@@ -3846,7 +3846,7 @@
       "organizationName": "Delaware Center for Justice - Read In, Read Out Program",
       "servicesDescription": "Selected incarcerated parents are able to record themselves reading age-appropriate books to their children. The recordings are then sent, along with the books and an inexpensive cd player, to each child. In this manner, incarcerated parents are better able to preserve a bond with their children, improve their communication and parenting skills, and ease their transition back to their families and to the community. Available at Baylor Women's Correctional Institution and Howard R. Young Correctional Institution.",
       "populationServed": "Age 18 and older",
-      "fullAddress": NaN,
+      "fullAddress": null,
       "phone": "302-658-7174 ext. 10 or ext. 21",
       "countyServed": "NCC",
       "website": "https://dcjustice.org/our-programs/read-in-read-out-riro/"
@@ -4116,8 +4116,8 @@
       "organizationName": "Concord Soccer",
       "servicesDescription": "US Youth Soccer TOPSoccer (The Outreach Program for Soccer) is a community-based training and team placement program for young athletes with disabilities. The program is designed to bring the opportunity of learning and playing soccer to any boy or girl, age 4-19, who has a cognitive or physical disability.",
       "populationServed": "Ages 4-19",
-      "fullAddress": NaN,
-      "phone": NaN,
+      "fullAddress": null,
+      "phone": null,
       "countyServed": "NCC",
       "website": "https://www.concordsoccer.com/programs/topsoccer-for-players-with-disabilities"
     },
@@ -4204,7 +4204,7 @@
     {
       "typeOfService": "RECREATIONAL",
       "organizationName": "Delaware Art Museum: Studio Art Classes",
-      "servicesDescription": "Workshops and multi-week courses in Painting, Drawing, Printmaking, Photography, Metalsmithing, Ceramics, Writing and more! Both children and adults of any skill level are welcome to ﬁnd inspiration in the Museum's collection and express themselves creatively in our unique studios.",
+      "servicesDescription": "Workshops and multi-week courses in Painting, Drawing, Printmaking, Photography, Metalsmithing, Ceramics, Writing and more! Both children and adults of any skill level are welcome to find inspiration in the Museum's collection and express themselves creatively in our unique studios.",
       "populationServed": "Age 6 and older",
       "fullAddress": "2301 Kentmere Parkway Wilmington, DE 19806",
       "phone": "302-351-8551",
@@ -4285,7 +4285,7 @@
       "typeOfService": "RECREATIONAL",
       "organizationName": "First State Boxing Club Inc / Fight Factory \"Gloves Against Drugs Foundation\"",
       "servicesDescription": "Program that partners with Christiana Care and PBH which offers educational curriculum with physical fitness; topics addressed include dealing with peer pressure, good decision making and understanding risks of substance abuse. Membership cost is $100/month.",
-      "populationServed": "Ages 9-10 and 12-25",
+      "populationServed": "Ages 9-25",
       "fullAddress": "340 Robinson Lane Wilmington, DE 19805",
       "phone": "302-442-8253; 302-607-1730",
       "countyServed": "NCC",
@@ -4306,7 +4306,7 @@
       "organizationName": "Future's Promises Foundation",
       "servicesDescription": "Greater Kings & Queens Chess is a program implementing after-school chess in Christina School District elementary schools in the city of Wilmington. Working closely with caring and motivated teachers, this program immerses students in a positive and safe environment fostering creativity, critical thinking, and decision-making skills for the purposes of developing strategies in decreasing behaviors leading to youth violence and poor academic performance.",
       "populationServed": "Grades K-5",
-      "fullAddress": NaN,
+      "fullAddress": null,
       "phone": "302-689-3392",
       "countyServed": "NCC",
       "website": "https://futurepromises.org/our-programs/greater-kings-and-queens/#"
@@ -4316,8 +4316,8 @@
       "organizationName": "Futures First Gaming",
       "servicesDescription": "Convenes e-sports enthusiasts to engage in competitive and recreational gaming events, fosters a gaming community and presents opportunities for participants to explore educational and career development pathways in STEM. Summer camps available as well.",
       "populationServed": "Ages 10-16",
-      "fullAddress": NaN,
-      "phone": NaN,
+      "fullAddress": null,
+      "phone": null,
       "countyServed": "NCC",
       "website": "https://www.futuresfirstgaming.com"
     },
@@ -4377,7 +4377,7 @@
       "servicesDescription": "The Healthy Kids Running Series is a 5 week race program offered in fall and spring to introduce youth to running and leading an active lifestyle. Distance of race is determined by age and grade level. Cost is $40 per season or $10 on day of event.",
       "populationServed": "Ages 2-14",
       "fullAddress": "101 Garden of Eden Road Wilmington, DE 19803",
-      "phone": NaN,
+      "phone": null,
       "countyServed": "NCC",
       "website": "http://www.healthykidsrunningseries.org"
     },
@@ -4517,7 +4517,7 @@
       "servicesDescription": "Offers foundational soccer program that includes parent/child program for kids 18months-3 years old. Offers soccer leagues for children 4-18 as well as foundational field hockey with Delaware Sharks Field Hockey Club.",
       "populationServed": "Ages 18ms-18",
       "fullAddress": "1220 River Road New Castle, DE 19720",
-      "phone": NaN,
+      "phone": null,
       "countyServed": "NCC",
       "website": "https://www.kirkwoodsports.org/"
     },
@@ -4576,7 +4576,7 @@
       "organizationName": "M.O.T. Future Stars",
       "servicesDescription": "Youth Basketball League offered in winter, fall and spring. Basketball camps are held during the summer. There is also a travel team.",
       "populationServed": "Grades 2-9",
-      "fullAddress": NaN,
+      "fullAddress": null,
       "phone": "704-957-3441",
       "countyServed": "NCC",
       "website": "http://www.motfuturestars.com"
@@ -4717,7 +4717,7 @@
       "servicesDescription": "Offers youth basketball leagues, camps, and clinics.",
       "populationServed": "Ages 4-17",
       "fullAddress": "201 Bayard Avenue Wilmington, DE 19805",
-      "phone": NaN,
+      "phone": null,
       "countyServed": "NCC",
       "website": "https://www.nbnsportsacademy.org"
     },
@@ -4726,7 +4726,7 @@
       "organizationName": "P.O.S.H. Yoga",
       "servicesDescription": "Sessions offered in different locations or online. Programs offered include yoga/mindfulness teacher training, mentorship spiritual development and consulting sessions.",
       "populationServed": "Age 5 and older",
-      "fullAddress": NaN,
+      "fullAddress": null,
       "phone": "302-635-9642",
       "countyServed": "NCC",
       "website": "https://www.posh-yoga.com/home-1"
@@ -4737,7 +4737,7 @@
       "servicesDescription": "Offers wrestling events and can do birthday parties. The organization operates out of the Greater Newark Boys and Girls Club. Email Lisa@RightCoastPro.com for all inquiries",
       "populationServed": "All",
       "fullAddress": "109 Glasgow Drive Newark, DE 19702",
-      "phone": NaN,
+      "phone": null,
       "countyServed": "NCC",
       "website": "https://www.rightcoastpro.com"
     },
@@ -4835,7 +4835,7 @@
       "typeOfService": "RECREATIONAL",
       "organizationName": "Summer at Independence",
       "servicesDescription": "Offers both half and full day summer camps at Independence School. Day camp costs $325 for full day, $200 for half day (per week) with a $20/week discount for full summer early registration. Mini camp is offered for 3-4 year olds. Mini camp is $280 for full day and $180 for half day (per week). Also offered for mini campers is extended day for an extra fee. Specialty camps are also offered and ages/prices vary by camp.",
-      "populationServed": "Age 3-14",
+      "populationServed": "Ages 3-14",
       "fullAddress": "1300 Paper Mill Road Newark, DE 19711",
       "phone": "302-239-0330",
       "countyServed": "NCC",
@@ -5025,7 +5025,7 @@
       "typeOfService": "RECREATIONAL",
       "organizationName": "West End Neighborhood House - Above Xpectations Track Club",
       "servicesDescription": "A nationally ranked track and field club team that offers indoor and outdoor Cross Country for youth. Every athlete is given the opportunity to compete against elite level athletes across the country. Track meets are held all over the country and include the Millrose Games (New York City, NY), Mark Trail Memorial Day (Atlanta, GA), and AAU Club Nationals (Orlando, FL). In addition to competing, athletes are also provided with college readiness, SAT prep, prevention services, and tutoring.",
-      "populationServed": "Ages 6 - 18",
+      "populationServed": "Ages 6-18",
       "fullAddress": "710 N Lincoln St Wilmington, DE 19805",
       "phone": "302-658-4171",
       "countyServed": "NCC",
@@ -5035,7 +5035,7 @@
       "typeOfService": "RECREATIONAL",
       "organizationName": "West End Neighborhood House - Camp W.E.S.T. Fun-Zone",
       "servicesDescription": "West End's Summer Camp program is filled with activities centered around children having fun in the sun. Junior and Senior Camp Counselors ensure that children are engaged in a variety of summer camp activities. West End has partnered with Summer Learning Collab to close the gap around summer learning loss and includes various academic enrichment activities to keep the education wheels turning while on summer break. Summer camp staff members are invigorating, creative, energetic, caring and passionate about working with children. Summer Camp runs from June to August of each year. West End also works closely with various school districts to offer services during school breaks, including: School Closing Camp, Spring Break Camp, Winter Break Camp, and In-Service Day Camp when possible.",
-      "populationServed": "Ages 5 - 12",
+      "populationServed": "Ages 5-12",
       "fullAddress": "710 N Lincoln Street Wilmington , DE 19805",
       "phone": "302-658-4171",
       "countyServed": "NCC",
@@ -5206,7 +5206,7 @@
       "organizationName": "Children & Families First - Functional Family Therapy Therapeutic Case Management",
       "servicesDescription": "Multi-disciplinary approach to assist families with children up to age 18. Assists with basic needs, handling current issues and provides ongoing coaching support with behavioral problems and family conflict.",
       "populationServed": "Families",
-      "fullAddress": NaN,
+      "fullAddress": null,
       "phone": "888-598-8567",
       "countyServed": "NCC",
       "website": "https://www.cffde.org/fft"
@@ -5556,8 +5556,8 @@
       "organizationName": "The Children's Advocacy Project of Wilmington (Cap4Kids)",
       "servicesDescription": "Resources for child abuse, domestic violence, early intervention, immigration services, literacy, legal, pregnancy, special needs/Autism and teen resources. Website includes links to other agencies that also have comprehensive advocacy information for families.",
       "populationServed": "All",
-      "fullAddress": NaN,
-      "phone": NaN,
+      "fullAddress": null,
+      "phone": null,
       "countyServed": "NCC",
       "website": "http://cap4kids.org/wilmington/parent-handouts/teen-resources/"
     },
@@ -5587,7 +5587,7 @@
       "servicesDescription": "Provides individuals and families with a variety of mental health and wellness service providers, including therapists, nutrition specialist and massage therapy.",
       "populationServed": "All",
       "fullAddress": "120 W Main St Middletown, DE 19709",
-      "phone": NaN,
+      "phone": null,
       "countyServed": "NCC",
       "website": "https://www.wellbeingonmain.com/"
     },
@@ -5697,7 +5697,7 @@
       "servicesDescription": "Offers DFS liaisons to support families who have an open DFS case and substance use issues. Referral must be made by DFS worker.",
       "populationServed": "Age 18 and older",
       "fullAddress": "119 Lower Beech Street Wilmington, DE 19805",
-      "phone": NaN,
+      "phone": null,
       "countyServed": "NCC",
       "website": "https://www.brandywinecounseling.com/dfs-liaisons/"
     },
@@ -5717,7 +5717,7 @@
       "servicesDescription": "Offers DFS liaisons to support families who have an open DFS case and substance use issues. Referral must be made by DFS worker.",
       "populationServed": "Age 18 and older",
       "fullAddress": "263 Chapman Road Newark, DE 19702",
-      "phone": NaN,
+      "phone": null,
       "countyServed": "NCC",
       "website": "https://www.brandywinecounseling.com/dfs-liaisons/"
     },
@@ -5975,8 +5975,8 @@
       "typeOfService": "TRANSPORTATION",
       "organizationName": "Kid Ridez",
       "servicesDescription": "Kid Ridez provides transportation for children to after school clubs/activities, recreational/sports activities, tutoring or to get to daycare/after school care. They are available 6:30am-6:30pm during the week and weekends upon request. Submit transportation request online. Youth served up to age 18. Serving mostly northern New Castle County.",
-      "populationServed": "Ages 18 and under",
-      "fullAddress": NaN,
+      "populationServed": "Age 18 and younger",
+      "fullAddress": null,
       "phone": "610-800-9731",
       "countyServed": "NCC",
       "website": "http://www.kidridez.com/index.html"
@@ -6015,7 +6015,7 @@
       "typeOfService": "VOLUNTEER",
       "organizationName": "Brandywine Valley SPCA",
       "servicesDescription": "Volunteering Opportunities: Dog & Cat Volunteer, Junior Volunteers, Group Service Day Assistance, Animal Appreciation Party, Baking Treats, Homemade Toys",
-      "populationServed": "All ages",
+      "populationServed": "All",
       "fullAddress": "290 Churchmans Rd, New Castle, DE 19720",
       "phone": "302-516-1000",
       "countyServed": "NCC",
