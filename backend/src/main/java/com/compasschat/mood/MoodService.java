@@ -2,7 +2,7 @@ package com.compasschat.mood;
 
 import com.compasschat.common.base.BaseService;
 import com.compasschat.common.enums.MoodType;
-import com.compasschat.common.exception.ResourceNotFoundException;
+import com.compasschat.common.base.exception.ResourceNotFoundException;
 import com.compasschat.mood.ResourceRecommendationService.RecommendedResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

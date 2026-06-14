@@ -1,6 +1,6 @@
 package com.compasschat.mood;
 
-import com.compasschat.auth.JwtService;
+import com.compasschat.auth.security.JwtService;
 import com.compasschat.common.base.ApiResponse;
 import com.compasschat.mood.dto.CreateMoodRequest;
 import com.compasschat.mood.dto.MoodHistoryEntry;

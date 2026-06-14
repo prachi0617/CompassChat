@@ -1,6 +1,6 @@
 package com.compasschat.message;
 
-import com.compasschat.auth.JwtService;
+import com.compasschat.auth.security.JwtService;
 import com.compasschat.common.base.ApiResponse;
 import com.compasschat.common.enums.Role;
 import com.compasschat.message.dto.CreateMessageRequest;

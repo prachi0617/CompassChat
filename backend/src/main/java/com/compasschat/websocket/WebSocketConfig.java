@@ -1,6 +1,6 @@
 package com.compasschat.websocket;
 
-import com.compasschat.security.JwtUtil;
+import com.compasschat.auth.security.JwtService;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -29,21 +29,16 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // The wall socket where the frontend plugs in its cup:
         registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("*"); // demo only! lock this down in production
+                .setAllowedOriginPatterns("*");
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/topic");          // the megaphone lives here
-        registry.setApplicationDestinationPrefixes("/app"); // user->server mail goes here
+        registry.enableSimpleBroker("/topic");
+        registry.setApplicationDestinationPrefixes("/app");
     }
 
-    /**
-     * Wristband check at the moment someone picks up the cup-phone.
-     * The frontend sends the JWT in the CONNECT frame's headers.
-     */
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(new ChannelInterceptor() {
@@ -57,7 +52,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
                     if (header == null || !header.startsWith("Bearer ")
                             || !jwtService.isValid(header.substring(7))) {
-                        // No valid wristband? You don't get a phone.
                         throw new IllegalArgumentException("Missing or invalid token");
                     }
 

@@ -5,7 +5,7 @@ import com.compasschat.channel.dto.UpdateChannelRequest;
 import com.compasschat.common.base.BaseService;
 import com.compasschat.common.enums.ChannelType;
 import com.compasschat.common.enums.Role;
-import com.compasschat.common.exception.ResourceNotFoundException;
+import com.compasschat.common.base.exception.ResourceNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

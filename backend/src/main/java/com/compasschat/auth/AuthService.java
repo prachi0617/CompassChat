@@ -3,6 +3,7 @@ package com.compasschat.auth;
 import com.compasschat.auth.dto.AuthResponse;
 import com.compasschat.auth.dto.LoginRequest;
 import com.compasschat.auth.dto.RegisterRequest;
+import com.compasschat.auth.security.JwtService;
 import com.compasschat.user.User;
 import com.compasschat.user.UserRepository;
 import com.compasschat.common.enums.Role;

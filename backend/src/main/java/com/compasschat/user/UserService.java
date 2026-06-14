@@ -1,7 +1,7 @@
 package com.compasschat.user;
 
 import com.compasschat.common.base.BaseService;
-import com.compasschat.common.exception.ResourceNotFoundException;
+import com.compasschat.common.base.exception.ResourceNotFoundException;
 import com.compasschat.user.dto.UpdateUserRequest;
 import org.springframework.stereotype.Service;
 

@@ -1,9 +1,10 @@
 package com.compasschat.message;
 
+import com.compasschat.channel.ChannelService;
 import com.compasschat.common.base.BaseService;
+import com.compasschat.common.base.exception.ResourceNotFoundException;
 import com.compasschat.common.enums.AuditAction;
 import com.compasschat.common.enums.Role;
-import com.compasschat.common.exception.ResourceNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -18,11 +19,14 @@ public class MessageService extends BaseService<Message, UUID> {
 
     private final MessageRepository messages;
     private final MessageAuditLogRepository auditLogs;
+    private final ChannelService channelService;
 
-    public MessageService(MessageRepository messages, MessageAuditLogRepository auditLogs) {
+    public MessageService(MessageRepository messages, MessageAuditLogRepository auditLogs,
+                          ChannelService channelService) {
         super(messages, "Message");
         this.messages = messages;
         this.auditLogs = auditLogs;
+        this.channelService = channelService;
     }
 
     // ----- WRITES -----

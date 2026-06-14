@@ -1,6 +1,6 @@
 package com.compasschat.channel;
 
-import com.compasschat.auth.JwtService;
+import com.compasschat.auth.security.JwtService;
 import com.compasschat.channel.dto.*;
 import com.compasschat.common.base.ApiResponse;
 import com.compasschat.common.enums.Role;
