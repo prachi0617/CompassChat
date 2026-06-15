@@ -15,6 +15,7 @@
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/controller/AiAgentController.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/dto/ChatRequest.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/dto/ChatResponse.java
+/Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/integration/AiResourceRecommendationClient.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/integration/CivicContextClient.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/integration/FirstStepClient.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/integration/HousingContextClient.java
