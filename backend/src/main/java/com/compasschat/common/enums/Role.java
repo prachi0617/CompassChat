@@ -3,5 +3,9 @@ package com.compasschat.common.enums;
 public enum Role {
     MEMBER,
     MODERATOR,
-    ADMIN
+    ADMIN,
+    CASE_WORKER,
+    COORDINATOR,
+    CLIENT,
+    VOLUNTEER
 }

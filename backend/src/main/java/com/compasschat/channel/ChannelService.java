@@ -1,28 +1,38 @@
 package com.compasschat.channel;
 
+import com.compasschat.channel.dto.ChannelResponse;
 import com.compasschat.channel.dto.CreateChannelRequest;
 import com.compasschat.channel.dto.UpdateChannelRequest;
 import com.compasschat.common.base.BaseService;
 import com.compasschat.common.enums.ChannelType;
 import com.compasschat.common.enums.Role;
 import com.compasschat.common.base.exception.ResourceNotFoundException;
+import com.compasschat.message.MessageRepository;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ChannelService extends BaseService<Channel, UUID> {
 
     private final ChannelRepository channels;
     private final ChannelMemberRepository members;
+    private final MessageRepository messages;
 
-    public ChannelService(ChannelRepository channels, ChannelMemberRepository members) {
+    public ChannelService(ChannelRepository channels, ChannelMemberRepository members,
+                          MessageRepository messages) {
         super(channels, "Channel");
         this.channels = channels;
         this.members = members;
+        this.messages = messages;
     }
 
     // ----- CREATION -----
@@ -147,6 +157,49 @@ public class ChannelService extends BaseService<Channel, UUID> {
         if (ch.isArchived()) return false;
         if (ch.getType() == ChannelType.PUBLIC) return true;
         return members.existsByChannelIdAndUserId(channelId, userId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ChannelResponse> listAccessible(UUID userId) {
+        Set<UUID> memberChannelIds = members.findByUserId(userId).stream()
+                .map(ChannelMember::getChannelId)
+                .collect(Collectors.toSet());
+
+        List<Channel> result = new ArrayList<>();
+        // all channels the user is explicitly a member of
+        memberChannelIds.forEach(id -> channels.findById(id).ifPresent(result::add));
+        // plus any PUBLIC channels not already in the list
+        channels.findByTypeAndArchivedFalse(ChannelType.PUBLIC, Pageable.unpaged())
+                .forEach(ch -> {
+                    if (!memberChannelIds.contains(ch.getId())) {
+                        result.add(ch);
+                    }
+                });
+
+        return result.stream()
+                .map(ch -> ChannelResponse.from(ch, members.countByChannelId(ch.getId())))
+                .toList();
+    }
+
+    @Transactional
+    public void markRead(UUID channelId, UUID userId) {
+        members.findByChannelIdAndUserId(channelId, userId)
+                .ifPresent(m -> {
+                    m.markRead();
+                    members.save(m);
+                });
+    }
+
+    @Transactional(readOnly = true)
+    public long getUnreadCount(UUID channelId, UUID userId) {
+        return members.findByChannelIdAndUserId(channelId, userId)
+                .map(m -> {
+                    LocalDateTime since = m.getLastReadAt();
+                    if (since == null) return messages.countByChannelIdAndCreatedAtAfterAndDeletedFalse(
+                            channelId, LocalDateTime.MIN);
+                    return messages.countByChannelIdAndCreatedAtAfterAndDeletedFalse(channelId, since);
+                })
+                .orElse(0L);
     }
 
     // ----- helpers -----

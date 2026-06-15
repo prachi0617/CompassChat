@@ -20,7 +20,7 @@ public class WebSocketMessageController {
 
     private final MessageService messageService;
 
-    public ChatWebSocketController(MessageService messageService) {
+    public WebSocketMessageController(MessageService messageService) {
         this.messageService = messageService;
     }
 

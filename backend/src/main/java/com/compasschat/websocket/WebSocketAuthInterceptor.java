@@ -1,6 +1,6 @@
 package com.compasschat.websocket;
 
-import com.compasschat.auth.JwtService;
+import com.compasschat.auth.security.JwtService;
 import com.compasschat.channel.ChannelService;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;

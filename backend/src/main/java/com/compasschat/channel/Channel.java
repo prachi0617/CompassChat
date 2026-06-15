@@ -18,6 +18,12 @@ public class Channel extends AuditableEntity {
     @Column(nullable = false)
     private ChannelType type = ChannelType.PUBLIC;
 
+    @Column(length = 500)
+    private String purpose;
+
+    @Column
+    private String linkedSubProject;
+
     @Column(nullable = false)
     private boolean archived = false;
 
@@ -35,6 +41,10 @@ public class Channel extends AuditableEntity {
 
     public String getName() { return name; }
     public String getDescription() { return description; }
+    public String getPurpose() { return purpose; }
+    public void setPurpose(String purpose) { this.purpose = purpose; }
+    public String getLinkedSubProject() { return linkedSubProject; }
+    public void setLinkedSubProject(String linkedSubProject) { this.linkedSubProject = linkedSubProject; }
     public ChannelType getType() { return type; }
     public boolean isArchived() { return archived; }
 }

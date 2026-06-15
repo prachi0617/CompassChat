@@ -62,6 +62,22 @@ public class ChannelController {
         return ApiResponse.ok("Channel archived", null);
     }
 
+    @GetMapping
+    public ApiResponse<List<ChannelResponse>> listAccessible(HttpServletRequest http) {
+        return ApiResponse.ok(channelService.listAccessible(currentUserId(http)));
+    }
+
+    @PostMapping("/{id}/read")
+    public ApiResponse<Void> markRead(@PathVariable UUID id, HttpServletRequest http) {
+        channelService.markRead(id, currentUserId(http));
+        return ApiResponse.ok(null);
+    }
+
+    @GetMapping("/{id}/unread")
+    public ApiResponse<Long> unreadCount(@PathVariable UUID id, HttpServletRequest http) {
+        return ApiResponse.ok(channelService.getUnreadCount(id, currentUserId(http)));
+    }
+
     @GetMapping("/mine")
     public ApiResponse<List<ChannelMemberResponse>> listMine(HttpServletRequest http) {
         List<ChannelMemberResponse> mine = channelService.listMyChannels(currentUserId(http))

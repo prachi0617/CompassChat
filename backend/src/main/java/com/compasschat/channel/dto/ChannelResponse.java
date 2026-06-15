@@ -10,7 +10,9 @@ public record ChannelResponse(
         UUID id,
         String name,
         String description,
+        String purpose,
         ChannelType type,
+        String linkedSubProject,
         boolean archived,
         long memberCount,
         LocalDateTime createdAt
@@ -20,7 +22,9 @@ public record ChannelResponse(
                 ch.getId(),
                 ch.getName(),
                 ch.getDescription(),
+                ch.getPurpose(),
                 ch.getType(),
+                ch.getLinkedSubProject(),
                 ch.isArchived(),
                 memberCount,
                 ch.getCreatedAt()

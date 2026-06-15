@@ -32,6 +32,14 @@ public class ChannelMember extends AuditableEntity {
     @Column(nullable = false)
     private boolean muted = false;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private MemberRole memberRole = MemberRole.MEMBER;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private NotificationPreference notificationPreference = NotificationPreference.ALL;
+
     protected ChannelMember() {} // JPA
 
     public ChannelMember(UUID channelId, UUID userId) {
@@ -50,6 +58,10 @@ public class ChannelMember extends AuditableEntity {
     public UUID getUserId() { return userId; }
     public LocalDateTime getLastReadAt() { return lastReadAt; }
     public boolean isMuted() { return muted; }
+    public MemberRole getMemberRole() { return memberRole; }
+    public void setMemberRole(MemberRole memberRole) { this.memberRole = memberRole; }
+    public NotificationPreference getNotificationPreference() { return notificationPreference; }
+    public void setNotificationPreference(NotificationPreference notificationPreference) { this.notificationPreference = notificationPreference; }
     /** Convenience alias for createdAt, reads better at call sites. */
     public LocalDateTime getJoinedAt() { return getCreatedAt(); }
 }
