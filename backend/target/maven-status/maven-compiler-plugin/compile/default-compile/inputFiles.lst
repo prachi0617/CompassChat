@@ -54,6 +54,7 @@
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/common/utils/DateUtil.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/config/DataSeeder.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/mention/Mention.java
+/Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/mention/MentionController.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/mention/MentionRepository.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/mention/MentionService.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/mention/UserMentionedEvent.java

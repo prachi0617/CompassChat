@@ -5,6 +5,7 @@ import com.compasschat.common.base.BaseService;
 import com.compasschat.common.base.exception.ResourceNotFoundException;
 import com.compasschat.common.enums.AuditAction;
 import com.compasschat.common.enums.Role;
+import com.compasschat.mention.MentionService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,14 +23,17 @@ public class MessageService extends BaseService<Message, UUID> {
     private final MessageAuditLogRepository auditLogs;
     private final ChannelService channelService;
     private final ApplicationEventPublisher eventPublisher;
+    private final MentionService mentionService;
 
     public MessageService(MessageRepository messages, MessageAuditLogRepository auditLogs,
-                          ChannelService channelService, ApplicationEventPublisher eventPublisher) {
+                          ChannelService channelService, ApplicationEventPublisher eventPublisher,
+                          MentionService mentionService) {
         super(messages, "Message");
         this.messages = messages;
         this.auditLogs = auditLogs;
         this.channelService = channelService;
         this.eventPublisher = eventPublisher;
+        this.mentionService = mentionService;
     }
 
     // ----- WRITES -----
@@ -44,6 +48,7 @@ public class MessageService extends BaseService<Message, UUID> {
                 msg.getId(), AuditAction.CREATED, senderId,
                 null, content));
         eventPublisher.publishEvent(new MessagePostedEvent(msg.getId()));
+        mentionService.extractAndSave(msg.getId(), channelId, senderId, content);
         return msg;
     }
 
