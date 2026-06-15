@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getChannels, getMessages, sendMessage } from "../api.js";
+import AttachmentUpload from "../components/AttachmentUpload.jsx";
 
 export default function ChatPage() {
     const [channels, setChannels] = useState([]);
