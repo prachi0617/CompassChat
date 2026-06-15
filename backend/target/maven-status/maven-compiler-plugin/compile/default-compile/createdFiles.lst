@@ -4,6 +4,7 @@ com/compasschat/channel/dto/ChannelResponse.class
 com/compasschat/common/base/AuditableEntity.class
 com/compasschat/ai/service/AiIntent.class
 com/compasschat/common/enums/MoodType.class
+com/compasschat/common/enums/ReminderType.class
 com/compasschat/websocket/ChatBroadcastListener.class
 com/compasschat/message/dto/UpdateMessageRequest.class
 com/compasschat/ai/service/AiAgentService.class
@@ -11,10 +12,10 @@ com/compasschat/ai/service/AiContextBuilder.class
 com/compasschat/common/enums/AuditAction.class
 com/compasschat/message/MessagePostedEvent.class
 com/compasschat/user/UserController.class
+com/compasschat/common/enums/NotificationType.class
 com/compasschat/websocket/PresenceEventListener.class
 com/compasschat/notification/NotificationController.class
 com/compasschat/ai/integration/CivicContextClient.class
-NotificationType.class
 com/compasschat/reminder/ReminderRepository.class
 com/compasschat/common/base/exception/ResourceNotFoundException.class
 com/compasschat/reminder/ReminderController.class
@@ -86,7 +87,6 @@ com/compasschat/common/enums/PresenceStatus.class
 com/compasschat/resources/ResourcesItem.class
 com/compasschat/common/base/SubProjectClient.class
 com/compasschat/websocket/WebSocketAuthInterceptor.class
-ReminderType.class
 com/compasschat/message/MessageService.class
 com/compasschat/mood/ResourceRecommendationService$RecommendedResource.class
 com/compasschat/ai/service/AiAgentService$1.class
