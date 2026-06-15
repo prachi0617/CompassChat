@@ -2,6 +2,139 @@
     box-sizing: border-box;
 }
 
+/* ---- Login Page ---- */
+.loginPage {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.loginCard {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 40px;
+    width: 400px;
+    max-width: 90vw;
+    box-shadow: var(--shadow);
+    text-align: center;
+}
+
+.loginCard h1 {
+    margin-top: 0;
+    font-size: 32px;
+    letter-spacing: -0.04em;
+}
+
+.loginCard form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 24px;
+}
+
+.loginCard .btn {
+    margin-top: 8px;
+}
+
+.switchAuth {
+    margin-top: 18px;
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.linkBtn {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0;
+    font-size: 14px;
+}
+
+.linkBtn:hover {
+    text-decoration: underline;
+}
+
+.error {
+    color: #dc2626;
+    font-size: 14px;
+    margin: 0;
+}
+
+/* ---- Admin Tabs ---- */
+.adminTabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.adminTabs .activeTab {
+    background: linear-gradient(135deg, var(--primary-dark), #7c3aed);
+    box-shadow: 0 6px 14px rgba(109, 93, 252, 0.3);
+}
+
+/* ---- AI Chat ---- */
+.aiChatContainer {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 240px);
+    min-height: 400px;
+}
+
+.aiMessages {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px;
+}
+
+.aiMessage {
+    background: #f0f4ff;
+    border: 1px solid #dbeafe;
+}
+
+.userMessage {
+    background: #faf5ff;
+    border: 1px solid #f3e8ff;
+}
+
+/* ---- Logout ---- */
+.logoutBtn {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fca5a5;
+    padding: 12px 18px;
+    border-radius: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 24px;
+    transition: 0.2s;
+}
+
+.logoutBtn:hover {
+    background: #fca5a5;
+    color: #7f1d1d;
+}
+
+/* ---- Scrollable sidebar nav ---- */
+.sidebar nav {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+/* ---- Misc helpers ---- */
+.attachmentBox {
+    margin-top: 12px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
 :root {
     --bg: #f6f7fb;
     --card: #ffffff;

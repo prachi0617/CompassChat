@@ -1,86 +1,94 @@
 import { useEffect, useState } from "react";
-import { createMood, getMoods, sendSupportRequest } from "../api.js";
+import { getMyMoods, logMood } from "../api/moodApi.js";
+
+const MOOD_OPTIONS = [
+    "HOPEFUL",
+    "HAPPY",
+    "STRESSED",
+    "LONELY",
+    "SAD",
+    "ANXIOUS",
+    "CALM",
+    "ENERGETIC"
+];
 
 export default function MoodPage() {
     const [moods, setMoods] = useState([]);
-    const [mood, setMood] = useState("Hopeful");
+    const [moodType, setMoodType] = useState("HOPEFUL");
     const [note, setNote] = useState("");
+    const [error, setError] = useState("");
 
     useEffect(() => {
-        async function load() {
-            const data = await getMoods();
-            setMoods(data);
-        }
-
-        load();
+        loadMoods();
     }, []);
 
-    async function saveMood(event) {
-        event.preventDefault();
-
-        const saved = await createMood({
-            mood,
-            note,
-            date: new Date().toISOString().slice(0, 10)
-        });
-
-        setMoods((current) => [saved, ...current]);
-        setNote("");
+    async function loadMoods() {
+        try {
+            const page = await getMyMoods();
+            setMoods(page.content || page);
+        } catch {
+            setMoods([]);
+        }
     }
 
-    async function requestSupport() {
-        const result = await sendSupportRequest({
-            sourceProject: "KindConnect",
-            userId: 1,
-            category: "Well-Being",
-            resourceTitle: "Mood Check-In",
-            supportType: "Mood Check-In",
-            message: `The user reported feeling ${mood}. Note: ${note || "No note"}`
-        });
+    async function handleSubmit(event) {
+        event.preventDefault();
+        setError("");
 
-        alert(`Support request sent to ${result.routedChannel}`);
+        try {
+            const result = await logMood(moodType, note);
+            setMoods((current) => [result, ...current]);
+            setNote("");
+        } catch (err) {
+            setError(err.response?.data?.message || "Failed to log mood");
+        }
     }
 
     return (
         <div>
             <h1>Mood Check-In</h1>
-            <p className="muted">Track mood and request support.</p>
+            <p className="muted">
+                Log how you're feeling and track your well-being over time.
+            </p>
 
-            <form onSubmit={saveMood} className="card">
-                <h3>Today's Mood</h3>
+            <form onSubmit={handleSubmit} className="card">
+                <h3>How are you feeling?</h3>
 
-                <select value={mood} onChange={(event) => setMood(event.target.value)}>
-                    <option>Hopeful</option>
-                    <option>Happy</option>
-                    <option>Stressed</option>
-                    <option>Lonely</option>
-                    <option>Sad</option>
+                <select
+                    value={moodType}
+                    onChange={(e) => setMoodType(e.target.value)}
+                >
+                    {MOOD_OPTIONS.map((m) => (
+                        <option key={m} value={m}>
+                            {m.charAt(0) + m.slice(1).toLowerCase()}
+                        </option>
+                    ))}
                 </select>
 
                 <input
                     value={note}
-                    onChange={(event) => setNote(event.target.value)}
-                    placeholder="Add note..."
+                    onChange={(e) => setNote(e.target.value)}
+                    placeholder="Add a note (optional)..."
                 />
 
-                <div className="actions">
-                    <button className="btn" type="submit">
-                        Save Mood
-                    </button>
+                {error && <p className="error">{error}</p>}
 
-                    <button className="btn" type="button" onClick={requestSupport}>
-                        Request Support
-                    </button>
-                </div>
+                <button className="btn" type="submit">
+                    Log Mood
+                </button>
             </form>
 
-            <h2>Mood History</h2>
+            <h2>History</h2>
 
-            {moods.map((item) => (
-                <div key={item.id} className="card">
-                    <h3>{item.mood}</h3>
-                    <p>{item.date}</p>
-                    <p>{item.note}</p>
+            {moods.length === 0 && (
+                <p className="muted">No mood entries yet.</p>
+            )}
+
+            {moods.map((entry) => (
+                <div key={entry.id} className="card">
+                    <span className="badge">{entry.moodType}</span>
+                    <p>{entry.note || "No note"}</p>
+                    <small className="muted">{entry.timeAgo || entry.loggedAt}</small>
                 </div>
             ))}
         </div>

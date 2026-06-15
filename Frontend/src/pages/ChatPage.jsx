@@ -1,87 +1,68 @@
-import { useEffect, useState } from "react";
-import { getChannels, getMessages, sendMessage } from "../api.js";
-import AttachmentUpload from "../components/AttachmentUpload.jsx";
+import { useState } from "react";
 
 export default function ChatPage() {
-    const [channels, setChannels] = useState([]);
-    const [selectedChannel, setSelectedChannel] = useState(null);
-    const [messages, setMessages] = useState([]);
-    const [body, setBody] = useState("");
+    const [messages, setMessages] = useState([
+        { sender: "Anitra", text: "Can someone review the housing request?" },
+        { sender: "Prachi", text: "Yes, I will check the case notes." },
+        { sender: "AI Assistant", text: "I found 2 related resources for this client." },
+    ]);
 
-    useEffect(() => {
-        async function loadChannels() {
-            const data = await getChannels();
-            setChannels(data);
-            setSelectedChannel(data[0]);
-        }
+    const [input, setInput] = useState("");
 
-        loadChannels();
-    }, []);
+    const sendMessage = (e) => {
+        e.preventDefault();
 
-    useEffect(() => {
-        async function loadMessages() {
-            if (!selectedChannel) return;
+        if (!input.trim()) return;
 
-            const data = await getMessages(selectedChannel.id);
-            setMessages(data);
-        }
-
-        loadMessages();
-    }, [selectedChannel]);
-
-    async function handleSend(event) {
-        event.preventDefault();
-
-        if (!body.trim()) return;
-
-        const saved = await sendMessage(selectedChannel.id, body);
-        setMessages((current) => [...current, saved]);
-        setBody("");
-    }
+        setMessages([...messages, { sender: "You", text: input }]);
+        setInput("");
+    };
 
     return (
         <div>
-            <h1>CompassChat</h1>
+            <h2>Channels</h2>
+            <p className="page-subtitle">Store-and-forward team messaging.</p>
 
-            <div className="chatLayout">
-                <div className="channelList">
-                    {channels.map((channel) => (
-                        <button
-                            key={channel.id}
-                            onClick={() => setSelectedChannel(channel)}
-                            className={
-                                selectedChannel?.id === channel.id
-                                    ? "channel activeChannel"
-                                    : "channel"
-                            }
-                        >
-                            #{channel.name}
-                            <small>{channel.type}</small>
-                        </button>
-                    ))}
+            <div className="chat-layout">
+                <div className="channel-panel">
+                    <h3>Channels</h3>
+                    <button>#general</button>
+                    <button>#housing-team</button>
+                    <button>#wellbeing-team</button>
+                    <button>#youth-services-team</button>
+                    <button>#tech-support</button>
                 </div>
 
-                <div>
-                    <h2>#{selectedChannel?.name}</h2>
+                <div className="chat-panel">
+                    <div className="chat-header">
+                        <h3>#general</h3>
+                        <p>Organization-wide discussion</p>
+                    </div>
 
                     <div className="messages">
-                        {messages.map((message) => (
-                            <div key={message.id} className="message">
-                                <strong>{message.senderName || "User"}</strong>
-                                <p>{message.body}</p>
+                        {messages.map((message, index) => (
+                            <div
+                                key={index}
+                                className={
+                                    message.sender === "You"
+                                        ? "message message-right"
+                                        : "message message-left"
+                                }
+                            >
+                                <strong>{message.sender}</strong>
+                                <p>{message.text}</p>
                             </div>
                         ))}
                     </div>
 
-                    <form onSubmit={handleSend} className="messageInput">
+                    <form className="message-form" onSubmit={sendMessage}>
                         <input
-                            value={body}
-                            onChange={(event) => setBody(event.target.value)}
-                            placeholder="Type message..."
+                            type="text"
+                            placeholder="Type a message..."
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
                         />
-                        <button className="btn" type="submit">
-                            Send
-                        </button>
+                        <button type="submit">Send</button>
                     </form>
                 </div>
             </div>

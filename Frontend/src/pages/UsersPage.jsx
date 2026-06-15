@@ -1,44 +1,45 @@
+import { useEffect, useState } from "react";
+import { getUsers } from "../api/userApi.js";
+
 export default function UsersPage() {
-    const users = [
-        {
-            id: 1,
-            name: "Prachi Patel",
-            email: "prachi@example.com",
-            role: "ADMIN",
-            status: "ONLINE"
-        },
-        {
-            id: 2,
-            name: "Case Worker Sarah",
-            email: "sarah@example.com",
-            role: "CASE_WORKER",
-            status: "AWAY"
-        },
-        {
-            id: 3,
-            name: "Client Demo",
-            email: "client@example.com",
-            role: "CLIENT",
-            status: "OFFLINE"
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function load() {
+            try {
+                const data = await getUsers();
+                setUsers(data);
+            } catch {
+                setUsers([]);
+            } finally {
+                setLoading(false);
+            }
         }
-    ];
+        load();
+    }, []);
 
     return (
         <div>
             <h1>Users</h1>
-            <p className="muted">Manage users, roles, and presence status.</p>
+            <p className="muted">All registered users and their presence status.</p>
+
+            {loading && <p className="muted">Loading users...</p>}
+
+            {!loading && users.length === 0 && (
+                <p className="muted">No users found.</p>
+            )}
 
             {users.map((user) => (
                 <div key={user.id} className="card row">
                     <div>
-                        <h3>{user.name}</h3>
-                        <p>{user.email}</p>
+                        <h3>{user.username}</h3>
+                        <p>{user.email || "No email"}</p>
                         <p>
                             Role: <strong>{user.role}</strong>
                         </p>
                     </div>
-
-                    <span className="badge">{user.status}</span>
+                    <span className="badge">{user.presence}</span>
                 </div>
             ))}
         </div>

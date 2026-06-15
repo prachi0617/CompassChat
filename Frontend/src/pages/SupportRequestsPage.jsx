@@ -1,38 +1,29 @@
-import { useState } from "react";
-import ReminderCard from "../components/ReminderCard.jsx";
-import ResourceCard from "../components/ResourceCard.jsx";
-
-const demoRequests = [
-    {
-        id: 1,
-        type: "Reminder Help",
-        message: "Client needs help with an appointment reminder.",
-        routedChannel: "#case-workers",
-        status: "NEW"
-    },
-    {
-        id: 2,
-        type: "Well-Being Check",
-        message: "Client reported feeling lonely and may need follow-up.",
-        routedChannel: "#wellbeing-team",
-        status: "NEW"
-    },
-    {
-        id: 3,
-        type: "Resource Help",
-        message: "Client needs help understanding a housing resource.",
-        routedChannel: "#housing-team",
-        status: "OPEN"
-    }
-];
+import { useEffect, useState } from "react";
+import { getAdminAuditLogs } from "../api/adminApi.js";
 
 export default function SupportRequestsPage() {
-    const [requests, setRequests] = useState(demoRequests);
+    const [requests, setRequests] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function load() {
+            try {
+                // Support requests are tracked through the volunteer/integration endpoints
+                const data = await getAdminAuditLogs();
+                setRequests(typeof data === "string" ? [] : data || []);
+            } catch {
+                setRequests([]);
+            } finally {
+                setLoading(false);
+            }
+        }
+        load();
+    }, []);
 
     function markHandled(id) {
         setRequests((current) =>
-            current.map((request) =>
-                request.id === id ? { ...request, status: "HANDLED" } : request
+            current.map((r) =>
+                r.id === id ? { ...r, status: "HANDLED" } : r
             )
         );
     }
@@ -41,31 +32,27 @@ export default function SupportRequestsPage() {
         <div>
             <h1>Support Requests</h1>
             <p className="muted">
-                Reminder, mood, and resource requests appear here as CompassChat support
-                requests.
+                Reminder, mood, and resource requests from integrated projects.
             </p>
 
-            {requests.map((request) => (
-                <div key={request.id} className="card row">
-                    <div>
-                        <span className="badge">{request.status}</span>
-                        <h3>{request.type}</h3>
-                        <p>{request.message}</p>
-                        <p>
-                            Routed to: <strong>{request.routedChannel}</strong>
-                        </p>
-                    </div>
+            {loading && <p className="muted">Loading support requests...</p>}
 
-                    <button className="btn" onClick={() => markHandled(request.id)}>
+            {!loading && requests.length === 0 && (
+                <p className="muted">No support requests yet.</p>
+            )}
+
+            {requests.map((req) => (
+                <div key={req.id} className="card row">
+                    <div>
+                        <span className="badge">{req.status || "NEW"}</span>
+                        <h3>{req.requestType || req.type || "Support Request"}</h3>
+                        <p>{req.description || req.message || "No details"}</p>
+                    </div>
+                    <button className="btn" onClick={() => markHandled(req.id)}>
                         Mark Handled
                     </button>
                 </div>
             ))}
-
-            <div className="grid">
-                <ReminderCard />
-                <ResourceCard />
-            </div>
         </div>
     );
 }

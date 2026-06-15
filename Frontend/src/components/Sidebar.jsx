@@ -3,21 +3,27 @@ import { NavLink } from "react-router-dom";
 export default function Sidebar() {
     return (
         <aside className="sidebar">
-            <h1>CompassChat</h1>
-            <p>Secure communication workspace</p>
+            <div className="brand">
+                <div className="brand-icon">🧭</div>
+                <div>
+                    <h2>CompassChat</h2>
+                    <p>Community Support</p>
+                </div>
+            </div>
 
-            <nav>
-                <NavLink to="/dashboard" className={({ isActive }) => isActive ? "nav active" : "nav"}>
-                    Dashboard
-                </NavLink>
-
-                <NavLink to="/chat" className={({ isActive }) => isActive ? "nav active" : "nav"}>
-                    Channels
-                </NavLink>
-
-                <NavLink to="/support" className={({ isActive }) => isActive ? "nav active" : "nav"}>
-                    Support Requests
-                </NavLink>
+            <nav className="nav">
+                <NavLink to="/dashboard">Dashboard</NavLink>
+                <NavLink to="/chat">Channels</NavLink>
+                <NavLink to="/dm">Direct Messages</NavLink>
+                <NavLink to="/ai">AI Assistant</NavLink>
+                <NavLink to="/support">Support Requests</NavLink>
+                <NavLink to="/mood">Mood Check-In</NavLink>
+                <NavLink to="/reminders">Reminders</NavLink>
+                <NavLink to="/resources">Resources</NavLink>
+                <NavLink to="/notifications">Notifications</NavLink>
+                <NavLink to="/mentions">Mentions</NavLink>
+                <NavLink to="/users">Users</NavLink>
+                <NavLink to="/admin">Admin</NavLink>
             </nav>
         </aside>
     );

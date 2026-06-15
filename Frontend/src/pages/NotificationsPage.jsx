@@ -1,41 +1,41 @@
+import { useEffect, useState } from "react";
+import { getNotificationStatus } from "../api/notificationApi.js";
+import { getUnreadMentions } from "../api/mentionApi.js";
+
 export default function NotificationsPage() {
-    const notifications = [
-        {
-            id: 1,
-            title: "New support request",
-            message: "A housing support request was routed to #housing-team.",
-            status: "Unread"
-        },
-        {
-            id: 2,
-            title: "Channel update",
-            message: "A new message was posted in #case-workers.",
-            status: "Unread"
-        },
-        {
-            id: 3,
-            title: "Admin alert",
-            message: "A user role was updated by an admin.",
-            status: "Read"
-        }
-    ];
+    const [status, setStatus] = useState("");
+    const [mentions, setMentions] = useState([]);
+
+    useEffect(() => {
+        getNotificationStatus()
+            .then(setStatus)
+            .catch(() => setStatus("Available"));
+
+        getUnreadMentions()
+            .then(setMentions)
+            .catch(() => setMentions([]));
+    }, []);
 
     return (
         <div>
             <h1>Notifications</h1>
             <p className="muted">
-                Updates from channels, support requests, and admin activity.
+                Updates from channels, mentions, and admin activity. Module: {status}
             </p>
 
-            {notifications.map((notification) => (
-                <div key={notification.id} className="card row">
+            <h2>Unread Mentions</h2>
+            {mentions.length === 0 && (
+                <p className="muted">No unread mentions.</p>
+            )}
+            {mentions.map((mention) => (
+                <div key={mention.id} className="card row">
                     <div>
-                        <span className="badge">{notification.status}</span>
-                        <h3>{notification.title}</h3>
-                        <p>{notification.message}</p>
+                        <span className="badge">MENTION</span>
+                        <p>In channel: {mention.channelId}</p>
+                        <small className="muted">
+                            {mention.createdAt}
+                        </small>
                     </div>
-
-                    <button className="btn">View</button>
                 </div>
             ))}
         </div>

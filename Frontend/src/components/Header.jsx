@@ -2,13 +2,13 @@ export default function Header() {
     return (
         <header className="header">
             <div>
-                <h2>CompassChat</h2>
-                <p>Channels, messages, and support coordination</p>
+                <h1>CompassChat</h1>
+                <p>Messaging layer for Community Compass</p>
             </div>
 
-            <div className="userBox">
-                <strong>Workspace User</strong>
-                <span>ADMIN</span>
+            <div className="header-user">
+                <span className="status-dot"></span>
+                Demo User
             </div>
         </header>
     );
