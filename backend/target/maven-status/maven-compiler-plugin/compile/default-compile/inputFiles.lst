@@ -3,6 +3,15 @@
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/admin/AdminChannelController.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/admin/AdminController.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/admin/AdminUserController.java
+/Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/context/AIContext.java
+/Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/context/AIContextBuilder.java
+/Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/context/ContextFragment.java
+/Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/context/ContextSource.java
+/Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/context/EscalationDecision.java
+/Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/context/IntentType.java
+/Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/context/parsers/IntentParser.java
+/Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/context/parsers/KeywordRouter.java
+/Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/context/parsers/SentimentParser.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/controller/AiAgentController.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/dto/ChatRequest.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/dto/ChatResponse.java
@@ -14,8 +23,11 @@
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/service/AiAgentService.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/service/AiContextBuilder.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/service/AiIntent.java
+/Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/service/AiProvider.java
+/Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/service/GroqProvider.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/service/IntentClassifier.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/service/ResourceSearchService.java
+/Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/service/RuleBasedProvider.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/auth/AuthController.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/auth/AuthService.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/auth/dto/AuthResponse.java

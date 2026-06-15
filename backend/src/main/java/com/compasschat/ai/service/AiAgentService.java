@@ -1,66 +1,52 @@
 package com.compasschat.ai.service;
 
+import com.compasschat.ai.context.AIContext;
+import com.compasschat.ai.context.AIContextBuilder;
 import com.compasschat.ai.dto.ChatResponse;
-import com.compasschat.ai.integration.FirstStepClient;
-
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 public class AiAgentService {
 
-    private final IntentClassifier classifier;
+    private final AIContextBuilder contextBuilder;
+    private final GroqProvider groqProvider;
+    private final RuleBasedProvider ruleBasedProvider;
 
-    private final FirstStepClient firstStepClient;
-
-    public AiAgentService(
-            IntentClassifier classifier,
-            FirstStepClient firstStepClient) {
-
-        this.classifier = classifier;
-        this.firstStepClient = firstStepClient;
+    public AiAgentService(AIContextBuilder contextBuilder,
+                          GroqProvider groqProvider,
+                          RuleBasedProvider ruleBasedProvider) {
+        this.contextBuilder = contextBuilder;
+        this.groqProvider = groqProvider;
+        this.ruleBasedProvider = ruleBasedProvider;
     }
 
-    public ChatResponse processMessage(String message) {
+    public ChatResponse processMessage(String message, UUID userId) {
+        AIContext context = contextBuilder.build(message, userId);
 
-        AiIntent intent =
-                classifier.classify(message);
+        // Escalation short-circuits AI call — no need to spend tokens
+        if (context.getEscalation().escalate()) {
+            return new ChatResponse(
+                    ruleBasedProvider.completeFromContext(context),
+                    context.getIntent().name(),
+                    true
+            );
+        }
 
-        return switch (intent) {
+        String responseText = generateResponse(context, message);
+        return new ChatResponse(responseText, context.getIntent().name(), false);
+    }
 
-            case RESOURCE_SEARCH ->
-                    new ChatResponse(
-                            "I found community resources that may help.",
-                            intent.name(),
-                            false
-                    );
-
-            case REMINDER ->
-                    new ChatResponse(
-                            "I can help create a reminder.",
-                            intent.name(),
-                            false
-                    );
-
-            case MOOD ->
-                    new ChatResponse(
-                            "Thank you for sharing how you feel. Would you like to talk with a live agent?",
-                            intent.name(),
-                            true
-                    );
-
-            case LIVE_AGENT ->
-                    new ChatResponse(
-                            "Connecting you to a live agent.",
-                            intent.name(),
-                            true
-                    );
-
-            default ->
-                    new ChatResponse(
-                            "Can you tell me more about what you need?",
-                            intent.name(),
-                            false
-                    );
-        };
+    private String generateResponse(AIContext context, String message) {
+        if (groqProvider.isEnabled()) {
+            try {
+                String systemPrompt = contextBuilder.buildSystemPrompt(context);
+                return groqProvider.complete(systemPrompt, message);
+            } catch (Exception e) {
+                // Fall through to rule-based on any Groq failure
+            }
+        }
+        return ruleBasedProvider.completeFromContext(context);
     }
 }

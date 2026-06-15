@@ -3,32 +3,38 @@ package com.compasschat.ai.controller;
 import com.compasschat.ai.dto.ChatRequest;
 import com.compasschat.ai.dto.ChatResponse;
 import com.compasschat.ai.service.AiAgentService;
-
+import com.compasschat.auth.security.JwtService;
 import com.compasschat.common.base.ApiResponse;
-
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/ai")
 public class AiAgentController {
 
     private final AiAgentService aiAgentService;
+    private final JwtService jwtService;
 
-    public AiAgentController(
-            AiAgentService aiAgentService) {
-
+    public AiAgentController(AiAgentService aiAgentService, JwtService jwtService) {
         this.aiAgentService = aiAgentService;
+        this.jwtService = jwtService;
     }
 
     @PostMapping("/chat")
-    public ApiResponse<ChatResponse> chat(
-            @RequestBody ChatRequest request) {
+    public ApiResponse<ChatResponse> chat(@RequestBody ChatRequest request,
+                                          HttpServletRequest http) {
+        UUID userId = jwtService.getUserId(extractToken(http));
+        return ApiResponse.ok(aiAgentService.processMessage(request.message(), userId));
+    }
 
-        ChatResponse response =
-                aiAgentService.processMessage(
-                        request.message()
-                );
-
-        return ApiResponse.ok(response);
+    private String extractToken(HttpServletRequest http) {
+        String header = http.getHeader("Authorization");
+        if (header == null || !header.startsWith("Bearer ")) {
+            throw new AccessDeniedException("Missing token");
+        }
+        return header.substring(7);
     }
 }
