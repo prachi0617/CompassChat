@@ -1,6 +1,6 @@
 package com.compasschat.admin;
 
-import com.compasschat.common.response.ApiResponse;
+import com.compasschat.common.base.ApiResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,9 +11,6 @@ public class AdminAuditController {
 
     @GetMapping
     public ApiResponse<String> audit() {
-
-        return ApiResponse.success(
-                "Audit reporting placeholder"
-        );
+        return ApiResponse.ok("Audit reporting placeholder");
     }
 }
