@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Community Compass Java Service</a> &gt; <a href="index.source.html" class="el_package">com.compasschat.auth</a> &gt; <span class="el_source">AuthService.java</span></div><h1>AuthService.java</h1><pre class="source lang-java linenums">package com.compasschat.auth;
+
+import com.compasschat.auth.dto.AuthResponse;
+import com.compasschat.auth.dto.LoginRequest;
+import com.compasschat.auth.dto.RegisterRequest;
+import com.compasschat.auth.security.JwtService;
+import com.compasschat.user.User;
+import com.compasschat.user.UserRepository;
+import com.compasschat.common.enums.Role;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+@Service
+public class AuthService {
+
+    private final UserRepository users;
+    private final PasswordEncoder encoder;  // the blender
+    private final JwtService jwtService;    // the wristband machine
+
+<span class="nc" id="L21">    public AuthService(UserRepository users, PasswordEncoder encoder, JwtService jwtService) {</span>
+<span class="nc" id="L22">        this.users = users;</span>
+<span class="nc" id="L23">        this.encoder = encoder;</span>
+<span class="nc" id="L24">        this.jwtService = jwtService;</span>
+<span class="nc" id="L25">    }</span>
+
+    /** Rule book for joining the club. */
+    public AuthResponse register(RegisterRequest req) {
+<span class="nc bnc" id="L29" title="All 2 branches missed.">        if (users.findByUsername(req.username()).isPresent()) {</span>
+<span class="nc" id="L30">            throw new IllegalStateException(&quot;That username is taken&quot;);</span>
+        }
+
+<span class="nc" id="L33">        User user = new User(req.username(), encoder.encode(req.password()), Role.MEMBER);</span>
+<span class="nc" id="L34">        user = users.save(user); // save returns the card WITH its new UUID filled in</span>
+
+<span class="nc" id="L36">        String token = jwtService.generateToken(user.getId(), user.getUsername(), user.getRole().name());</span>
+<span class="nc" id="L37">        return new AuthResponse(token, user.getId(), user.getUsername(), user.getRole().name());</span>
+    }
+
+    /** Rule book for getting in the door. */
+    public AuthResponse login(LoginRequest req) {
+        // Same vague error for &quot;no such user&quot; AND &quot;wrong password&quot;,
+        // so snoopers can't discover which usernames exist.
+<span class="nc" id="L44">        User user = users.findByUsername(req.username())</span>
+<span class="nc" id="L45">                .orElseThrow(() -&gt; new BadCredentialsException(&quot;Invalid username or password&quot;));</span>
+
+<span class="nc bnc" id="L47" title="All 2 branches missed.">        if (!encoder.matches(req.password(), user.getPasswordHash())) {</span>
+<span class="nc" id="L48">            throw new BadCredentialsException(&quot;Invalid username or password&quot;);</span>
+        }
+
+<span class="nc" id="L51">        String token = jwtService.generateToken(user.getId(), user.getUsername(), user.getRole().name());</span>
+<span class="nc" id="L52">        return new AuthResponse(token, user.getId(), user.getUsername(), user.getRole().name());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

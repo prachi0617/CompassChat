@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WebSocketAuthInterceptor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Community Compass Java Service</a> &gt; <a href="index.source.html" class="el_package">com.compasschat.websocket</a> &gt; <span class="el_source">WebSocketAuthInterceptor.java</span></div><h1>WebSocketAuthInterceptor.java</h1><pre class="source lang-java linenums">package com.compasschat.websocket;
+
+import com.compasschat.auth.security.JwtService;
+import com.compasschat.channel.ChannelService;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.MessageHeaderAccessor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.UUID;
+
+@Component
+public class WebSocketAuthInterceptor implements ChannelInterceptor {
+
+    private final JwtService jwtService;
+    private final ChannelService channelService;
+
+<span class="nc" id="L23">    public WebSocketAuthInterceptor(JwtService jwtService, ChannelService channelService) {</span>
+<span class="nc" id="L24">        this.jwtService = jwtService;</span>
+<span class="nc" id="L25">        this.channelService = channelService;</span>
+<span class="nc" id="L26">    }</span>
+
+    @Override
+    public Message&lt;?&gt; preSend(Message&lt;?&gt; message, MessageChannel channel) {
+<span class="nc" id="L30">        StompHeaderAccessor accessor =</span>
+<span class="nc" id="L31">                MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);</span>
+<span class="nc bnc" id="L32" title="All 4 branches missed.">        if (accessor == null || accessor.getCommand() == null) return message;</span>
+
+<span class="nc bnc" id="L34" title="All 4 branches missed.">        switch (accessor.getCommand()) {</span>
+<span class="nc" id="L35">            case CONNECT   -&gt; handleConnect(accessor);</span>
+<span class="nc" id="L36">            case SUBSCRIBE -&gt; handleSubscribe(accessor);</span>
+<span class="nc" id="L37">            case SEND      -&gt; handleSend(accessor);</span>
+            default        -&gt; { /* HEARTBEAT, DISCONNECT, ACK: nothing */ }
+        }
+<span class="nc" id="L40">        return message;</span>
+    }
+
+    private void handleConnect(StompHeaderAccessor accessor) {
+<span class="nc" id="L44">        String header = accessor.getFirstNativeHeader(&quot;Authorization&quot;);</span>
+<span class="nc bnc" id="L45" title="All 4 branches missed.">        if (header == null || !header.startsWith(&quot;Bearer &quot;)) {</span>
+<span class="nc" id="L46">            throw new IllegalArgumentException(&quot;Missing or malformed Authorization header&quot;);</span>
+        }
+<span class="nc" id="L48">        String token = header.substring(7);</span>
+<span class="nc bnc" id="L49" title="All 2 branches missed.">        if (!jwtService.isValid(token)) {</span>
+<span class="nc" id="L50">            throw new IllegalArgumentException(&quot;Invalid or expired token&quot;);</span>
+        }
+
+<span class="nc" id="L53">        UUID userId = jwtService.getUserId(token);</span>
+<span class="nc" id="L54">        String username = jwtService.getUsername(token);</span>
+<span class="nc" id="L55">        String role = jwtService.getRole(token);</span>
+
+<span class="nc" id="L57">        accessor.setUser(new UsernamePasswordAuthenticationToken(</span>
+<span class="nc" id="L58">                new StompPrincipal(userId, username),</span>
+<span class="nc" id="L59">                null,</span>
+<span class="nc" id="L60">                List.of(new SimpleGrantedAuthority(&quot;ROLE_&quot; + role))));</span>
+<span class="nc" id="L61">    }</span>
+
+    private void handleSubscribe(StompHeaderAccessor accessor) {
+<span class="nc" id="L64">        UUID channelId = parseChannelTopic(accessor.getDestination());</span>
+<span class="nc bnc" id="L65" title="All 2 branches missed.">        if (channelId == null) return; // not a channel topic - let it through</span>
+
+<span class="nc bnc" id="L67" title="All 2 branches missed.">        if (!channelService.canUserAccess(channelId, currentUserId(accessor))) {</span>
+<span class="nc" id="L68">            throw new IllegalArgumentException(&quot;Not allowed to subscribe to this channel&quot;);</span>
+        }
+<span class="nc" id="L70">    }</span>
+
+    private void handleSend(StompHeaderAccessor accessor) {
+<span class="nc" id="L73">        UUID channelId = parseAppChannel(accessor.getDestination());</span>
+<span class="nc bnc" id="L74" title="All 2 branches missed.">        if (channelId == null) return;</span>
+
+<span class="nc bnc" id="L76" title="All 2 branches missed.">        if (!channelService.canUserAccess(channelId, currentUserId(accessor))) {</span>
+<span class="nc" id="L77">            throw new IllegalArgumentException(&quot;Not allowed to send to this channel&quot;);</span>
+        }
+<span class="nc" id="L79">    }</span>
+
+    private UUID currentUserId(StompHeaderAccessor accessor) {
+<span class="nc bnc" id="L82" title="All 2 branches missed.">        if (accessor.getUser() instanceof UsernamePasswordAuthenticationToken auth</span>
+<span class="nc bnc" id="L83" title="All 2 branches missed.">                &amp;&amp; auth.getPrincipal() instanceof StompPrincipal p) {</span>
+<span class="nc" id="L84">            return p.userId();</span>
+        }
+<span class="nc" id="L86">        throw new IllegalArgumentException(&quot;Not authenticated&quot;);</span>
+    }
+
+    /** Matches /topic/channels/{uuid} and /topic/channels/{uuid}/typing */
+    private UUID parseChannelTopic(String destination) {
+<span class="nc bnc" id="L91" title="All 4 branches missed.">        if (destination == null || !destination.startsWith(&quot;/topic/channels/&quot;)) return null;</span>
+<span class="nc" id="L92">        String tail = destination.substring(&quot;/topic/channels/&quot;.length()).split(&quot;/&quot;)[0];</span>
+<span class="nc" id="L93">        try { return UUID.fromString(tail); } catch (Exception e) { return null; }</span>
+    }
+
+    /** Matches /app/channels/{uuid}/messages and /app/channels/{uuid}/typing */
+    private UUID parseAppChannel(String destination) {
+<span class="nc bnc" id="L98" title="All 4 branches missed.">        if (destination == null || !destination.startsWith(&quot;/app/channels/&quot;)) return null;</span>
+<span class="nc" id="L99">        String tail = destination.substring(&quot;/app/channels/&quot;.length()).split(&quot;/&quot;)[0];</span>
+<span class="nc" id="L100">        try { return UUID.fromString(tail); } catch (Exception e) { return null; }</span>
+    }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

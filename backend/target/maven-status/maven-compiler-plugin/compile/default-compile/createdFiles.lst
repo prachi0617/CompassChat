@@ -6,6 +6,7 @@ com/compasschat/common/base/AuditableEntity.class
 com/compasschat/ai/service/AiIntent.class
 com/compasschat/common/enums/MoodType.class
 com/compasschat/common/enums/ReminderType.class
+application.properties
 com/compasschat/websocket/ChatBroadcastListener.class
 com/compasschat/message/dto/UpdateMessageRequest.class
 com/compasschat/ai/service/AiAgentService.class
@@ -65,6 +66,7 @@ com/compasschat/auth/AuthController.class
 com/compasschat/ai/context/EscalationDecision.class
 com/compasschat/common/base/BaseService.class
 com/compasschat/ai/context/AIContext.class
+data/news_schema.json
 com/compasschat/mood/MoodRepository.class
 com/compasschat/resources/ResourcesCacheService.class
 com/compasschat/admin/AdminAuditController.class
@@ -84,6 +86,7 @@ com/compasschat/channel/NotificationPreference.class
 com/compasschat/ai/context/AIContextBuilder.class
 com/compasschat/mention/dto/MentionResponse.class
 com/compasschat/message/MessageAuditLog.class
+data/Service_Directory_cleaned.json
 com/compasschat/mention/Mention.class
 com/compasschat/mood/dto/MoodHistoryEntry.class
 com/compasschat/user/dto/UserResponse.class

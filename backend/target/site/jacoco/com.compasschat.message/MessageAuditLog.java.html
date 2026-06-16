@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MessageAuditLog.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Community Compass Java Service</a> &gt; <a href="index.source.html" class="el_package">com.compasschat.message</a> &gt; <span class="el_source">MessageAuditLog.java</span></div><h1>MessageAuditLog.java</h1><pre class="source lang-java linenums">package com.compasschat.message;
+
+import com.compasschat.common.base.AuditableEntity;
+import com.compasschat.common.enums.AuditAction;
+import jakarta.persistence.*;
+
+import java.util.UUID;
+
+@Entity
+@Table(
+        name = &quot;message_audit_logs&quot;,
+        indexes = {
+                @Index(name = &quot;idx_audit_message&quot;, columnList = &quot;messageId&quot;),
+                @Index(name = &quot;idx_audit_performed_by&quot;, columnList = &quot;performedBy&quot;)
+        }
+)
+public class MessageAuditLog extends AuditableEntity {
+
+    @Column(nullable = false)
+    private UUID messageId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 16)
+    private AuditAction action;
+
+    /** Whoever did the deed - the user id from the JWT. */
+    @Column(nullable = false)
+    private UUID performedBy;
+
+    @Column(length = 4000)
+    private String previousContent;
+
+    @Column(length = 4000)
+    private String newContent;
+
+<span class="nc" id="L36">    protected MessageAuditLog() {} // JPA</span>
+
+<span class="nc" id="L38">    public MessageAuditLog(UUID messageId, AuditAction action, UUID performedBy,</span>
+                           String previousContent, String newContent) {
+<span class="nc" id="L40">        this.messageId = messageId;</span>
+<span class="nc" id="L41">        this.action = action;</span>
+<span class="nc" id="L42">        this.performedBy = performedBy;</span>
+<span class="nc" id="L43">        this.previousContent = previousContent;</span>
+<span class="nc" id="L44">        this.newContent = newContent;</span>
+<span class="nc" id="L45">    }</span>
+
+<span class="nc" id="L47">    public UUID getMessageId() { return messageId; }</span>
+<span class="nc" id="L48">    public AuditAction getAction() { return action; }</span>
+<span class="nc" id="L49">    public UUID getPerformedBy() { return performedBy; }</span>
+<span class="nc" id="L50">    public String getPreviousContent() { return previousContent; }</span>
+<span class="nc" id="L51">    public String getNewContent() { return newContent; }</span>
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

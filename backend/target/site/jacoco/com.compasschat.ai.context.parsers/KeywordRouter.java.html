@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>KeywordRouter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Community Compass Java Service</a> &gt; <a href="index.source.html" class="el_package">com.compasschat.ai.context.parsers</a> &gt; <span class="el_source">KeywordRouter.java</span></div><h1>KeywordRouter.java</h1><pre class="source lang-java linenums">package com.compasschat.ai.context.parsers;
+
+import com.compasschat.ai.context.ContextFragment;
+import com.compasschat.ai.context.ContextSource;
+import org.springframework.stereotype.Component;
+
+@Component
+<span class="nc" id="L8">public class KeywordRouter {</span>
+
+    /**
+     * Last-resort router: produces a generic resource fragment when
+     * IntentParser returns UNKNOWN. Always returns a non-null fragment
+     * so AIContextBuilder always has something to send the provider.
+     */
+    public ContextFragment route(String message) {
+<span class="nc" id="L16">        String input = message.toLowerCase();</span>
+
+<span class="nc bnc" id="L18" title="All 2 branches missed.">        if (containsAny(input, &quot;mental health&quot;, &quot;counseling&quot;, &quot;therapy&quot;, &quot;wellbeing&quot;, &quot;well-being&quot;))</span>
+<span class="nc" id="L19">            return new ContextFragment(ContextSource.WELLBEING,</span>
+<span class="nc" id="L20">                    &quot;Mental health and counseling services are available in the community.&quot;);</span>
+
+<span class="nc bnc" id="L22" title="All 2 branches missed.">        if (containsAny(input, &quot;child&quot;, &quot;family&quot;, &quot;parent&quot;, &quot;youth&quot;, &quot;teen&quot;, &quot;kid&quot;))</span>
+<span class="nc" id="L23">            return new ContextFragment(ContextSource.YOUTH,</span>
+<span class="nc" id="L24">                    &quot;Youth and family support programs are available.&quot;);</span>
+
+<span class="nc bnc" id="L26" title="All 2 branches missed.">        if (containsAny(input, &quot;legal&quot;, &quot;rights&quot;, &quot;court&quot;, &quot;attorney&quot;, &quot;advocate&quot;))</span>
+<span class="nc" id="L27">            return new ContextFragment(ContextSource.CIVIC,</span>
+<span class="nc" id="L28">                    &quot;Legal aid and advocacy resources are available in Delaware.&quot;);</span>
+
+<span class="nc" id="L30">        return new ContextFragment(ContextSource.RESOURCE_DIRECTORY,</span>
+<span class="nc" id="L31">                &quot;General community resources are available. Ask about housing, food, healthcare, or youth services.&quot;);</span>
+    }
+
+    private boolean containsAny(String input, String... keywords) {
+<span class="nc bnc" id="L35" title="All 2 branches missed.">        for (String kw : keywords) {</span>
+<span class="nc bnc" id="L36" title="All 2 branches missed.">            if (input.contains(kw)) return true;</span>
+        }
+<span class="nc" id="L38">        return false;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

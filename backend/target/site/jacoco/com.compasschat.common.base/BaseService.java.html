@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BaseService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Community Compass Java Service</a> &gt; <a href="index.source.html" class="el_package">com.compasschat.common.base</a> &gt; <span class="el_source">BaseService.java</span></div><h1>BaseService.java</h1><pre class="source lang-java linenums">package com.compasschat.common.base;
+
+import com.compasschat.common.base.exception.ResourceNotFoundException;
+
+import java.util.List;
+
+public abstract class BaseService&lt;T extends AuditableEntity, ID&gt; {
+
+    protected final BaseRepository&lt;T, ID&gt; repository;
+
+    protected final String entityName;
+
+<span class="nc" id="L13">    protected BaseService(BaseRepository&lt;T, ID&gt; repository, String entityName) {</span>
+<span class="nc" id="L14">        this.repository = repository;</span>
+<span class="nc" id="L15">        this.entityName = entityName;</span>
+<span class="nc" id="L16">    }</span>
+
+    public T findById(ID id) {
+<span class="nc" id="L19">        return repository.findById(id)</span>
+<span class="nc" id="L20">                .orElseThrow(() -&gt; new ResourceNotFoundException(entityName, String.valueOf(id)));</span>
+    }
+
+    public List&lt;T&gt; findAll() {
+<span class="nc" id="L24">        return repository.findAll();</span>
+    }
+
+    public T save(T entity) {
+<span class="nc" id="L28">        return repository.save(entity);</span>
+    }
+
+    public void delete(ID id) {
+<span class="nc bnc" id="L32" title="All 2 branches missed.">        if (!repository.existsById(id)) {</span>
+<span class="nc" id="L33">            throw new ResourceNotFoundException(entityName, String.valueOf(id));</span>
+        }
+<span class="nc" id="L35">        repository.deleteById(id);</span>
+<span class="nc" id="L36">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

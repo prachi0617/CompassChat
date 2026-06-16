@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ChannelService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Community Compass Java Service</a> &gt; <a href="index.source.html" class="el_package">com.compasschat.channel</a> &gt; <span class="el_source">ChannelService.java</span></div><h1>ChannelService.java</h1><pre class="source lang-java linenums">package com.compasschat.channel;
+
+import com.compasschat.channel.dto.ChannelResponse;
+import com.compasschat.channel.dto.CreateChannelRequest;
+import com.compasschat.channel.dto.UpdateChannelRequest;
+import com.compasschat.common.base.BaseService;
+import com.compasschat.common.enums.ChannelType;
+import com.compasschat.common.enums.Role;
+import com.compasschat.common.base.exception.ResourceNotFoundException;
+import com.compasschat.message.MessageRepository;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@Service
+public class ChannelService extends BaseService&lt;Channel, UUID&gt; {
+
+    private final ChannelRepository channels;
+    private final ChannelMemberRepository members;
+    private final MessageRepository messages;
+
+    public ChannelService(ChannelRepository channels, ChannelMemberRepository members,
+                          MessageRepository messages) {
+<span class="nc" id="L32">        super(channels, &quot;Channel&quot;);</span>
+<span class="nc" id="L33">        this.channels = channels;</span>
+<span class="nc" id="L34">        this.members = members;</span>
+<span class="nc" id="L35">        this.messages = messages;</span>
+<span class="nc" id="L36">    }</span>
+
+    // ----- CREATION -----
+
+    @Transactional
+    public Channel create(CreateChannelRequest req, UUID creatorId) {
+<span class="nc bnc" id="L42" title="All 2 branches missed.">        if (channels.existsByName(req.name())) {</span>
+<span class="nc" id="L43">            throw new IllegalStateException(&quot;Channel name '&quot; + req.name() + &quot;' is already taken&quot;);</span>
+        }
+
+<span class="nc" id="L46">        Channel channel = new Channel(req.name(), req.description(), req.type());</span>
+<span class="nc" id="L47">        channel.setCreatedBy(creatorId);</span>
+<span class="nc" id="L48">        channel = channels.save(channel);</span>
+
+<span class="nc" id="L50">        members.save(new ChannelMember(channel.getId(), creatorId));</span>
+
+<span class="nc" id="L52">        return channel;</span>
+    }
+
+    // ----- UPDATES -----
+
+    @Transactional
+    public Channel update(UUID channelId, UpdateChannelRequest req, UUID requesterId, Role role) {
+<span class="nc" id="L59">        Channel ch = findById(channelId);</span>
+<span class="nc" id="L60">        requireChannelAdmin(ch, requesterId, role);</span>
+
+<span class="nc bnc" id="L62" title="All 6 branches missed.">        if (req.name() != null &amp;&amp; !req.name().isBlank() &amp;&amp; !req.name().equals(ch.getName())) {</span>
+<span class="nc bnc" id="L63" title="All 2 branches missed.">            if (channels.existsByName(req.name())) {</span>
+<span class="nc" id="L64">                throw new IllegalStateException(&quot;Channel name '&quot; + req.name() + &quot;' is already taken&quot;);</span>
+            }
+<span class="nc" id="L66">            ch.rename(req.name());</span>
+        }
+<span class="nc bnc" id="L68" title="All 2 branches missed.">        if (req.description() != null) {</span>
+<span class="nc" id="L69">            ch.updateDescription(req.description());</span>
+        }
+<span class="nc" id="L71">        return ch;</span>
+    }
+
+    @Transactional
+    public void archive(UUID channelId, UUID requesterId, Role role) {
+<span class="nc" id="L76">        Channel ch = findById(channelId);</span>
+<span class="nc" id="L77">        requireChannelAdmin(ch, requesterId, role);</span>
+<span class="nc" id="L78">        ch.archive();</span>
+<span class="nc" id="L79">    }</span>
+
+    // ----- MEMBERSHIP -----
+
+    @Transactional
+    public ChannelMember addMember(UUID channelId, UUID userToAdd, UUID requesterId) {
+<span class="nc" id="L85">        Channel ch = findById(channelId);</span>
+<span class="nc bnc" id="L86" title="All 2 branches missed.">        if (ch.isArchived()) {</span>
+<span class="nc" id="L87">            throw new IllegalStateException(&quot;Cannot add members to an archived channel&quot;);</span>
+        }
+
+<span class="nc bnc" id="L90" title="All 4 branches missed.">        switch (ch.getType()) {</span>
+<span class="nc" id="L91">            case DIRECT -&gt; throw new AccessDeniedException(&quot;Direct message channels are closed&quot;);</span>
+            case PRIVATE -&gt; {
+<span class="nc bnc" id="L93" title="All 2 branches missed.">                if (!members.existsByChannelIdAndUserId(channelId, requesterId)) {</span>
+<span class="nc" id="L94">                    throw new AccessDeniedException(&quot;Only members can invite to a private channel&quot;);</span>
+                }
+            }
+            case PUBLIC -&gt; {
+                // Self-join is always fine; inviting someone else requires membership
+<span class="nc bnc" id="L99" title="All 2 branches missed.">                if (!userToAdd.equals(requesterId)</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">                        &amp;&amp; !members.existsByChannelIdAndUserId(channelId, requesterId)) {</span>
+<span class="nc" id="L101">                    throw new AccessDeniedException(&quot;Join the channel before inviting others&quot;);</span>
+                }
+            }
+        }
+
+        // Idempotent: already a member? return the existing row.
+<span class="nc" id="L107">        return members.findByChannelIdAndUserId(channelId, userToAdd)</span>
+<span class="nc" id="L108">                .orElseGet(() -&gt; members.save(new ChannelMember(channelId, userToAdd)));</span>
+    }
+
+    @Transactional
+    public void removeMember(UUID channelId, UUID userToRemove, UUID requesterId, Role role) {
+<span class="nc" id="L113">        ChannelMember m = members.findByChannelIdAndUserId(channelId, userToRemove)</span>
+<span class="nc" id="L114">                .orElseThrow(() -&gt; new ResourceNotFoundException(</span>
+<span class="nc" id="L115">                        &quot;ChannelMember&quot;, channelId + &quot;/&quot; + userToRemove));</span>
+
+        // Self-leave is always allowed; otherwise need staff or channel admin.
+<span class="nc" id="L118">        boolean isSelf = userToRemove.equals(requesterId);</span>
+<span class="nc bnc" id="L119" title="All 4 branches missed.">        boolean isStaff = role == Role.ADMIN || role == Role.MODERATOR;</span>
+<span class="nc" id="L120">        Channel ch = findById(channelId);</span>
+<span class="nc" id="L121">        boolean isChannelCreator = requesterId.equals(ch.getCreatedBy());</span>
+<span class="nc bnc" id="L122" title="All 6 branches missed.">        if (!isSelf &amp;&amp; !isStaff &amp;&amp; !isChannelCreator) {</span>
+<span class="nc" id="L123">            throw new AccessDeniedException(&quot;Not allowed to remove that member&quot;);</span>
+        }
+
+<span class="nc" id="L126">        members.deleteById(m.getId());</span>
+<span class="nc" id="L127">    }</span>
+
+    // ----- READS -----
+
+    @Transactional(readOnly = true)
+    public List&lt;ChannelMember&gt; listMembers(UUID channelId) {
+<span class="nc bnc" id="L133" title="All 2 branches missed.">        if (!channels.existsById(channelId)) {</span>
+<span class="nc" id="L134">            throw new ResourceNotFoundException(&quot;Channel&quot;, channelId.toString());</span>
+        }
+<span class="nc" id="L136">        return members.findByChannelId(channelId);</span>
+    }
+
+    @Transactional(readOnly = true)
+    public List&lt;ChannelMember&gt; listMyChannels(UUID userId) {
+<span class="nc" id="L141">        return members.findByUserId(userId);</span>
+    }
+
+    @Transactional(readOnly = true)
+    public long getMemberCount(UUID channelId) {
+<span class="nc" id="L146">        return members.countByChannelId(channelId);</span>
+    }
+
+    /**
+     * THE authorization gate other services use. Currently public
+     * because MessageService needs to call it; in larger codebases
+     * this would be its own AuthorizationService.
+     */
+    @Transactional(readOnly = true)
+    public boolean canUserAccess(UUID channelId, UUID userId) {
+<span class="nc" id="L156">        Channel ch = findById(channelId);</span>
+<span class="nc bnc" id="L157" title="All 2 branches missed.">        if (ch.isArchived()) return false;</span>
+<span class="nc bnc" id="L158" title="All 2 branches missed.">        if (ch.getType() == ChannelType.PUBLIC) return true;</span>
+<span class="nc" id="L159">        return members.existsByChannelIdAndUserId(channelId, userId);</span>
+    }
+
+    @Transactional(readOnly = true)
+    public List&lt;ChannelResponse&gt; listAccessible(UUID userId) {
+<span class="nc" id="L164">        Set&lt;UUID&gt; memberChannelIds = members.findByUserId(userId).stream()</span>
+<span class="nc" id="L165">                .map(ChannelMember::getChannelId)</span>
+<span class="nc" id="L166">                .collect(Collectors.toSet());</span>
+
+<span class="nc" id="L168">        List&lt;Channel&gt; result = new ArrayList&lt;&gt;();</span>
+        // all channels the user is explicitly a member of
+<span class="nc" id="L170">        memberChannelIds.forEach(id -&gt; channels.findById(id).ifPresent(result::add));</span>
+        // plus any PUBLIC channels not already in the list
+<span class="nc" id="L172">        channels.findByTypeAndArchivedFalse(ChannelType.PUBLIC, Pageable.unpaged())</span>
+<span class="nc" id="L173">                .forEach(ch -&gt; {</span>
+<span class="nc bnc" id="L174" title="All 2 branches missed.">                    if (!memberChannelIds.contains(ch.getId())) {</span>
+<span class="nc" id="L175">                        result.add(ch);</span>
+                    }
+<span class="nc" id="L177">                });</span>
+
+<span class="nc" id="L179">        return result.stream()</span>
+<span class="nc" id="L180">                .map(ch -&gt; ChannelResponse.from(ch, members.countByChannelId(ch.getId())))</span>
+<span class="nc" id="L181">                .toList();</span>
+    }
+
+    @Transactional
+    public void markRead(UUID channelId, UUID userId) {
+<span class="nc" id="L186">        members.findByChannelIdAndUserId(channelId, userId)</span>
+<span class="nc" id="L187">                .ifPresent(m -&gt; {</span>
+<span class="nc" id="L188">                    m.markRead();</span>
+<span class="nc" id="L189">                    members.save(m);</span>
+<span class="nc" id="L190">                });</span>
+<span class="nc" id="L191">    }</span>
+
+    @Transactional(readOnly = true)
+    public long getUnreadCount(UUID channelId, UUID userId) {
+<span class="nc" id="L195">        return members.findByChannelIdAndUserId(channelId, userId)</span>
+<span class="nc" id="L196">                .map(m -&gt; {</span>
+<span class="nc" id="L197">                    LocalDateTime since = m.getLastReadAt();</span>
+<span class="nc bnc" id="L198" title="All 2 branches missed.">                    if (since == null) return messages.countByChannelIdAndCreatedAtAfterAndDeletedFalse(</span>
+<span class="nc" id="L199">                            channelId, LocalDateTime.MIN);</span>
+<span class="nc" id="L200">                    return messages.countByChannelIdAndCreatedAtAfterAndDeletedFalse(channelId, since);</span>
+                })
+<span class="nc" id="L202">                .orElse(0L);</span>
+    }
+
+    // ----- helpers -----
+
+    private void requireChannelAdmin(Channel ch, UUID requesterId, Role role) {
+<span class="nc" id="L208">        boolean isCreator = requesterId.equals(ch.getCreatedBy());</span>
+<span class="nc bnc" id="L209" title="All 4 branches missed.">        boolean isStaff = role == Role.ADMIN || role == Role.MODERATOR;</span>
+<span class="nc bnc" id="L210" title="All 4 branches missed.">        if (!isCreator &amp;&amp; !isStaff) {</span>
+<span class="nc" id="L211">            throw new AccessDeniedException(&quot;Not allowed to modify this channel&quot;);</span>
+        }
+<span class="nc" id="L213">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

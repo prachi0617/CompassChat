@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WebSocketMessageController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Community Compass Java Service</a> &gt; <a href="index.source.html" class="el_package">com.compasschat.websocket</a> &gt; <span class="el_source">WebSocketMessageController.java</span></div><h1>WebSocketMessageController.java</h1><pre class="source lang-java linenums">package com.compasschat.websocket;
+
+import com.compasschat.message.MessageService;
+import com.compasschat.websocket.dto.IncomingChatMessage;
+import com.compasschat.websocket.dto.TypingIndicator;
+import jakarta.validation.Valid;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.annotation.SendToUser;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Controller;
+
+import java.security.Principal;
+import java.util.UUID;
+
+@Controller
+public class WebSocketMessageController {
+
+    private final MessageService messageService;
+
+<span class="nc" id="L23">    public WebSocketMessageController(MessageService messageService) {</span>
+<span class="nc" id="L24">        this.messageService = messageService;</span>
+<span class="nc" id="L25">    }</span>
+
+    @MessageMapping(&quot;/channels/{channelId}/messages&quot;)
+    public void sendMessage(@DestinationVariable UUID channelId,
+                            @Valid @Payload IncomingChatMessage msg,
+                            Principal principal) {
+
+<span class="nc" id="L32">        UUID senderId = requirePrincipal(principal).userId();</span>
+        // MessageService persists AND publishes the event that triggers broadcast.
+<span class="nc" id="L34">        messageService.post(channelId, senderId, msg.content());</span>
+<span class="nc" id="L35">    }</span>
+
+    /**
+     * Typing indicator: not persisted, simply rebroadcast to channel.
+     * @SendTo on the method tells Spring &quot;whatever I return, send it
+     * to this destination&quot; - convenient for fire-and-forget broadcasts.
+     */
+    @MessageMapping(&quot;/channels/{channelId}/typing&quot;)
+    @SendTo(&quot;/topic/channels/{channelId}/typing&quot;)
+    public TypingIndicator typing(@DestinationVariable UUID channelId,
+                                  @Payload TypingIndicator incoming,
+                                  Principal principal) {
+<span class="nc" id="L47">        StompPrincipal p = requirePrincipal(principal);</span>
+        // Re-stamp from server-side identity. Client cannot impersonate.
+<span class="nc" id="L49">        return new TypingIndicator(channelId, p.userId(), p.username(), incoming.typing());</span>
+    }
+
+    /**
+     * Demonstrates per-user messaging: if something throws inside this
+     * controller, Spring routes a string back to /user/queue/errors
+     * for THIS session only. Frontend subscribes to that to show toasts.
+     */
+    @org.springframework.messaging.handler.annotation.MessageExceptionHandler
+    @SendToUser(&quot;/queue/errors&quot;)
+    public String handleError(Exception e) {
+<span class="nc" id="L60">        return e.getMessage();</span>
+    }
+
+    private StompPrincipal requirePrincipal(Principal principal) {
+<span class="nc bnc" id="L64" title="All 2 branches missed.">        if (principal instanceof org.springframework.security.authentication.UsernamePasswordAuthenticationToken auth</span>
+<span class="nc bnc" id="L65" title="All 2 branches missed.">                &amp;&amp; auth.getPrincipal() instanceof StompPrincipal p) {</span>
+<span class="nc" id="L66">            return p;</span>
+        }
+<span class="nc" id="L68">        throw new AccessDeniedException(&quot;Not authenticated&quot;);</span>
+    }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HousingContextClient.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Community Compass Java Service</a> &gt; <a href="index.source.html" class="el_package">com.compasschat.ai.integration</a> &gt; <span class="el_source">HousingContextClient.java</span></div><h1>HousingContextClient.java</h1><pre class="source lang-java linenums">package com.compasschat.ai.integration;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+@Component
+<span class="nc" id="L14">public class HousingContextClient {</span>
+
+<span class="nc" id="L16">    private static final ObjectMapper MAPPER = new ObjectMapper();</span>
+<span class="nc" id="L17">    private static final List&lt;String&gt; HOUSING_TYPES = List.of(</span>
+<span class="nc" id="L18">            &quot;HOUSING&quot;, &quot;SHELTER&quot;, &quot;EMERGENCY SHELTER&quot;, &quot;TRANSITIONAL HOUSING&quot;, &quot;RENTAL ASSISTANCE&quot;</span>
+<span class="nc" id="L19">    );</span>
+
+    public String getContext(String query) {
+        try {
+<span class="nc" id="L23">            InputStream stream = new ClassPathResource(&quot;data/Service_Directory_cleaned.json&quot;)</span>
+<span class="nc" id="L24">                    .getInputStream();</span>
+<span class="nc" id="L25">            JsonNode root = MAPPER.readTree(stream);</span>
+<span class="nc" id="L26">            JsonNode services = root.path(&quot;services&quot;);</span>
+
+<span class="nc" id="L28">            List&lt;String&gt; matches = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L29" title="All 2 branches missed.">            for (JsonNode service : services) {</span>
+<span class="nc" id="L30">                String type = service.path(&quot;typeOfService&quot;).asText(&quot;&quot;).toUpperCase();</span>
+<span class="nc bnc" id="L31" title="All 2 branches missed.">                if (HOUSING_TYPES.stream().anyMatch(type::contains)) {</span>
+<span class="nc" id="L32">                    matches.add(formatService(service));</span>
+<span class="nc bnc" id="L33" title="All 2 branches missed.">                    if (matches.size() == 3) break;</span>
+                }
+            }
+
+<span class="nc bnc" id="L37" title="All 2 branches missed.">            if (matches.isEmpty()) return &quot;No housing resources found in the directory.&quot;;</span>
+
+<span class="nc" id="L39">            return &quot;Housing resources available in Delaware:\n&quot; + String.join(&quot;\n\n&quot;, matches);</span>
+
+<span class="nc" id="L41">        } catch (IOException e) {</span>
+<span class="nc" id="L42">            return &quot;Housing resource directory temporarily unavailable.&quot;;</span>
+        }
+    }
+
+    private String formatService(JsonNode s) {
+<span class="nc" id="L47">        return String.format(&quot;• %s\n  %s\n  Phone: %s | %s&quot;,</span>
+<span class="nc" id="L48">                s.path(&quot;organizationName&quot;).asText(),</span>
+<span class="nc" id="L49">                s.path(&quot;servicesDescription&quot;).asText(),</span>
+<span class="nc" id="L50">                s.path(&quot;phone&quot;).asText(&quot;N/A&quot;),</span>
+<span class="nc" id="L51">                s.path(&quot;fullAddress&quot;).asText(&quot;&quot;));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
