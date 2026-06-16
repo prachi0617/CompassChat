@@ -28,84 +28,84 @@ public class MessageService extends BaseService&lt;Message, UUID&gt; {
     public MessageService(MessageRepository messages, MessageAuditLogRepository auditLogs,
                           ChannelService channelService, ApplicationEventPublisher eventPublisher,
                           MentionService mentionService) {
-<span class="nc" id="L31">        super(messages, &quot;Message&quot;);</span>
-<span class="nc" id="L32">        this.messages = messages;</span>
-<span class="nc" id="L33">        this.auditLogs = auditLogs;</span>
-<span class="nc" id="L34">        this.channelService = channelService;</span>
-<span class="nc" id="L35">        this.eventPublisher = eventPublisher;</span>
-<span class="nc" id="L36">        this.mentionService = mentionService;</span>
-<span class="nc" id="L37">    }</span>
+<span class="fc" id="L31">        super(messages, &quot;Message&quot;);</span>
+<span class="fc" id="L32">        this.messages = messages;</span>
+<span class="fc" id="L33">        this.auditLogs = auditLogs;</span>
+<span class="fc" id="L34">        this.channelService = channelService;</span>
+<span class="fc" id="L35">        this.eventPublisher = eventPublisher;</span>
+<span class="fc" id="L36">        this.mentionService = mentionService;</span>
+<span class="fc" id="L37">    }</span>
 
     // ----- WRITES -----
 
     @Transactional
     public Message post(UUID channelId, UUID senderId, String content) {
-<span class="nc bnc" id="L43" title="All 2 branches missed.">        if (!channelService.canUserAccess(channelId, senderId)) {</span>
-<span class="nc" id="L44">            throw new AccessDeniedException(&quot;Not a member of this channel&quot;);</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">        if (!channelService.canUserAccess(channelId, senderId)) {</span>
+<span class="fc" id="L44">            throw new AccessDeniedException(&quot;Not a member of this channel&quot;);</span>
         }
-<span class="nc" id="L46">        Message msg = messages.save(new Message(senderId, channelId, content));</span>
-<span class="nc" id="L47">        auditLogs.save(new MessageAuditLog(</span>
-<span class="nc" id="L48">                msg.getId(), AuditAction.CREATED, senderId,</span>
-<span class="nc" id="L49">                null, content));</span>
-<span class="nc" id="L50">        eventPublisher.publishEvent(new MessagePostedEvent(msg.getId()));</span>
-<span class="nc" id="L51">        mentionService.extractAndSave(msg.getId(), channelId, senderId, content);</span>
-<span class="nc" id="L52">        return msg;</span>
+<span class="fc" id="L46">        Message msg = messages.save(new Message(senderId, channelId, content));</span>
+<span class="fc" id="L47">        auditLogs.save(new MessageAuditLog(</span>
+<span class="fc" id="L48">                msg.getId(), AuditAction.CREATED, senderId,</span>
+<span class="fc" id="L49">                null, content));</span>
+<span class="fc" id="L50">        eventPublisher.publishEvent(new MessagePostedEvent(msg.getId()));</span>
+<span class="fc" id="L51">        mentionService.extractAndSave(msg.getId(), channelId, senderId, content);</span>
+<span class="fc" id="L52">        return msg;</span>
     }
 
     @Transactional
     public Message edit(UUID messageId, UUID requesterId, String newContent) {
-<span class="nc" id="L57">        Message msg = findVisibleById(messageId);</span>
+<span class="fc" id="L57">        Message msg = findVisibleById(messageId);</span>
 
         // Rule: only the original sender can edit their own message.
         // (We do NOT allow moderators to silently rewrite content -
         // that destroys trust. Moderators can delete; only authors edit.)
-<span class="nc bnc" id="L62" title="All 2 branches missed.">        if (!msg.getSenderId().equals(requesterId)) {</span>
-<span class="nc" id="L63">            throw new AccessDeniedException(&quot;Only the author can edit this message&quot;);</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">        if (!msg.getSenderId().equals(requesterId)) {</span>
+<span class="fc" id="L63">            throw new AccessDeniedException(&quot;Only the author can edit this message&quot;);</span>
         }
 
-<span class="nc" id="L66">        String previous = msg.getContent();</span>
-<span class="nc" id="L67">        msg.editContent(newContent); // domain method - keeps content + editedAt in sync</span>
+<span class="fc" id="L66">        String previous = msg.getContent();</span>
+<span class="fc" id="L67">        msg.editContent(newContent); // domain method - keeps content + editedAt in sync</span>
 
-<span class="nc" id="L69">        auditLogs.save(new MessageAuditLog(</span>
-<span class="nc" id="L70">                msg.getId(), AuditAction.EDITED, requesterId,</span>
-<span class="nc" id="L71">                previous, newContent</span>
+<span class="fc" id="L69">        auditLogs.save(new MessageAuditLog(</span>
+<span class="fc" id="L70">                msg.getId(), AuditAction.EDITED, requesterId,</span>
+<span class="fc" id="L71">                previous, newContent</span>
         ));
-<span class="nc" id="L73">        return msg;</span>
+<span class="fc" id="L73">        return msg;</span>
     }
 
     @Transactional
     public void softDelete(UUID messageId, UUID requesterId, Role requesterRole) {
-<span class="nc" id="L78">        Message msg = findVisibleById(messageId);</span>
+<span class="fc" id="L78">        Message msg = findVisibleById(messageId);</span>
 
         // Rule: sender can delete their own; mods/admins can delete any.
-<span class="nc" id="L81">        boolean isAuthor = msg.getSenderId().equals(requesterId);</span>
-<span class="nc bnc" id="L82" title="All 4 branches missed.">        boolean isStaff = requesterRole == Role.MODERATOR || requesterRole == Role.ADMIN;</span>
-<span class="nc bnc" id="L83" title="All 4 branches missed.">        if (!isAuthor &amp;&amp; !isStaff) {</span>
-<span class="nc" id="L84">            throw new AccessDeniedException(&quot;Not allowed to delete this message&quot;);</span>
+<span class="fc" id="L81">        boolean isAuthor = msg.getSenderId().equals(requesterId);</span>
+<span class="fc bfc" id="L82" title="All 4 branches covered.">        boolean isStaff = requesterRole == Role.MODERATOR || requesterRole == Role.ADMIN;</span>
+<span class="fc bfc" id="L83" title="All 4 branches covered.">        if (!isAuthor &amp;&amp; !isStaff) {</span>
+<span class="fc" id="L84">            throw new AccessDeniedException(&quot;Not allowed to delete this message&quot;);</span>
         }
 
         // Audit FIRST. If this throws, the message stays intact.
-<span class="nc" id="L88">        auditLogs.save(new MessageAuditLog(</span>
-<span class="nc" id="L89">                msg.getId(), AuditAction.DELETED, requesterId,</span>
-<span class="nc" id="L90">                msg.getContent(), null</span>
+<span class="fc" id="L88">        auditLogs.save(new MessageAuditLog(</span>
+<span class="fc" id="L89">                msg.getId(), AuditAction.DELETED, requesterId,</span>
+<span class="fc" id="L90">                msg.getContent(), null</span>
         ));
-<span class="nc" id="L92">        msg.markDeleted();</span>
-<span class="nc" id="L93">    }</span>
+<span class="fc" id="L92">        msg.markDeleted();</span>
+<span class="fc" id="L93">    }</span>
 
     // ----- READS -----
 
     @Transactional(readOnly = true)
     public Page&lt;Message&gt; listChannelMessages(UUID channelId, Pageable pageable) {
-<span class="nc" id="L99">        return messages.findByChannelIdAndDeletedFalseOrderByCreatedAtDesc(channelId, pageable);</span>
+<span class="fc" id="L99">        return messages.findByChannelIdAndDeletedFalseOrderByCreatedAtDesc(channelId, pageable);</span>
     }
 
     @Transactional(readOnly = true)
     public List&lt;MessageAuditLog&gt; getHistory(UUID messageId) {
         // ensure the message exists (even if deleted - mods need history)
-<span class="nc bnc" id="L105" title="All 2 branches missed.">        if (!messages.existsById(messageId)) {</span>
-<span class="nc" id="L106">            throw new ResourceNotFoundException(&quot;Message&quot;, messageId.toString());</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">        if (!messages.existsById(messageId)) {</span>
+<span class="fc" id="L106">            throw new ResourceNotFoundException(&quot;Message&quot;, messageId.toString());</span>
         }
-<span class="nc" id="L108">        return auditLogs.findByMessageIdOrderByCreatedAtAsc(messageId);</span>
+<span class="fc" id="L108">        return auditLogs.findByMessageIdOrderByCreatedAtAsc(messageId);</span>
     }
 
     // ----- HELPERS -----
@@ -114,11 +114,11 @@ public class MessageService extends BaseService&lt;Message, UUID&gt; {
      *  enforces &quot;if it's crumpled, pretend it doesn't exist&quot; for
      *  normal callers. Moderator code paths use findById directly. */
     private Message findVisibleById(UUID id) {
-<span class="nc" id="L117">        Message msg = findById(id); // throws ResourceNotFound if missing</span>
-<span class="nc bnc" id="L118" title="All 2 branches missed.">        if (msg.isDeleted()) {</span>
-<span class="nc" id="L119">            throw new ResourceNotFoundException(&quot;Message&quot;, id.toString());</span>
+<span class="fc" id="L117">        Message msg = findById(id); // throws ResourceNotFound if missing</span>
+<span class="fc bfc" id="L118" title="All 2 branches covered.">        if (msg.isDeleted()) {</span>
+<span class="fc" id="L119">            throw new ResourceNotFoundException(&quot;Message&quot;, id.toString());</span>
         }
-<span class="nc" id="L121">        return msg;</span>
+<span class="fc" id="L121">        return msg;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

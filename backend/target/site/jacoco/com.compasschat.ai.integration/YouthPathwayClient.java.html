@@ -11,33 +11,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-<span class="nc" id="L14">public class YouthPathwayClient {</span>
+<span class="fc" id="L14">public class YouthPathwayClient {</span>
 
-<span class="nc" id="L16">    private static final ObjectMapper MAPPER = new ObjectMapper();</span>
-<span class="nc" id="L17">    private static final List&lt;String&gt; YOUTH_TYPES = List.of(</span>
-<span class="nc" id="L18">            &quot;YOUTH&quot;, &quot;EDUCATION&quot;, &quot;TRAINING&quot;, &quot;EMPLOYMENT&quot;, &quot;JOB&quot;, &quot;CAREER&quot;,</span>
-<span class="nc" id="L19">            &quot;AFTER SCHOOL&quot;, &quot;AFTERSCHOOL&quot;, &quot;COLLEGE&quot;, &quot;VOCATIONAL&quot;</span>
-<span class="nc" id="L20">    );</span>
+<span class="fc" id="L16">    private static final ObjectMapper MAPPER = new ObjectMapper();</span>
+<span class="fc" id="L17">    private static final List&lt;String&gt; YOUTH_TYPES = List.of(</span>
+<span class="fc" id="L18">            &quot;YOUTH&quot;, &quot;EDUCATION&quot;, &quot;TRAINING&quot;, &quot;EMPLOYMENT&quot;, &quot;JOB&quot;, &quot;CAREER&quot;,</span>
+<span class="fc" id="L19">            &quot;AFTER SCHOOL&quot;, &quot;AFTERSCHOOL&quot;, &quot;COLLEGE&quot;, &quot;VOCATIONAL&quot;</span>
+<span class="fc" id="L20">    );</span>
 
     public String getContext(String query) {
         try {
-<span class="nc" id="L24">            InputStream stream = new ClassPathResource(&quot;data/Service_Directory_cleaned.json&quot;)</span>
-<span class="nc" id="L25">                    .getInputStream();</span>
-<span class="nc" id="L26">            JsonNode root = MAPPER.readTree(stream);</span>
-<span class="nc" id="L27">            JsonNode services = root.path(&quot;services&quot;);</span>
+<span class="fc" id="L24">            InputStream stream = new ClassPathResource(&quot;data/Service_Directory_cleaned.json&quot;)</span>
+<span class="fc" id="L25">                    .getInputStream();</span>
+<span class="fc" id="L26">            JsonNode root = MAPPER.readTree(stream);</span>
+<span class="fc" id="L27">            JsonNode services = root.path(&quot;services&quot;);</span>
 
-<span class="nc" id="L29">            List&lt;String&gt; matches = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L30" title="All 2 branches missed.">            for (JsonNode service : services) {</span>
-<span class="nc" id="L31">                String type = service.path(&quot;typeOfService&quot;).asText(&quot;&quot;).toUpperCase();</span>
-<span class="nc bnc" id="L32" title="All 2 branches missed.">                if (YOUTH_TYPES.stream().anyMatch(type::contains)) {</span>
-<span class="nc" id="L33">                    matches.add(formatService(service));</span>
-<span class="nc bnc" id="L34" title="All 2 branches missed.">                    if (matches.size() == 3) break;</span>
+<span class="fc" id="L29">            List&lt;String&gt; matches = new ArrayList&lt;&gt;();</span>
+<span class="pc bpc" id="L30" title="1 of 2 branches missed.">            for (JsonNode service : services) {</span>
+<span class="fc" id="L31">                String type = service.path(&quot;typeOfService&quot;).asText(&quot;&quot;).toUpperCase();</span>
+<span class="fc bfc" id="L32" title="All 2 branches covered.">                if (YOUTH_TYPES.stream().anyMatch(type::contains)) {</span>
+<span class="fc" id="L33">                    matches.add(formatService(service));</span>
+<span class="fc bfc" id="L34" title="All 2 branches covered.">                    if (matches.size() == 3) break;</span>
                 }
             }
 
-<span class="nc bnc" id="L38" title="All 2 branches missed.">            if (matches.isEmpty()) return &quot;No youth pathway resources found in the directory.&quot;;</span>
+<span class="pc bpc" id="L38" title="1 of 2 branches missed.">            if (matches.isEmpty()) return &quot;No youth pathway resources found in the directory.&quot;;</span>
 
-<span class="nc" id="L40">            return &quot;Youth and career pathway resources:\n&quot; + String.join(&quot;\n\n&quot;, matches);</span>
+<span class="fc" id="L40">            return &quot;Youth and career pathway resources:\n&quot; + String.join(&quot;\n\n&quot;, matches);</span>
 
 <span class="nc" id="L42">        } catch (IOException e) {</span>
 <span class="nc" id="L43">            return &quot;Youth resource directory temporarily unavailable.&quot;;</span>
@@ -45,11 +45,11 @@ import java.util.List;
     }
 
     private String formatService(JsonNode s) {
-<span class="nc" id="L48">        return String.format(&quot;• %s\n  %s\n  Phone: %s | %s&quot;,</span>
-<span class="nc" id="L49">                s.path(&quot;organizationName&quot;).asText(),</span>
-<span class="nc" id="L50">                s.path(&quot;servicesDescription&quot;).asText(),</span>
-<span class="nc" id="L51">                s.path(&quot;phone&quot;).asText(&quot;N/A&quot;),</span>
-<span class="nc" id="L52">                s.path(&quot;fullAddress&quot;).asText(&quot;&quot;));</span>
+<span class="fc" id="L48">        return String.format(&quot;• %s\n  %s\n  Phone: %s | %s&quot;,</span>
+<span class="fc" id="L49">                s.path(&quot;organizationName&quot;).asText(),</span>
+<span class="fc" id="L50">                s.path(&quot;servicesDescription&quot;).asText(),</span>
+<span class="fc" id="L51">                s.path(&quot;phone&quot;).asText(&quot;N/A&quot;),</span>
+<span class="fc" id="L52">                s.path(&quot;fullAddress&quot;).asText(&quot;&quot;));</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

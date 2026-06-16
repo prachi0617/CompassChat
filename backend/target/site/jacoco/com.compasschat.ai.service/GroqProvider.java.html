@@ -15,21 +15,21 @@ public class GroqProvider implements AiProvider {
      * ChatClient.Builder is optional so Spring does not force the OpenAiChatModel
      * bean (and its mandatory-key check) when GROQ_API_KEY is absent.
      */
-<span class="nc" id="L18">    public GroqProvider(@Autowired(required = false) ChatClient.Builder builder,</span>
+<span class="fc" id="L18">    public GroqProvider(@Autowired(required = false) ChatClient.Builder builder,</span>
                         @Value(&quot;${spring.ai.openai.api-key:}&quot;) String apiKey) {
-<span class="nc bnc" id="L20" title="All 4 branches missed.">        boolean keyPresent = apiKey != null &amp;&amp; !apiKey.isBlank();</span>
-<span class="nc bnc" id="L21" title="All 4 branches missed.">        this.enabled = keyPresent &amp;&amp; builder != null;</span>
-<span class="nc bnc" id="L22" title="All 2 branches missed.">        this.chatClient = this.enabled ? builder.build() : null;</span>
-<span class="nc" id="L23">    }</span>
+<span class="fc bfc" id="L20" title="All 4 branches covered.">        boolean keyPresent = apiKey != null &amp;&amp; !apiKey.isBlank();</span>
+<span class="pc bpc" id="L21" title="1 of 4 branches missed.">        this.enabled = keyPresent &amp;&amp; builder != null;</span>
+<span class="pc bpc" id="L22" title="1 of 2 branches missed.">        this.chatClient = this.enabled ? builder.build() : null;</span>
+<span class="fc" id="L23">    }</span>
 
     public boolean isEnabled() {
-<span class="nc" id="L26">        return enabled;</span>
+<span class="fc" id="L26">        return enabled;</span>
     }
 
     @Override
     public String complete(String systemPrompt, String userMessage) {
-<span class="nc bnc" id="L31" title="All 2 branches missed.">        if (!enabled) {</span>
-<span class="nc" id="L32">            throw new UnsupportedOperationException(&quot;Groq API key not configured&quot;);</span>
+<span class="pc bpc" id="L31" title="1 of 2 branches missed.">        if (!enabled) {</span>
+<span class="fc" id="L32">            throw new UnsupportedOperationException(&quot;Groq API key not configured&quot;);</span>
         }
 <span class="nc" id="L34">        return chatClient.prompt()</span>
 <span class="nc" id="L35">                .system(systemPrompt)</span>

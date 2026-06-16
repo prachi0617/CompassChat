@@ -20,84 +20,84 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
     private final JwtService jwtService;
     private final ChannelService channelService;
 
-<span class="nc" id="L23">    public WebSocketAuthInterceptor(JwtService jwtService, ChannelService channelService) {</span>
-<span class="nc" id="L24">        this.jwtService = jwtService;</span>
-<span class="nc" id="L25">        this.channelService = channelService;</span>
-<span class="nc" id="L26">    }</span>
+<span class="fc" id="L23">    public WebSocketAuthInterceptor(JwtService jwtService, ChannelService channelService) {</span>
+<span class="fc" id="L24">        this.jwtService = jwtService;</span>
+<span class="fc" id="L25">        this.channelService = channelService;</span>
+<span class="fc" id="L26">    }</span>
 
     @Override
     public Message&lt;?&gt; preSend(Message&lt;?&gt; message, MessageChannel channel) {
-<span class="nc" id="L30">        StompHeaderAccessor accessor =</span>
-<span class="nc" id="L31">                MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);</span>
-<span class="nc bnc" id="L32" title="All 4 branches missed.">        if (accessor == null || accessor.getCommand() == null) return message;</span>
+<span class="fc" id="L30">        StompHeaderAccessor accessor =</span>
+<span class="fc" id="L31">                MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);</span>
+<span class="pc bpc" id="L32" title="2 of 4 branches missed.">        if (accessor == null || accessor.getCommand() == null) return message;</span>
 
-<span class="nc bnc" id="L34" title="All 4 branches missed.">        switch (accessor.getCommand()) {</span>
-<span class="nc" id="L35">            case CONNECT   -&gt; handleConnect(accessor);</span>
-<span class="nc" id="L36">            case SUBSCRIBE -&gt; handleSubscribe(accessor);</span>
-<span class="nc" id="L37">            case SEND      -&gt; handleSend(accessor);</span>
+<span class="fc bfc" id="L34" title="All 4 branches covered.">        switch (accessor.getCommand()) {</span>
+<span class="fc" id="L35">            case CONNECT   -&gt; handleConnect(accessor);</span>
+<span class="fc" id="L36">            case SUBSCRIBE -&gt; handleSubscribe(accessor);</span>
+<span class="fc" id="L37">            case SEND      -&gt; handleSend(accessor);</span>
             default        -&gt; { /* HEARTBEAT, DISCONNECT, ACK: nothing */ }
         }
-<span class="nc" id="L40">        return message;</span>
+<span class="fc" id="L40">        return message;</span>
     }
 
     private void handleConnect(StompHeaderAccessor accessor) {
-<span class="nc" id="L44">        String header = accessor.getFirstNativeHeader(&quot;Authorization&quot;);</span>
-<span class="nc bnc" id="L45" title="All 4 branches missed.">        if (header == null || !header.startsWith(&quot;Bearer &quot;)) {</span>
-<span class="nc" id="L46">            throw new IllegalArgumentException(&quot;Missing or malformed Authorization header&quot;);</span>
+<span class="fc" id="L44">        String header = accessor.getFirstNativeHeader(&quot;Authorization&quot;);</span>
+<span class="fc bfc" id="L45" title="All 4 branches covered.">        if (header == null || !header.startsWith(&quot;Bearer &quot;)) {</span>
+<span class="fc" id="L46">            throw new IllegalArgumentException(&quot;Missing or malformed Authorization header&quot;);</span>
         }
-<span class="nc" id="L48">        String token = header.substring(7);</span>
-<span class="nc bnc" id="L49" title="All 2 branches missed.">        if (!jwtService.isValid(token)) {</span>
-<span class="nc" id="L50">            throw new IllegalArgumentException(&quot;Invalid or expired token&quot;);</span>
+<span class="fc" id="L48">        String token = header.substring(7);</span>
+<span class="fc bfc" id="L49" title="All 2 branches covered.">        if (!jwtService.isValid(token)) {</span>
+<span class="fc" id="L50">            throw new IllegalArgumentException(&quot;Invalid or expired token&quot;);</span>
         }
 
-<span class="nc" id="L53">        UUID userId = jwtService.getUserId(token);</span>
-<span class="nc" id="L54">        String username = jwtService.getUsername(token);</span>
-<span class="nc" id="L55">        String role = jwtService.getRole(token);</span>
+<span class="fc" id="L53">        UUID userId = jwtService.getUserId(token);</span>
+<span class="fc" id="L54">        String username = jwtService.getUsername(token);</span>
+<span class="fc" id="L55">        String role = jwtService.getRole(token);</span>
 
-<span class="nc" id="L57">        accessor.setUser(new UsernamePasswordAuthenticationToken(</span>
-<span class="nc" id="L58">                new StompPrincipal(userId, username),</span>
-<span class="nc" id="L59">                null,</span>
-<span class="nc" id="L60">                List.of(new SimpleGrantedAuthority(&quot;ROLE_&quot; + role))));</span>
-<span class="nc" id="L61">    }</span>
+<span class="fc" id="L57">        accessor.setUser(new UsernamePasswordAuthenticationToken(</span>
+<span class="fc" id="L58">                new StompPrincipal(userId, username),</span>
+<span class="fc" id="L59">                null,</span>
+<span class="fc" id="L60">                List.of(new SimpleGrantedAuthority(&quot;ROLE_&quot; + role))));</span>
+<span class="fc" id="L61">    }</span>
 
     private void handleSubscribe(StompHeaderAccessor accessor) {
-<span class="nc" id="L64">        UUID channelId = parseChannelTopic(accessor.getDestination());</span>
-<span class="nc bnc" id="L65" title="All 2 branches missed.">        if (channelId == null) return; // not a channel topic - let it through</span>
+<span class="fc" id="L64">        UUID channelId = parseChannelTopic(accessor.getDestination());</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        if (channelId == null) return; // not a channel topic - let it through</span>
 
-<span class="nc bnc" id="L67" title="All 2 branches missed.">        if (!channelService.canUserAccess(channelId, currentUserId(accessor))) {</span>
-<span class="nc" id="L68">            throw new IllegalArgumentException(&quot;Not allowed to subscribe to this channel&quot;);</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">        if (!channelService.canUserAccess(channelId, currentUserId(accessor))) {</span>
+<span class="fc" id="L68">            throw new IllegalArgumentException(&quot;Not allowed to subscribe to this channel&quot;);</span>
         }
-<span class="nc" id="L70">    }</span>
+<span class="fc" id="L70">    }</span>
 
     private void handleSend(StompHeaderAccessor accessor) {
-<span class="nc" id="L73">        UUID channelId = parseAppChannel(accessor.getDestination());</span>
-<span class="nc bnc" id="L74" title="All 2 branches missed.">        if (channelId == null) return;</span>
+<span class="fc" id="L73">        UUID channelId = parseAppChannel(accessor.getDestination());</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">        if (channelId == null) return;</span>
 
-<span class="nc bnc" id="L76" title="All 2 branches missed.">        if (!channelService.canUserAccess(channelId, currentUserId(accessor))) {</span>
-<span class="nc" id="L77">            throw new IllegalArgumentException(&quot;Not allowed to send to this channel&quot;);</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">        if (!channelService.canUserAccess(channelId, currentUserId(accessor))) {</span>
+<span class="fc" id="L77">            throw new IllegalArgumentException(&quot;Not allowed to send to this channel&quot;);</span>
         }
-<span class="nc" id="L79">    }</span>
+<span class="fc" id="L79">    }</span>
 
     private UUID currentUserId(StompHeaderAccessor accessor) {
-<span class="nc bnc" id="L82" title="All 2 branches missed.">        if (accessor.getUser() instanceof UsernamePasswordAuthenticationToken auth</span>
-<span class="nc bnc" id="L83" title="All 2 branches missed.">                &amp;&amp; auth.getPrincipal() instanceof StompPrincipal p) {</span>
-<span class="nc" id="L84">            return p.userId();</span>
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">        if (accessor.getUser() instanceof UsernamePasswordAuthenticationToken auth</span>
+<span class="pc bpc" id="L83" title="1 of 2 branches missed.">                &amp;&amp; auth.getPrincipal() instanceof StompPrincipal p) {</span>
+<span class="fc" id="L84">            return p.userId();</span>
         }
 <span class="nc" id="L86">        throw new IllegalArgumentException(&quot;Not authenticated&quot;);</span>
     }
 
     /** Matches /topic/channels/{uuid} and /topic/channels/{uuid}/typing */
     private UUID parseChannelTopic(String destination) {
-<span class="nc bnc" id="L91" title="All 4 branches missed.">        if (destination == null || !destination.startsWith(&quot;/topic/channels/&quot;)) return null;</span>
-<span class="nc" id="L92">        String tail = destination.substring(&quot;/topic/channels/&quot;.length()).split(&quot;/&quot;)[0];</span>
-<span class="nc" id="L93">        try { return UUID.fromString(tail); } catch (Exception e) { return null; }</span>
+<span class="pc bpc" id="L91" title="1 of 4 branches missed.">        if (destination == null || !destination.startsWith(&quot;/topic/channels/&quot;)) return null;</span>
+<span class="fc" id="L92">        String tail = destination.substring(&quot;/topic/channels/&quot;.length()).split(&quot;/&quot;)[0];</span>
+<span class="pc" id="L93">        try { return UUID.fromString(tail); } catch (Exception e) { return null; }</span>
     }
 
     /** Matches /app/channels/{uuid}/messages and /app/channels/{uuid}/typing */
     private UUID parseAppChannel(String destination) {
-<span class="nc bnc" id="L98" title="All 4 branches missed.">        if (destination == null || !destination.startsWith(&quot;/app/channels/&quot;)) return null;</span>
-<span class="nc" id="L99">        String tail = destination.substring(&quot;/app/channels/&quot;.length()).split(&quot;/&quot;)[0];</span>
-<span class="nc" id="L100">        try { return UUID.fromString(tail); } catch (Exception e) { return null; }</span>
+<span class="pc bpc" id="L98" title="1 of 4 branches missed.">        if (destination == null || !destination.startsWith(&quot;/app/channels/&quot;)) return null;</span>
+<span class="fc" id="L99">        String tail = destination.substring(&quot;/app/channels/&quot;.length()).split(&quot;/&quot;)[0];</span>
+<span class="pc" id="L100">        try { return UUID.fromString(tail); } catch (Exception e) { return null; }</span>
     }
 }
 

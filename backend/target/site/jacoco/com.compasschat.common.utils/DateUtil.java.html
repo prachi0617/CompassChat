@@ -11,50 +11,50 @@ import java.time.temporal.ChronoUnit;
 public final class DateUtil {
 
     /** Stick to ISO display format across the whole app. */
-<span class="nc" id="L14">    public static final DateTimeFormatter DISPLAY_FORMAT =</span>
-<span class="nc" id="L15">            DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd HH:mm&quot;);</span>
+<span class="fc" id="L14">    public static final DateTimeFormatter DISPLAY_FORMAT =</span>
+<span class="fc" id="L15">            DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd HH:mm&quot;);</span>
 
     /** Single source of truth for &quot;what time zone are we in?&quot; */
-<span class="nc" id="L18">    public static final ZoneId APP_ZONE = ZoneId.of(&quot;UTC&quot;);</span>
+<span class="fc" id="L18">    public static final ZoneId APP_ZONE = ZoneId.of(&quot;UTC&quot;);</span>
 
-<span class="nc" id="L20">    private DateUtil() {</span>
+<span class="fc" id="L20">    private DateUtil() {</span>
         // Never instantiated. If reflection tries, refuse.
-<span class="nc" id="L22">        throw new AssertionError(&quot;DateUtil is a utility class; do not instantiate&quot;);</span>
+<span class="fc" id="L22">        throw new AssertionError(&quot;DateUtil is a utility class; do not instantiate&quot;);</span>
     }
 
     public static String format(LocalDateTime when) {
-<span class="nc bnc" id="L26" title="All 2 branches missed.">        return when == null ? &quot;&quot; : when.format(DISPLAY_FORMAT);</span>
+<span class="fc bfc" id="L26" title="All 2 branches covered.">        return when == null ? &quot;&quot; : when.format(DISPLAY_FORMAT);</span>
     }
 
     public static LocalDateTime now() {
-<span class="nc" id="L30">        return LocalDateTime.now(APP_ZONE);</span>
+<span class="fc" id="L30">        return LocalDateTime.now(APP_ZONE);</span>
     }
 
     public static LocalDateTime startOfDay(LocalDate date) {
-<span class="nc" id="L34">        return date.atStartOfDay();</span>
+<span class="fc" id="L34">        return date.atStartOfDay();</span>
     }
 
     public static LocalDateTime endOfDay(LocalDate date) {
-<span class="nc" id="L38">        return date.atTime(LocalTime.MAX);</span>
+<span class="fc" id="L38">        return date.atTime(LocalTime.MAX);</span>
     }
 
     public static long daysBetween(LocalDateTime start, LocalDateTime end) {
-<span class="nc" id="L42">        return ChronoUnit.DAYS.between(start, end);</span>
+<span class="fc" id="L42">        return ChronoUnit.DAYS.between(start, end);</span>
     }
 
     public static boolean isWithinLast(LocalDateTime when, long days) {
-<span class="nc bnc" id="L46" title="All 2 branches missed.">        if (when == null) return false;</span>
-<span class="nc" id="L47">        return when.isAfter(now().minusDays(days));</span>
+<span class="fc bfc" id="L46" title="All 2 branches covered.">        if (when == null) return false;</span>
+<span class="fc" id="L47">        return when.isAfter(now().minusDays(days));</span>
     }
 
     public static String timeAgo(LocalDateTime when) {
-<span class="nc bnc" id="L51" title="All 2 branches missed.">        if (when == null) return &quot;&quot;;</span>
-<span class="nc" id="L52">        Duration d = Duration.between(when, now());</span>
-<span class="nc bnc" id="L53" title="All 2 branches missed.">        if (d.toMinutes() &lt; 1)  return &quot;just now&quot;;</span>
-<span class="nc bnc" id="L54" title="All 2 branches missed.">        if (d.toMinutes() &lt; 60) return d.toMinutes() + &quot;m ago&quot;;</span>
-<span class="nc bnc" id="L55" title="All 2 branches missed.">        if (d.toHours()   &lt; 24) return d.toHours()   + &quot;h ago&quot;;</span>
-<span class="nc bnc" id="L56" title="All 2 branches missed.">        if (d.toDays()    &lt; 7)  return d.toDays()    + &quot;d ago&quot;;</span>
-<span class="nc" id="L57">        return format(when); // far enough back: show the date</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        if (when == null) return &quot;&quot;;</span>
+<span class="fc" id="L52">        Duration d = Duration.between(when, now());</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">        if (d.toMinutes() &lt; 1)  return &quot;just now&quot;;</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">        if (d.toMinutes() &lt; 60) return d.toMinutes() + &quot;m ago&quot;;</span>
+<span class="fc bfc" id="L55" title="All 2 branches covered.">        if (d.toHours()   &lt; 24) return d.toHours()   + &quot;h ago&quot;;</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">        if (d.toDays()    &lt; 7)  return d.toDays()    + &quot;d ago&quot;;</span>
+<span class="fc" id="L57">        return format(when); // far enough back: show the date</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

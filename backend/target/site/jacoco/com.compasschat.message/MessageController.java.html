@@ -25,10 +25,10 @@ public class MessageController {
     private final MessageService messageService;
     private final JwtService jwtService;
 
-<span class="nc" id="L28">    public MessageController(MessageService messageService, JwtService jwtService) {</span>
-<span class="nc" id="L29">        this.messageService = messageService;</span>
-<span class="nc" id="L30">        this.jwtService = jwtService;</span>
-<span class="nc" id="L31">    }</span>
+<span class="fc" id="L28">    public MessageController(MessageService messageService, JwtService jwtService) {</span>
+<span class="fc" id="L29">        this.messageService = messageService;</span>
+<span class="fc" id="L30">        this.jwtService = jwtService;</span>
+<span class="fc" id="L31">    }</span>
 
     @PostMapping(&quot;/channels/{channelId}/messages&quot;)
     public ResponseEntity&lt;ApiResponse&lt;MessageResponse&gt;&gt; post(
@@ -36,11 +36,11 @@ public class MessageController {
             @Valid @RequestBody CreateMessageRequest req,
             HttpServletRequest http) {
 
-<span class="nc" id="L39">        UUID senderId = currentUserId(http);</span>
-<span class="nc" id="L40">        Message saved = messageService.post(channelId, senderId, req.content());</span>
-<span class="nc" id="L41">        return ResponseEntity</span>
-<span class="nc" id="L42">                .status(HttpStatus.CREATED)</span>
-<span class="nc" id="L43">                .body(ApiResponse.ok(&quot;Message posted&quot;, MessageResponse.from(saved)));</span>
+<span class="fc" id="L39">        UUID senderId = currentUserId(http);</span>
+<span class="fc" id="L40">        Message saved = messageService.post(channelId, senderId, req.content());</span>
+<span class="fc" id="L41">        return ResponseEntity</span>
+<span class="fc" id="L42">                .status(HttpStatus.CREATED)</span>
+<span class="fc" id="L43">                .body(ApiResponse.ok(&quot;Message posted&quot;, MessageResponse.from(saved)));</span>
     }
 
     @GetMapping(&quot;/channels/{channelId}/messages&quot;)
@@ -48,10 +48,10 @@ public class MessageController {
             @PathVariable UUID channelId,
             Pageable pageable) {
 
-<span class="nc" id="L51">        Page&lt;MessageResponse&gt; page = messageService</span>
-<span class="nc" id="L52">                .listChannelMessages(channelId, pageable)</span>
-<span class="nc" id="L53">                .map(MessageResponse::from);</span>
-<span class="nc" id="L54">        return ApiResponse.ok(page);</span>
+<span class="fc" id="L51">        Page&lt;MessageResponse&gt; page = messageService</span>
+<span class="fc" id="L52">                .listChannelMessages(channelId, pageable)</span>
+<span class="fc" id="L53">                .map(MessageResponse::from);</span>
+<span class="fc" id="L54">        return ApiResponse.ok(page);</span>
     }
 
     @PutMapping(&quot;/messages/{id}&quot;)
@@ -60,45 +60,45 @@ public class MessageController {
             @Valid @RequestBody UpdateMessageRequest req,
             HttpServletRequest http) {
 
-<span class="nc" id="L63">        UUID requesterId = currentUserId(http);</span>
-<span class="nc" id="L64">        Message updated = messageService.edit(id, requesterId, req.content());</span>
-<span class="nc" id="L65">        return ApiResponse.ok(&quot;Message edited&quot;, MessageResponse.from(updated));</span>
+<span class="fc" id="L63">        UUID requesterId = currentUserId(http);</span>
+<span class="fc" id="L64">        Message updated = messageService.edit(id, requesterId, req.content());</span>
+<span class="fc" id="L65">        return ApiResponse.ok(&quot;Message edited&quot;, MessageResponse.from(updated));</span>
     }
 
     @DeleteMapping(&quot;/messages/{id}&quot;)
     public ApiResponse&lt;Void&gt; delete(@PathVariable UUID id, HttpServletRequest http) {
-<span class="nc" id="L70">        UUID requesterId = currentUserId(http);</span>
-<span class="nc" id="L71">        Role role = currentRole(http);</span>
-<span class="nc" id="L72">        messageService.softDelete(id, requesterId, role);</span>
-<span class="nc" id="L73">        return ApiResponse.ok(&quot;Message deleted&quot;, null);</span>
+<span class="fc" id="L70">        UUID requesterId = currentUserId(http);</span>
+<span class="fc" id="L71">        Role role = currentRole(http);</span>
+<span class="fc" id="L72">        messageService.softDelete(id, requesterId, role);</span>
+<span class="fc" id="L73">        return ApiResponse.ok(&quot;Message deleted&quot;, null);</span>
     }
 
     @GetMapping(&quot;/messages/{id}/history&quot;)
     public ApiResponse&lt;List&lt;MessageAuditLogResponse&gt;&gt; history(@PathVariable UUID id) {
         // (You'd protect this with @PreAuthorize(&quot;hasRole('MODERATOR')&quot;) in
         // a hardened version. For demo it's open.)
-<span class="nc" id="L80">        List&lt;MessageAuditLogResponse&gt; entries = messageService.getHistory(id).stream()</span>
-<span class="nc" id="L81">                .map(MessageAuditLogResponse::from)</span>
-<span class="nc" id="L82">                .toList();</span>
-<span class="nc" id="L83">        return ApiResponse.ok(entries);</span>
+<span class="fc" id="L80">        List&lt;MessageAuditLogResponse&gt; entries = messageService.getHistory(id).stream()</span>
+<span class="fc" id="L81">                .map(MessageAuditLogResponse::from)</span>
+<span class="fc" id="L82">                .toList();</span>
+<span class="fc" id="L83">        return ApiResponse.ok(entries);</span>
     }
 
     // ----- helpers for pulling identity off the JWT -----
 
     private UUID currentUserId(HttpServletRequest http) {
-<span class="nc" id="L89">        return jwtService.getUserId(extractToken(http));</span>
+<span class="fc" id="L89">        return jwtService.getUserId(extractToken(http));</span>
     }
 
     private Role currentRole(HttpServletRequest http) {
-<span class="nc" id="L93">        return Role.valueOf(jwtService.getRole(extractToken(http)));</span>
+<span class="fc" id="L93">        return Role.valueOf(jwtService.getRole(extractToken(http)));</span>
     }
 
     private String extractToken(HttpServletRequest http) {
-<span class="nc" id="L97">        String header = http.getHeader(&quot;Authorization&quot;);</span>
-<span class="nc bnc" id="L98" title="All 4 branches missed.">        if (header == null || !header.startsWith(&quot;Bearer &quot;)) {</span>
+<span class="fc" id="L97">        String header = http.getHeader(&quot;Authorization&quot;);</span>
+<span class="pc bpc" id="L98" title="2 of 4 branches missed.">        if (header == null || !header.startsWith(&quot;Bearer &quot;)) {</span>
 <span class="nc" id="L99">            throw new org.springframework.security.access.AccessDeniedException(&quot;Missing token&quot;);</span>
         }
-<span class="nc" id="L101">        return header.substring(7);</span>
+<span class="fc" id="L101">        return header.substring(7);</span>
     }
 }
 

@@ -30,39 +30,39 @@ public class ChannelMember extends AuditableEntity {
     private LocalDateTime lastReadAt;
 
     @Column(nullable = false)
-<span class="nc" id="L33">    private boolean muted = false;</span>
+<span class="pc" id="L33">    private boolean muted = false;</span>
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-<span class="nc" id="L37">    private MemberRole memberRole = MemberRole.MEMBER;</span>
+<span class="pc" id="L37">    private MemberRole memberRole = MemberRole.MEMBER;</span>
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-<span class="nc" id="L41">    private NotificationPreference notificationPreference = NotificationPreference.ALL;</span>
+<span class="pc" id="L41">    private NotificationPreference notificationPreference = NotificationPreference.ALL;</span>
 
 <span class="nc" id="L43">    protected ChannelMember() {} // JPA</span>
 
-<span class="nc" id="L45">    public ChannelMember(UUID channelId, UUID userId) {</span>
-<span class="nc" id="L46">        this.channelId = channelId;</span>
-<span class="nc" id="L47">        this.userId = userId;</span>
-<span class="nc" id="L48">    }</span>
+<span class="fc" id="L45">    public ChannelMember(UUID channelId, UUID userId) {</span>
+<span class="fc" id="L46">        this.channelId = channelId;</span>
+<span class="fc" id="L47">        this.userId = userId;</span>
+<span class="fc" id="L48">    }</span>
 
     public void markRead() {
-<span class="nc" id="L51">        this.lastReadAt = LocalDateTime.now();</span>
-<span class="nc" id="L52">    }</span>
+<span class="fc" id="L51">        this.lastReadAt = LocalDateTime.now();</span>
+<span class="fc" id="L52">    }</span>
 
 <span class="nc" id="L54">    public void mute()   { this.muted = true; }</span>
 <span class="nc" id="L55">    public void unmute() { this.muted = false; }</span>
 
-<span class="nc" id="L57">    public UUID getChannelId() { return channelId; }</span>
-<span class="nc" id="L58">    public UUID getUserId() { return userId; }</span>
-<span class="nc" id="L59">    public LocalDateTime getLastReadAt() { return lastReadAt; }</span>
-<span class="nc" id="L60">    public boolean isMuted() { return muted; }</span>
-<span class="nc" id="L61">    public MemberRole getMemberRole() { return memberRole; }</span>
+<span class="fc" id="L57">    public UUID getChannelId() { return channelId; }</span>
+<span class="fc" id="L58">    public UUID getUserId() { return userId; }</span>
+<span class="fc" id="L59">    public LocalDateTime getLastReadAt() { return lastReadAt; }</span>
+<span class="fc" id="L60">    public boolean isMuted() { return muted; }</span>
+<span class="fc" id="L61">    public MemberRole getMemberRole() { return memberRole; }</span>
 <span class="nc" id="L62">    public void setMemberRole(MemberRole memberRole) { this.memberRole = memberRole; }</span>
-<span class="nc" id="L63">    public NotificationPreference getNotificationPreference() { return notificationPreference; }</span>
+<span class="fc" id="L63">    public NotificationPreference getNotificationPreference() { return notificationPreference; }</span>
 <span class="nc" id="L64">    public void setNotificationPreference(NotificationPreference notificationPreference) { this.notificationPreference = notificationPreference; }</span>
     /** Convenience alias for createdAt, reads better at call sites. */
-<span class="nc" id="L66">    public LocalDateTime getJoinedAt() { return getCreatedAt(); }</span>
+<span class="fc" id="L66">    public LocalDateTime getJoinedAt() { return getCreatedAt(); }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

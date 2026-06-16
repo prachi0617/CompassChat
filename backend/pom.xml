@@ -149,6 +149,8 @@
                 <exclude>jdk/**</exclude>
                 <exclude>sun/**</exclude>
                 <exclude>java/**</exclude>
+                <exclude>com/sun/**</exclude>
+                <exclude>javax/**</exclude>
               </excludes>
             </configuration>
           </execution>

@@ -20,19 +20,19 @@ public class WebSocketMessageController {
 
     private final MessageService messageService;
 
-<span class="nc" id="L23">    public WebSocketMessageController(MessageService messageService) {</span>
-<span class="nc" id="L24">        this.messageService = messageService;</span>
-<span class="nc" id="L25">    }</span>
+<span class="fc" id="L23">    public WebSocketMessageController(MessageService messageService) {</span>
+<span class="fc" id="L24">        this.messageService = messageService;</span>
+<span class="fc" id="L25">    }</span>
 
     @MessageMapping(&quot;/channels/{channelId}/messages&quot;)
     public void sendMessage(@DestinationVariable UUID channelId,
                             @Valid @Payload IncomingChatMessage msg,
                             Principal principal) {
 
-<span class="nc" id="L32">        UUID senderId = requirePrincipal(principal).userId();</span>
+<span class="fc" id="L32">        UUID senderId = requirePrincipal(principal).userId();</span>
         // MessageService persists AND publishes the event that triggers broadcast.
-<span class="nc" id="L34">        messageService.post(channelId, senderId, msg.content());</span>
-<span class="nc" id="L35">    }</span>
+<span class="fc" id="L34">        messageService.post(channelId, senderId, msg.content());</span>
+<span class="fc" id="L35">    }</span>
 
     /**
      * Typing indicator: not persisted, simply rebroadcast to channel.
@@ -44,9 +44,9 @@ public class WebSocketMessageController {
     public TypingIndicator typing(@DestinationVariable UUID channelId,
                                   @Payload TypingIndicator incoming,
                                   Principal principal) {
-<span class="nc" id="L47">        StompPrincipal p = requirePrincipal(principal);</span>
+<span class="fc" id="L47">        StompPrincipal p = requirePrincipal(principal);</span>
         // Re-stamp from server-side identity. Client cannot impersonate.
-<span class="nc" id="L49">        return new TypingIndicator(channelId, p.userId(), p.username(), incoming.typing());</span>
+<span class="fc" id="L49">        return new TypingIndicator(channelId, p.userId(), p.username(), incoming.typing());</span>
     }
 
     /**
@@ -57,15 +57,15 @@ public class WebSocketMessageController {
     @org.springframework.messaging.handler.annotation.MessageExceptionHandler
     @SendToUser(&quot;/queue/errors&quot;)
     public String handleError(Exception e) {
-<span class="nc" id="L60">        return e.getMessage();</span>
+<span class="fc" id="L60">        return e.getMessage();</span>
     }
 
     private StompPrincipal requirePrincipal(Principal principal) {
-<span class="nc bnc" id="L64" title="All 2 branches missed.">        if (principal instanceof org.springframework.security.authentication.UsernamePasswordAuthenticationToken auth</span>
-<span class="nc bnc" id="L65" title="All 2 branches missed.">                &amp;&amp; auth.getPrincipal() instanceof StompPrincipal p) {</span>
-<span class="nc" id="L66">            return p;</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">        if (principal instanceof org.springframework.security.authentication.UsernamePasswordAuthenticationToken auth</span>
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">                &amp;&amp; auth.getPrincipal() instanceof StompPrincipal p) {</span>
+<span class="fc" id="L66">            return p;</span>
         }
-<span class="nc" id="L68">        throw new AccessDeniedException(&quot;Not authenticated&quot;);</span>
+<span class="fc" id="L68">        throw new AccessDeniedException(&quot;Not authenticated&quot;);</span>
     }
 }
 

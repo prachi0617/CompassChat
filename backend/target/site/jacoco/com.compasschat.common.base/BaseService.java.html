@@ -10,29 +10,29 @@ public abstract class BaseService&lt;T extends AuditableEntity, ID&gt; {
 
     protected final String entityName;
 
-<span class="nc" id="L13">    protected BaseService(BaseRepository&lt;T, ID&gt; repository, String entityName) {</span>
-<span class="nc" id="L14">        this.repository = repository;</span>
-<span class="nc" id="L15">        this.entityName = entityName;</span>
-<span class="nc" id="L16">    }</span>
+<span class="fc" id="L13">    protected BaseService(BaseRepository&lt;T, ID&gt; repository, String entityName) {</span>
+<span class="fc" id="L14">        this.repository = repository;</span>
+<span class="fc" id="L15">        this.entityName = entityName;</span>
+<span class="fc" id="L16">    }</span>
 
     public T findById(ID id) {
-<span class="nc" id="L19">        return repository.findById(id)</span>
-<span class="nc" id="L20">                .orElseThrow(() -&gt; new ResourceNotFoundException(entityName, String.valueOf(id)));</span>
+<span class="fc" id="L19">        return repository.findById(id)</span>
+<span class="fc" id="L20">                .orElseThrow(() -&gt; new ResourceNotFoundException(entityName, String.valueOf(id)));</span>
     }
 
     public List&lt;T&gt; findAll() {
-<span class="nc" id="L24">        return repository.findAll();</span>
+<span class="fc" id="L24">        return repository.findAll();</span>
     }
 
     public T save(T entity) {
-<span class="nc" id="L28">        return repository.save(entity);</span>
+<span class="fc" id="L28">        return repository.save(entity);</span>
     }
 
     public void delete(ID id) {
-<span class="nc bnc" id="L32" title="All 2 branches missed.">        if (!repository.existsById(id)) {</span>
-<span class="nc" id="L33">            throw new ResourceNotFoundException(entityName, String.valueOf(id));</span>
+<span class="fc bfc" id="L32" title="All 2 branches covered.">        if (!repository.existsById(id)) {</span>
+<span class="fc" id="L33">            throw new ResourceNotFoundException(entityName, String.valueOf(id));</span>
         }
-<span class="nc" id="L35">        repository.deleteById(id);</span>
-<span class="nc" id="L36">    }</span>
+<span class="fc" id="L35">        repository.deleteById(id);</span>
+<span class="fc" id="L36">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -13,30 +13,30 @@ public class PresenceEventListener {
 
     private final PresenceService presenceService;
 
-<span class="nc" id="L16">    public PresenceEventListener(PresenceService presenceService) {</span>
-<span class="nc" id="L17">        this.presenceService = presenceService;</span>
-<span class="nc" id="L18">    }</span>
+<span class="fc" id="L16">    public PresenceEventListener(PresenceService presenceService) {</span>
+<span class="fc" id="L17">        this.presenceService = presenceService;</span>
+<span class="fc" id="L18">    }</span>
 
     @EventListener
     public void onConnected(SessionConnectedEvent event) {
-<span class="nc" id="L22">        StompPrincipal p = principal(event.getUser());</span>
-<span class="nc bnc" id="L23" title="All 2 branches missed.">        if (p == null) return;</span>
-<span class="nc" id="L24">        presenceService.setStatus(p.userId(), PresenceStatus.ONLINE);</span>
-<span class="nc" id="L25">    }</span>
+<span class="fc" id="L22">        StompPrincipal p = principal(event.getUser());</span>
+<span class="fc bfc" id="L23" title="All 2 branches covered.">        if (p == null) return;</span>
+<span class="fc" id="L24">        presenceService.setStatus(p.userId(), PresenceStatus.ONLINE);</span>
+<span class="fc" id="L25">    }</span>
 
     @EventListener
     public void onDisconnected(SessionDisconnectEvent event) {
-<span class="nc" id="L29">        StompPrincipal p = principal(event.getUser());</span>
-<span class="nc bnc" id="L30" title="All 2 branches missed.">        if (p == null) return;</span>
-<span class="nc" id="L31">        presenceService.setStatus(p.userId(), PresenceStatus.OFFLINE);</span>
-<span class="nc" id="L32">    }</span>
+<span class="fc" id="L29">        StompPrincipal p = principal(event.getUser());</span>
+<span class="fc bfc" id="L30" title="All 2 branches covered.">        if (p == null) return;</span>
+<span class="fc" id="L31">        presenceService.setStatus(p.userId(), PresenceStatus.OFFLINE);</span>
+<span class="fc" id="L32">    }</span>
 
     private StompPrincipal principal(java.security.Principal raw) {
-<span class="nc bnc" id="L35" title="All 2 branches missed.">        if (raw instanceof UsernamePasswordAuthenticationToken auth</span>
-<span class="nc bnc" id="L36" title="All 2 branches missed.">                &amp;&amp; auth.getPrincipal() instanceof StompPrincipal p) {</span>
-<span class="nc" id="L37">            return p;</span>
+<span class="fc bfc" id="L35" title="All 2 branches covered.">        if (raw instanceof UsernamePasswordAuthenticationToken auth</span>
+<span class="pc bpc" id="L36" title="1 of 2 branches missed.">                &amp;&amp; auth.getPrincipal() instanceof StompPrincipal p) {</span>
+<span class="fc" id="L37">            return p;</span>
         }
-<span class="nc" id="L39">        return null;</span>
+<span class="fc" id="L39">        return null;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -7,28 +7,28 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 @Component
-<span class="nc" id="L10">public class CivicContextClient {</span>
+<span class="fc" id="L10">public class CivicContextClient {</span>
 
     public String getRelevantContext(String query) {
 
         try {
 
-<span class="nc" id="L16">            ClassPathResource resource =</span>
-<span class="nc" id="L17">                    new ClassPathResource(</span>
-<span class="nc" id="L18">                            &quot;data/news_schema.json&quot;</span>
+<span class="fc" id="L16">            ClassPathResource resource =</span>
+<span class="fc" id="L17">                    new ClassPathResource(</span>
+<span class="fc" id="L18">                            &quot;data/news_schema.json&quot;</span>
                     );
 
-<span class="nc" id="L21">            String json =</span>
-<span class="nc" id="L22">                    Files.readString(</span>
-<span class="nc" id="L23">                            resource.getFile().toPath()</span>
+<span class="fc" id="L21">            String json =</span>
+<span class="fc" id="L22">                    Files.readString(</span>
+<span class="fc" id="L23">                            resource.getFile().toPath()</span>
                     );
 
-<span class="nc" id="L26">            String lower =</span>
-<span class="nc" id="L27">                    query.toLowerCase();</span>
+<span class="fc" id="L26">            String lower =</span>
+<span class="fc" id="L27">                    query.toLowerCase();</span>
 
-<span class="nc bnc" id="L29" title="All 2 branches missed.">            if (lower.contains(&quot;housing&quot;)) {</span>
+<span class="fc bfc" id="L29" title="All 2 branches covered.">            if (lower.contains(&quot;housing&quot;)) {</span>
 
-<span class="nc" id="L31">                return &quot;&quot;&quot;</span>
+<span class="fc" id="L31">                return &quot;&quot;&quot;</span>
                         Housing Update:
                         New housing assistance programs may be available.
 
@@ -37,9 +37,9 @@ import java.nio.file.Files;
                         &quot;&quot;&quot;;
             }
 
-<span class="nc bnc" id="L40" title="All 2 branches missed.">            if (lower.contains(&quot;food&quot;)) {</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">            if (lower.contains(&quot;food&quot;)) {</span>
 
-<span class="nc" id="L42">                return &quot;&quot;&quot;</span>
+<span class="fc" id="L42">                return &quot;&quot;&quot;</span>
                         Food Assistance Update:
 
                         Community food distribution events are available.
@@ -50,7 +50,7 @@ import java.nio.file.Files;
                         &quot;&quot;&quot;;
             }
 
-<span class="nc" id="L53">            return &quot;&quot;&quot;</span>
+<span class="fc" id="L53">            return &quot;&quot;&quot;</span>
                     Civic Update Available.
 
                     Why It Matters:

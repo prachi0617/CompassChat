@@ -14,40 +14,40 @@ public class AiAgentService {
     private final GroqProvider groqProvider;
     private final RuleBasedProvider ruleBasedProvider;
 
-<span class="nc" id="L17">    public AiAgentService(AIContextBuilder contextBuilder,</span>
+<span class="fc" id="L17">    public AiAgentService(AIContextBuilder contextBuilder,</span>
                           GroqProvider groqProvider,
                           RuleBasedProvider ruleBasedProvider) {
-<span class="nc" id="L20">        this.contextBuilder = contextBuilder;</span>
-<span class="nc" id="L21">        this.groqProvider = groqProvider;</span>
-<span class="nc" id="L22">        this.ruleBasedProvider = ruleBasedProvider;</span>
-<span class="nc" id="L23">    }</span>
+<span class="fc" id="L20">        this.contextBuilder = contextBuilder;</span>
+<span class="fc" id="L21">        this.groqProvider = groqProvider;</span>
+<span class="fc" id="L22">        this.ruleBasedProvider = ruleBasedProvider;</span>
+<span class="fc" id="L23">    }</span>
 
     public ChatResponse processMessage(String message, UUID userId) {
-<span class="nc" id="L26">        AIContext context = contextBuilder.build(message, userId);</span>
+<span class="fc" id="L26">        AIContext context = contextBuilder.build(message, userId);</span>
 
         // Escalation short-circuits AI call — no need to spend tokens
-<span class="nc bnc" id="L29" title="All 2 branches missed.">        if (context.getEscalation().escalate()) {</span>
-<span class="nc" id="L30">            return new ChatResponse(</span>
-<span class="nc" id="L31">                    ruleBasedProvider.completeFromContext(context),</span>
-<span class="nc" id="L32">                    context.getIntent().name(),</span>
-<span class="nc" id="L33">                    true</span>
+<span class="fc bfc" id="L29" title="All 2 branches covered.">        if (context.getEscalation().escalate()) {</span>
+<span class="fc" id="L30">            return new ChatResponse(</span>
+<span class="fc" id="L31">                    ruleBasedProvider.completeFromContext(context),</span>
+<span class="fc" id="L32">                    context.getIntent().name(),</span>
+<span class="fc" id="L33">                    true</span>
             );
         }
 
-<span class="nc" id="L37">        String responseText = generateResponse(context, message);</span>
-<span class="nc" id="L38">        return new ChatResponse(responseText, context.getIntent().name(), false);</span>
+<span class="fc" id="L37">        String responseText = generateResponse(context, message);</span>
+<span class="fc" id="L38">        return new ChatResponse(responseText, context.getIntent().name(), false);</span>
     }
 
     private String generateResponse(AIContext context, String message) {
-<span class="nc bnc" id="L42" title="All 2 branches missed.">        if (groqProvider.isEnabled()) {</span>
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        if (groqProvider.isEnabled()) {</span>
             try {
-<span class="nc" id="L44">                String systemPrompt = contextBuilder.buildSystemPrompt(context);</span>
-<span class="nc" id="L45">                return groqProvider.complete(systemPrompt, message);</span>
-<span class="nc" id="L46">            } catch (Exception e) {</span>
+<span class="fc" id="L44">                String systemPrompt = contextBuilder.buildSystemPrompt(context);</span>
+<span class="fc" id="L45">                return groqProvider.complete(systemPrompt, message);</span>
+<span class="fc" id="L46">            } catch (Exception e) {</span>
                 // Fall through to rule-based on any Groq failure
             }
         }
-<span class="nc" id="L50">        return ruleBasedProvider.completeFromContext(context);</span>
+<span class="fc" id="L50">        return ruleBasedProvider.completeFromContext(context);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

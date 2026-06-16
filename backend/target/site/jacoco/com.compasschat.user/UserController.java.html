@@ -21,52 +21,52 @@ public class UserController {
     private final JwtService jwtService;
     private final PresenceService presenceService;
 
-<span class="nc" id="L24">    public UserController(UserService userService, JwtService jwtService, PresenceService presenceService) {</span>
-<span class="nc" id="L25">        this.userService = userService;</span>
-<span class="nc" id="L26">        this.jwtService = jwtService;</span>
-<span class="nc" id="L27">        this.presenceService = presenceService;</span>
-<span class="nc" id="L28">    }</span>
+<span class="fc" id="L24">    public UserController(UserService userService, JwtService jwtService, PresenceService presenceService) {</span>
+<span class="fc" id="L25">        this.userService = userService;</span>
+<span class="fc" id="L26">        this.jwtService = jwtService;</span>
+<span class="fc" id="L27">        this.presenceService = presenceService;</span>
+<span class="fc" id="L28">    }</span>
 
     @GetMapping(&quot;/me&quot;)
     public ApiResponse&lt;UserResponse&gt; me(HttpServletRequest http) {
-<span class="nc" id="L32">        String username = jwtService.getUsername(extractToken(http));</span>
-<span class="nc" id="L33">        return ApiResponse.ok(UserResponse.from(userService.findByUsername(username)));</span>
+<span class="fc" id="L32">        String username = jwtService.getUsername(extractToken(http));</span>
+<span class="fc" id="L33">        return ApiResponse.ok(UserResponse.from(userService.findByUsername(username)));</span>
     }
 
     @PutMapping(&quot;/me/presence&quot;)
     public ApiResponse&lt;Void&gt; updatePresence(@Valid @RequestBody PresenceUpdateRequest req,
                                             HttpServletRequest http) {
-<span class="nc" id="L39">        UUID userId = jwtService.getUserId(extractToken(http));</span>
-<span class="nc" id="L40">        presenceService.setStatus(userId, req.status());</span>
-<span class="nc" id="L41">        return ApiResponse.ok(null);</span>
+<span class="fc" id="L39">        UUID userId = jwtService.getUserId(extractToken(http));</span>
+<span class="fc" id="L40">        presenceService.setStatus(userId, req.status());</span>
+<span class="fc" id="L41">        return ApiResponse.ok(null);</span>
     }
 
     @GetMapping(&quot;/{id}&quot;)
     public ApiResponse&lt;UserResponse&gt; getUser(@PathVariable UUID id) {
-<span class="nc" id="L46">        return ApiResponse.ok(UserResponse.from(userService.findById(id)));</span>
+<span class="fc" id="L46">        return ApiResponse.ok(UserResponse.from(userService.findById(id)));</span>
     }
 
     @GetMapping
     public ApiResponse&lt;List&lt;UserResponse&gt;&gt; getAllUsers() {
-<span class="nc" id="L51">        List&lt;UserResponse&gt; safeCopies = userService.findAll().stream()</span>
-<span class="nc" id="L52">                .map(UserResponse::from)</span>
-<span class="nc" id="L53">                .toList();</span>
-<span class="nc" id="L54">        return ApiResponse.ok(safeCopies);</span>
+<span class="fc" id="L51">        List&lt;UserResponse&gt; safeCopies = userService.findAll().stream()</span>
+<span class="fc" id="L52">                .map(UserResponse::from)</span>
+<span class="fc" id="L53">                .toList();</span>
+<span class="fc" id="L54">        return ApiResponse.ok(safeCopies);</span>
     }
 
     @PutMapping(&quot;/{id}&quot;)
     public ApiResponse&lt;UserResponse&gt; updateUser(@PathVariable UUID id,
                                                 @Valid @RequestBody UpdateUserRequest req) {
-<span class="nc" id="L60">        return ApiResponse.ok(&quot;Profile updated&quot;,</span>
-<span class="nc" id="L61">                UserResponse.from(userService.updateProfile(id, req)));</span>
+<span class="fc" id="L60">        return ApiResponse.ok(&quot;Profile updated&quot;,</span>
+<span class="fc" id="L61">                UserResponse.from(userService.updateProfile(id, req)));</span>
     }
 
     private String extractToken(HttpServletRequest http) {
-<span class="nc" id="L65">        String header = http.getHeader(&quot;Authorization&quot;);</span>
-<span class="nc bnc" id="L66" title="All 4 branches missed.">        if (header == null || !header.startsWith(&quot;Bearer &quot;)) {</span>
+<span class="fc" id="L65">        String header = http.getHeader(&quot;Authorization&quot;);</span>
+<span class="pc bpc" id="L66" title="2 of 4 branches missed.">        if (header == null || !header.startsWith(&quot;Bearer &quot;)) {</span>
 <span class="nc" id="L67">            throw new IllegalArgumentException(&quot;Missing Authorization header&quot;);</span>
         }
-<span class="nc" id="L69">        return header.substring(7);</span>
+<span class="fc" id="L69">        return header.substring(7);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

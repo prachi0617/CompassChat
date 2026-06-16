@@ -18,38 +18,38 @@ public class AuthService {
     private final PasswordEncoder encoder;  // the blender
     private final JwtService jwtService;    // the wristband machine
 
-<span class="nc" id="L21">    public AuthService(UserRepository users, PasswordEncoder encoder, JwtService jwtService) {</span>
-<span class="nc" id="L22">        this.users = users;</span>
-<span class="nc" id="L23">        this.encoder = encoder;</span>
-<span class="nc" id="L24">        this.jwtService = jwtService;</span>
-<span class="nc" id="L25">    }</span>
+<span class="fc" id="L21">    public AuthService(UserRepository users, PasswordEncoder encoder, JwtService jwtService) {</span>
+<span class="fc" id="L22">        this.users = users;</span>
+<span class="fc" id="L23">        this.encoder = encoder;</span>
+<span class="fc" id="L24">        this.jwtService = jwtService;</span>
+<span class="fc" id="L25">    }</span>
 
     /** Rule book for joining the club. */
     public AuthResponse register(RegisterRequest req) {
-<span class="nc bnc" id="L29" title="All 2 branches missed.">        if (users.findByUsername(req.username()).isPresent()) {</span>
-<span class="nc" id="L30">            throw new IllegalStateException(&quot;That username is taken&quot;);</span>
+<span class="fc bfc" id="L29" title="All 2 branches covered.">        if (users.findByUsername(req.username()).isPresent()) {</span>
+<span class="fc" id="L30">            throw new IllegalStateException(&quot;That username is taken&quot;);</span>
         }
 
-<span class="nc" id="L33">        User user = new User(req.username(), encoder.encode(req.password()), Role.MEMBER);</span>
-<span class="nc" id="L34">        user = users.save(user); // save returns the card WITH its new UUID filled in</span>
+<span class="fc" id="L33">        User user = new User(req.username(), encoder.encode(req.password()), Role.MEMBER);</span>
+<span class="fc" id="L34">        user = users.save(user); // save returns the card WITH its new UUID filled in</span>
 
-<span class="nc" id="L36">        String token = jwtService.generateToken(user.getId(), user.getUsername(), user.getRole().name());</span>
-<span class="nc" id="L37">        return new AuthResponse(token, user.getId(), user.getUsername(), user.getRole().name());</span>
+<span class="fc" id="L36">        String token = jwtService.generateToken(user.getId(), user.getUsername(), user.getRole().name());</span>
+<span class="fc" id="L37">        return new AuthResponse(token, user.getId(), user.getUsername(), user.getRole().name());</span>
     }
 
     /** Rule book for getting in the door. */
     public AuthResponse login(LoginRequest req) {
         // Same vague error for &quot;no such user&quot; AND &quot;wrong password&quot;,
         // so snoopers can't discover which usernames exist.
-<span class="nc" id="L44">        User user = users.findByUsername(req.username())</span>
-<span class="nc" id="L45">                .orElseThrow(() -&gt; new BadCredentialsException(&quot;Invalid username or password&quot;));</span>
+<span class="fc" id="L44">        User user = users.findByUsername(req.username())</span>
+<span class="fc" id="L45">                .orElseThrow(() -&gt; new BadCredentialsException(&quot;Invalid username or password&quot;));</span>
 
-<span class="nc bnc" id="L47" title="All 2 branches missed.">        if (!encoder.matches(req.password(), user.getPasswordHash())) {</span>
-<span class="nc" id="L48">            throw new BadCredentialsException(&quot;Invalid username or password&quot;);</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">        if (!encoder.matches(req.password(), user.getPasswordHash())) {</span>
+<span class="fc" id="L48">            throw new BadCredentialsException(&quot;Invalid username or password&quot;);</span>
         }
 
-<span class="nc" id="L51">        String token = jwtService.generateToken(user.getId(), user.getUsername(), user.getRole().name());</span>
-<span class="nc" id="L52">        return new AuthResponse(token, user.getId(), user.getUsername(), user.getRole().name());</span>
+<span class="fc" id="L51">        String token = jwtService.generateToken(user.getId(), user.getUsername(), user.getRole().name());</span>
+<span class="fc" id="L52">        return new AuthResponse(token, user.getId(), user.getUsername(), user.getRole().name());</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -18,24 +18,24 @@ public class AiAgentController {
     private final AiAgentService aiAgentService;
     private final JwtService jwtService;
 
-<span class="nc" id="L21">    public AiAgentController(AiAgentService aiAgentService, JwtService jwtService) {</span>
-<span class="nc" id="L22">        this.aiAgentService = aiAgentService;</span>
-<span class="nc" id="L23">        this.jwtService = jwtService;</span>
-<span class="nc" id="L24">    }</span>
+<span class="fc" id="L21">    public AiAgentController(AiAgentService aiAgentService, JwtService jwtService) {</span>
+<span class="fc" id="L22">        this.aiAgentService = aiAgentService;</span>
+<span class="fc" id="L23">        this.jwtService = jwtService;</span>
+<span class="fc" id="L24">    }</span>
 
     @PostMapping(&quot;/chat&quot;)
     public ApiResponse&lt;ChatResponse&gt; chat(@RequestBody ChatRequest request,
                                           HttpServletRequest http) {
-<span class="nc" id="L29">        UUID userId = jwtService.getUserId(extractToken(http));</span>
-<span class="nc" id="L30">        return ApiResponse.ok(aiAgentService.processMessage(request.message(), userId));</span>
+<span class="fc" id="L29">        UUID userId = jwtService.getUserId(extractToken(http));</span>
+<span class="fc" id="L30">        return ApiResponse.ok(aiAgentService.processMessage(request.message(), userId));</span>
     }
 
     private String extractToken(HttpServletRequest http) {
-<span class="nc" id="L34">        String header = http.getHeader(&quot;Authorization&quot;);</span>
-<span class="nc bnc" id="L35" title="All 4 branches missed.">        if (header == null || !header.startsWith(&quot;Bearer &quot;)) {</span>
+<span class="fc" id="L34">        String header = http.getHeader(&quot;Authorization&quot;);</span>
+<span class="pc bpc" id="L35" title="2 of 4 branches missed.">        if (header == null || !header.startsWith(&quot;Bearer &quot;)) {</span>
 <span class="nc" id="L36">            throw new AccessDeniedException(&quot;Missing token&quot;);</span>
         }
-<span class="nc" id="L38">        return header.substring(7);</span>
+<span class="fc" id="L38">        return header.substring(7);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

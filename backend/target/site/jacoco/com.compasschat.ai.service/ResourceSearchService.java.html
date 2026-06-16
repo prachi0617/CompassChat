@@ -7,42 +7,42 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 @Service
-<span class="nc" id="L10">public class ResourceSearchService {</span>
+<span class="fc" id="L10">public class ResourceSearchService {</span>
 
     public String search(String query) {
 
         try {
 
-<span class="nc" id="L16">            ClassPathResource resource =</span>
-<span class="nc" id="L17">                    new ClassPathResource(</span>
-<span class="nc" id="L18">                            &quot;data/Service_Directory_cleaned.json&quot;</span>
+<span class="fc" id="L16">            ClassPathResource resource =</span>
+<span class="fc" id="L17">                    new ClassPathResource(</span>
+<span class="fc" id="L18">                            &quot;data/Service_Directory_cleaned.json&quot;</span>
                     );
 
-<span class="nc" id="L21">            String json =</span>
-<span class="nc" id="L22">                    Files.readString(</span>
-<span class="nc" id="L23">                            resource.getFile().toPath()</span>
+<span class="fc" id="L21">            String json =</span>
+<span class="fc" id="L22">                    Files.readString(</span>
+<span class="fc" id="L23">                            resource.getFile().toPath()</span>
                     );
 
-<span class="nc" id="L26">            String lower =</span>
-<span class="nc" id="L27">                    query.toLowerCase();</span>
+<span class="fc" id="L26">            String lower =</span>
+<span class="fc" id="L27">                    query.toLowerCase();</span>
 
-<span class="nc bnc" id="L29" title="All 2 branches missed.">            if (lower.contains(&quot;food&quot;)) {</span>
-<span class="nc" id="L30">                return &quot;Food assistance resources found.&quot;;</span>
+<span class="fc bfc" id="L29" title="All 2 branches covered.">            if (lower.contains(&quot;food&quot;)) {</span>
+<span class="fc" id="L30">                return &quot;Food assistance resources found.&quot;;</span>
             }
 
-<span class="nc bnc" id="L33" title="All 2 branches missed.">            if (lower.contains(&quot;housing&quot;)) {</span>
-<span class="nc" id="L34">                return &quot;Housing assistance resources found.&quot;;</span>
+<span class="fc bfc" id="L33" title="All 2 branches covered.">            if (lower.contains(&quot;housing&quot;)) {</span>
+<span class="fc" id="L34">                return &quot;Housing assistance resources found.&quot;;</span>
             }
 
-<span class="nc bnc" id="L37" title="All 2 branches missed.">            if (lower.contains(&quot;transportation&quot;)) {</span>
-<span class="nc" id="L38">                return &quot;Transportation resources found.&quot;;</span>
+<span class="fc bfc" id="L37" title="All 2 branches covered.">            if (lower.contains(&quot;transportation&quot;)) {</span>
+<span class="fc" id="L38">                return &quot;Transportation resources found.&quot;;</span>
             }
 
-<span class="nc bnc" id="L41" title="All 2 branches missed.">            if (lower.contains(&quot;health&quot;)) {</span>
-<span class="nc" id="L42">                return &quot;Healthcare resources found.&quot;;</span>
+<span class="fc bfc" id="L41" title="All 2 branches covered.">            if (lower.contains(&quot;health&quot;)) {</span>
+<span class="fc" id="L42">                return &quot;Healthcare resources found.&quot;;</span>
             }
 
-<span class="nc" id="L45">            return &quot;Community resources available.&quot;;</span>
+<span class="fc" id="L45">            return &quot;Community resources available.&quot;;</span>
 
 <span class="nc" id="L47">        } catch (IOException ex) {</span>
 

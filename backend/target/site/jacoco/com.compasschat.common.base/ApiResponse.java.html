@@ -4,7 +4,7 @@ public record ApiResponse&lt;T&gt;(boolean success, String message, T data) {
 
     /** Happy path with a goodie inside. */
     public static &lt;T&gt; ApiResponse&lt;T&gt; ok(T data) {
-<span class="nc" id="L7">        return new ApiResponse&lt;&gt;(true, &quot;Operation successful&quot;, data);</span>
+<span class="fc" id="L7">        return new ApiResponse&lt;&gt;(true, &quot;Operation successful&quot;, data);</span>
     }
 
     /** Happy path with a custom note. */

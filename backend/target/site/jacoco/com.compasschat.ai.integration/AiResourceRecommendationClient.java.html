@@ -16,83 +16,83 @@ public class AiResourceRecommendationClient implements ResourceRecommendationSer
 
     private final GroqProvider groqProvider;
 
-<span class="nc" id="L19">    public AiResourceRecommendationClient(GroqProvider groqProvider) {</span>
-<span class="nc" id="L20">        this.groqProvider = groqProvider;</span>
-<span class="nc" id="L21">    }</span>
+<span class="fc" id="L19">    public AiResourceRecommendationClient(GroqProvider groqProvider) {</span>
+<span class="fc" id="L20">        this.groqProvider = groqProvider;</span>
+<span class="fc" id="L21">    }</span>
 
     @Override
     public List&lt;RecommendedResource&gt; recommend(MoodType moodType, String note) {
-<span class="nc bnc" id="L25" title="All 2 branches missed.">        if (groqProvider.isEnabled()) {</span>
+<span class="fc bfc" id="L25" title="All 2 branches covered.">        if (groqProvider.isEnabled()) {</span>
             try {
-<span class="nc" id="L27">                return recommendViaGroq(moodType, note);</span>
-<span class="nc" id="L28">            } catch (Exception ignored) {</span>
+<span class="fc" id="L27">                return recommendViaGroq(moodType, note);</span>
+<span class="fc" id="L28">            } catch (Exception ignored) {</span>
                 // fall through to rule-based
             }
         }
-<span class="nc" id="L32">        return ruleBasedRecommendations(moodType);</span>
+<span class="fc" id="L32">        return ruleBasedRecommendations(moodType);</span>
     }
 
     private List&lt;RecommendedResource&gt; recommendViaGroq(MoodType moodType, String note) {
-<span class="nc" id="L36">        String prompt = String.format(</span>
-<span class="nc" id="L37">                &quot;A user logged their mood as %s with the note: \&quot;%s\&quot;. &quot; +</span>
+<span class="fc" id="L36">        String prompt = String.format(</span>
+<span class="fc" id="L37">                &quot;A user logged their mood as %s with the note: \&quot;%s\&quot;. &quot; +</span>
                 &quot;List 1-2 Delaware community resources that could help them right now. &quot; +
                 &quot;Reply as plain text: one resource per line, format: Title | Short description | URL&quot;,
-<span class="nc bnc" id="L40" title="All 2 branches missed.">                moodType.name(), note == null ? &quot;&quot; : note</span>
+<span class="pc bpc" id="L40" title="1 of 2 branches missed.">                moodType.name(), note == null ? &quot;&quot; : note</span>
         );
 
-<span class="nc" id="L43">        String raw = groqProvider.complete(</span>
-<span class="nc" id="L44">                &quot;You are CompassChat, a community resource assistant for Delaware residents. &quot; +</span>
+<span class="fc" id="L43">        String raw = groqProvider.complete(</span>
+<span class="fc" id="L44">                &quot;You are CompassChat, a community resource assistant for Delaware residents. &quot; +</span>
                 &quot;Be concise and empathetic.&quot;,
-<span class="nc" id="L46">                prompt</span>
+<span class="fc" id="L46">                prompt</span>
         );
 
-<span class="nc" id="L49">        return parseGroqResponse(raw);</span>
+<span class="fc" id="L49">        return parseGroqResponse(raw);</span>
     }
 
     private List&lt;RecommendedResource&gt; parseGroqResponse(String raw) {
-<span class="nc" id="L53">        return raw.lines()</span>
-<span class="nc" id="L54">                .map(String::trim)</span>
-<span class="nc" id="L55">                .filter(l -&gt; l.contains(&quot;|&quot;))</span>
-<span class="nc" id="L56">                .map(l -&gt; {</span>
-<span class="nc" id="L57">                    String[] parts = l.split(&quot;\\|&quot;, 3);</span>
-<span class="nc" id="L58">                    return new RecommendedResource(</span>
-<span class="nc" id="L59">                            parts[0].trim(),</span>
-<span class="nc bnc" id="L60" title="All 2 branches missed.">                            parts.length &gt; 1 ? parts[1].trim() : &quot;&quot;,</span>
-<span class="nc bnc" id="L61" title="All 2 branches missed.">                            parts.length &gt; 2 ? parts[2].trim() : &quot;&quot;,</span>
-<span class="nc" id="L62">                            &quot;groq&quot;</span>
+<span class="fc" id="L53">        return raw.lines()</span>
+<span class="fc" id="L54">                .map(String::trim)</span>
+<span class="fc" id="L55">                .filter(l -&gt; l.contains(&quot;|&quot;))</span>
+<span class="fc" id="L56">                .map(l -&gt; {</span>
+<span class="fc" id="L57">                    String[] parts = l.split(&quot;\\|&quot;, 3);</span>
+<span class="fc" id="L58">                    return new RecommendedResource(</span>
+<span class="fc" id="L59">                            parts[0].trim(),</span>
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">                            parts.length &gt; 1 ? parts[1].trim() : &quot;&quot;,</span>
+<span class="pc bpc" id="L61" title="1 of 2 branches missed.">                            parts.length &gt; 2 ? parts[2].trim() : &quot;&quot;,</span>
+<span class="fc" id="L62">                            &quot;groq&quot;</span>
                     );
                 })
-<span class="nc" id="L65">                .limit(2)</span>
-<span class="nc" id="L66">                .toList();</span>
+<span class="fc" id="L65">                .limit(2)</span>
+<span class="fc" id="L66">                .toList();</span>
     }
 
     private List&lt;RecommendedResource&gt; ruleBasedRecommendations(MoodType moodType) {
-<span class="nc bnc" id="L70" title="All 4 branches missed.">        return switch (moodType) {</span>
-<span class="nc" id="L71">            case ANXIOUS, STRESSED, SAD, LONELY -&gt; List.of(</span>
-<span class="nc" id="L72">                    new RecommendedResource(</span>
-<span class="nc" id="L73">                            &quot;Delaware 211 Helpline&quot;,</span>
-<span class="nc" id="L74">                            &quot;Free, confidential help connecting you to local health and human services.&quot;,</span>
-<span class="nc" id="L75">                            &quot;https://www.delaware211.org&quot;,</span>
-<span class="nc" id="L76">                            &quot;rule_based&quot;</span>
+<span class="fc bfc" id="L70" title="All 4 branches covered.">        return switch (moodType) {</span>
+<span class="fc" id="L71">            case ANXIOUS, STRESSED, SAD, LONELY -&gt; List.of(</span>
+<span class="fc" id="L72">                    new RecommendedResource(</span>
+<span class="fc" id="L73">                            &quot;Delaware 211 Helpline&quot;,</span>
+<span class="fc" id="L74">                            &quot;Free, confidential help connecting you to local health and human services.&quot;,</span>
+<span class="fc" id="L75">                            &quot;https://www.delaware211.org&quot;,</span>
+<span class="fc" id="L76">                            &quot;rule_based&quot;</span>
                     )
             );
-<span class="nc" id="L79">            case OVERWHELMED, DISTRESSED -&gt; List.of(</span>
-<span class="nc" id="L80">                    new RecommendedResource(</span>
-<span class="nc" id="L81">                            &quot;NAMI Delaware&quot;,</span>
-<span class="nc" id="L82">                            &quot;Mental health support, education, and advocacy for Delawareans.&quot;,</span>
-<span class="nc" id="L83">                            &quot;https://namide.org&quot;,</span>
-<span class="nc" id="L84">                            &quot;rule_based&quot;</span>
+<span class="fc" id="L79">            case OVERWHELMED, DISTRESSED -&gt; List.of(</span>
+<span class="fc" id="L80">                    new RecommendedResource(</span>
+<span class="fc" id="L81">                            &quot;NAMI Delaware&quot;,</span>
+<span class="fc" id="L82">                            &quot;Mental health support, education, and advocacy for Delawareans.&quot;,</span>
+<span class="fc" id="L83">                            &quot;https://namide.org&quot;,</span>
+<span class="fc" id="L84">                            &quot;rule_based&quot;</span>
                     )
             );
-<span class="nc" id="L87">            case TIRED -&gt; List.of(</span>
-<span class="nc" id="L88">                    new RecommendedResource(</span>
-<span class="nc" id="L89">                            &quot;Delaware Health &amp; Social Services&quot;,</span>
-<span class="nc" id="L90">                            &quot;Programs supporting physical and emotional wellbeing across Delaware.&quot;,</span>
-<span class="nc" id="L91">                            &quot;https://dhss.delaware.gov&quot;,</span>
-<span class="nc" id="L92">                            &quot;rule_based&quot;</span>
+<span class="fc" id="L87">            case TIRED -&gt; List.of(</span>
+<span class="fc" id="L88">                    new RecommendedResource(</span>
+<span class="fc" id="L89">                            &quot;Delaware Health &amp; Social Services&quot;,</span>
+<span class="fc" id="L90">                            &quot;Programs supporting physical and emotional wellbeing across Delaware.&quot;,</span>
+<span class="fc" id="L91">                            &quot;https://dhss.delaware.gov&quot;,</span>
+<span class="fc" id="L92">                            &quot;rule_based&quot;</span>
                     )
             );
-<span class="nc" id="L95">            default -&gt; List.of();</span>
+<span class="fc" id="L95">            default -&gt; List.of();</span>
         };
     }
 }

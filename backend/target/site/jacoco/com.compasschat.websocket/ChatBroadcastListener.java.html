@@ -16,27 +16,27 @@ public class ChatBroadcastListener {
     private final SimpMessagingTemplate megaphone;
     private final MessageRepository messages;
 
-<span class="nc" id="L19">    public ChatBroadcastListener(SimpMessagingTemplate megaphone, MessageRepository messages) {</span>
-<span class="nc" id="L20">        this.megaphone = megaphone;</span>
-<span class="nc" id="L21">        this.messages = messages;</span>
-<span class="nc" id="L22">    }</span>
+<span class="fc" id="L19">    public ChatBroadcastListener(SimpMessagingTemplate megaphone, MessageRepository messages) {</span>
+<span class="fc" id="L20">        this.megaphone = megaphone;</span>
+<span class="fc" id="L21">        this.messages = messages;</span>
+<span class="fc" id="L22">    }</span>
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onMessagePosted(MessagePostedEvent event) {
         // We re-load the message so the broadcast carries the authoritative
         // server-side timestamp (createdAt), not whatever the event captured.
-<span class="nc" id="L28">        Message msg = messages.findById(event.getMessageId()).orElse(null);</span>
-<span class="nc bnc" id="L29" title="All 2 branches missed.">        if (msg == null) return; // gone between commit and broadcast - skip</span>
+<span class="fc" id="L28">        Message msg = messages.findById(event.getMessageId()).orElse(null);</span>
+<span class="fc bfc" id="L29" title="All 2 branches covered.">        if (msg == null) return; // gone between commit and broadcast - skip</span>
 
-<span class="nc" id="L31">        OutgoingChatMessage payload = new OutgoingChatMessage(</span>
-<span class="nc" id="L32">                msg.getId(),</span>
-<span class="nc" id="L33">                msg.getChannelId(),</span>
-<span class="nc" id="L34">                msg.getSenderId(),</span>
-<span class="nc" id="L35">                msg.getContent(),</span>
-<span class="nc" id="L36">                msg.getCreatedAt()</span>
+<span class="fc" id="L31">        OutgoingChatMessage payload = new OutgoingChatMessage(</span>
+<span class="fc" id="L32">                msg.getId(),</span>
+<span class="fc" id="L33">                msg.getChannelId(),</span>
+<span class="fc" id="L34">                msg.getSenderId(),</span>
+<span class="fc" id="L35">                msg.getContent(),</span>
+<span class="fc" id="L36">                msg.getCreatedAt()</span>
         );
 
-<span class="nc" id="L39">        megaphone.convertAndSend(&quot;/topic/channels/&quot; + msg.getChannelId(), payload);</span>
-<span class="nc" id="L40">    }</span>
+<span class="fc" id="L39">        megaphone.convertAndSend(&quot;/topic/channels/&quot; + msg.getChannelId(), payload);</span>
+<span class="fc" id="L40">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
