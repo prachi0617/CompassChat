@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>IntentParser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Community Compass Java Service</a> &gt; <a href="index.source.html" class="el_package">com.compasschat.ai.context.parsers</a> &gt; <span class="el_source">IntentParser.java</span></div><h1>IntentParser.java</h1><pre class="source lang-java linenums">package com.compasschat.ai.context.parsers;
+
+import com.compasschat.ai.context.IntentType;
+import org.springframework.stereotype.Component;
+
+@Component
+<span class="fc" id="L7">public class IntentParser {</span>
+
+    public IntentType parse(String message) {
+<span class="fc" id="L10">        String input = message.toLowerCase();</span>
+
+<span class="fc bfc" id="L12" title="All 2 branches covered.">        if (containsAny(input, &quot;agent&quot;, &quot;caseworker&quot;, &quot;case worker&quot;, &quot;person&quot;, &quot;human&quot;, &quot;help me now&quot;, &quot;talk to someone&quot;))</span>
+<span class="fc" id="L13">            return IntentType.ESCALATE;</span>
+
+<span class="fc bfc" id="L15" title="All 2 branches covered.">        if (containsAny(input, &quot;rent&quot;, &quot;housing&quot;, &quot;voucher&quot;, &quot;eviction&quot;, &quot;evicted&quot;, &quot;shelter&quot;, &quot;homeless&quot;, &quot;landlord&quot;))</span>
+<span class="fc" id="L16">            return IntentType.HOUSING;</span>
+
+<span class="fc bfc" id="L18" title="All 2 branches covered.">        if (containsAny(input, &quot;job&quot;, &quot;career&quot;, &quot;first step&quot;, &quot;resume&quot;, &quot;college&quot;, &quot;training&quot;, &quot;internship&quot;, &quot;youth&quot;, &quot;future&quot;))</span>
+<span class="fc" id="L19">            return IntentType.YOUTH;</span>
+
+<span class="fc bfc" id="L21" title="All 2 branches covered.">        if (containsAny(input, &quot;wilmington&quot;, &quot;policy&quot;, &quot;news&quot;, &quot;civic&quot;, &quot;government&quot;, &quot;legislation&quot;, &quot;vote&quot;, &quot;council&quot;))</span>
+<span class="fc" id="L22">            return IntentType.CIVIC;</span>
+
+<span class="fc bfc" id="L24" title="All 2 branches covered.">        if (containsAny(input, &quot;food&quot;, &quot;transportation&quot;, &quot;healthcare&quot;, &quot;clinic&quot;, &quot;resource&quot;, &quot;assistance&quot;, &quot;benefit&quot;, &quot;snap&quot;, &quot;medicaid&quot;))</span>
+<span class="fc" id="L25">            return IntentType.RESOURCES;</span>
+
+<span class="fc bfc" id="L27" title="All 2 branches covered.">        if (containsAny(input, &quot;sad&quot;, &quot;stressed&quot;, &quot;lonely&quot;, &quot;anxious&quot;, &quot;depressed&quot;, &quot;scared&quot;, &quot;hopeless&quot;, &quot;overwhelmed&quot;, &quot;mood&quot;, &quot;feeling&quot;, &quot;crisis&quot;))</span>
+<span class="fc" id="L28">            return IntentType.MOOD;</span>
+
+<span class="fc bfc" id="L30" title="All 2 branches covered.">        if (containsAny(input, &quot;remind&quot;, &quot;appointment&quot;, &quot;tomorrow&quot;, &quot;medicine&quot;, &quot;medication&quot;, &quot;meeting&quot;, &quot;schedule&quot;))</span>
+<span class="fc" id="L31">            return IntentType.REMINDER;</span>
+
+<span class="fc bfc" id="L33" title="All 2 branches covered.">        if (containsAny(input, &quot;case&quot;, &quot;workflow&quot;, &quot;client&quot;, &quot;intake&quot;, &quot;referral&quot;, &quot;follow up&quot;, &quot;status&quot;))</span>
+<span class="fc" id="L34">            return IntentType.CASEWORKER;</span>
+
+<span class="fc" id="L36">        return IntentType.UNKNOWN;</span>
+    }
+
+    private boolean containsAny(String input, String... keywords) {
+<span class="fc bfc" id="L40" title="All 2 branches covered.">        for (String kw : keywords) {</span>
+<span class="fc bfc" id="L41" title="All 2 branches covered.">            if (input.contains(kw)) return true;</span>
+        }
+<span class="fc" id="L43">        return false;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

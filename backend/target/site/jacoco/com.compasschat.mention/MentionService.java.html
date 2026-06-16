@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MentionService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Community Compass Java Service</a> &gt; <a href="index.source.html" class="el_package">com.compasschat.mention</a> &gt; <span class="el_source">MentionService.java</span></div><h1>MentionService.java</h1><pre class="source lang-java linenums">package com.compasschat.mention;
+
+import com.compasschat.common.base.BaseService;
+import com.compasschat.mention.dto.MentionResponse;
+import com.compasschat.user.UserRepository;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+@Service
+public class MentionService extends BaseService&lt;Mention, UUID&gt; {
+
+<span class="fc" id="L19">    private static final Pattern MENTION_PATTERN = Pattern.compile(&quot;@([\\w.\\-]+)&quot;);</span>
+
+    private final MentionRepository mentions;
+    private final UserRepository users;
+    private final ApplicationEventPublisher eventPublisher;
+    private final SimpMessagingTemplate broker;
+
+    public MentionService(MentionRepository mentions, UserRepository users,
+                          ApplicationEventPublisher eventPublisher, SimpMessagingTemplate broker) {
+<span class="fc" id="L28">        super(mentions, &quot;Mention&quot;);</span>
+<span class="fc" id="L29">        this.mentions = mentions;</span>
+<span class="fc" id="L30">        this.users = users;</span>
+<span class="fc" id="L31">        this.eventPublisher = eventPublisher;</span>
+<span class="fc" id="L32">        this.broker = broker;</span>
+<span class="fc" id="L33">    }</span>
+
+    /**
+     * Called after a message is persisted. Parses every @username token,
+     * resolves it to a user, saves a Mention row, fires UserMentionedEvent,
+     * and pushes a real-time notification to the mentioned user's private queue.
+     */
+    @Transactional
+    public void extractAndSave(UUID messageId, UUID channelId, UUID senderUserId, String content) {
+<span class="fc" id="L42">        Matcher matcher = MENTION_PATTERN.matcher(content);</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">        while (matcher.find()) {</span>
+<span class="fc" id="L44">            String username = matcher.group(1);</span>
+<span class="fc" id="L45">            users.findByUsername(username).ifPresent(mentionedUser -&gt; {</span>
+                // Don't notify someone they mentioned themselves
+<span class="fc bfc" id="L47" title="All 2 branches covered.">                if (mentionedUser.getId().equals(senderUserId)) return;</span>
+
+<span class="fc" id="L49">                Mention mention = mentions.save(</span>
+<span class="fc" id="L50">                        new Mention(messageId, channelId, senderUserId, mentionedUser.getId()));</span>
+
+<span class="fc" id="L52">                eventPublisher.publishEvent(new UserMentionedEvent(</span>
+<span class="fc" id="L53">                        mention.getId(), mentionedUser.getId(),</span>
+<span class="fc" id="L54">                        messageId, channelId, senderUserId));</span>
+
+                // Real-time push: frontend subscribes to /user/queue/mentions
+<span class="fc" id="L57">                broker.convertAndSendToUser(</span>
+<span class="fc" id="L58">                        mentionedUser.getUsername(),</span>
+<span class="fc" id="L59">                        &quot;/queue/mentions&quot;,</span>
+<span class="fc" id="L60">                        MentionResponse.from(mention));</span>
+<span class="fc" id="L61">            });</span>
+        }
+<span class="fc" id="L63">    }</span>
+
+    @Transactional(readOnly = true)
+    public List&lt;MentionResponse&gt; getUnread(UUID userId) {
+<span class="fc" id="L67">        return mentions.findByMentionedUserIdAndReadFalseOrderByCreatedAtDesc(userId)</span>
+<span class="fc" id="L68">                .stream().map(MentionResponse::from).toList();</span>
+    }
+
+    @Transactional(readOnly = true)
+    public List&lt;MentionResponse&gt; getAll(UUID userId) {
+<span class="fc" id="L73">        return mentions.findByMentionedUserIdOrderByCreatedAtDesc(userId)</span>
+<span class="fc" id="L74">                .stream().map(MentionResponse::from).toList();</span>
+    }
+
+    @Transactional(readOnly = true)
+    public long countUnread(UUID userId) {
+<span class="fc" id="L79">        return mentions.countByMentionedUserIdAndReadFalse(userId);</span>
+    }
+
+    @Transactional
+    public MentionResponse markRead(UUID mentionId, UUID requesterId) {
+<span class="fc" id="L84">        Mention mention = findById(mentionId);</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">        if (!mention.getMentionedUserId().equals(requesterId)) {</span>
+<span class="fc" id="L86">            throw new org.springframework.security.access.AccessDeniedException(</span>
+<span class="fc" id="L87">                    &quot;Cannot mark another user's mention as read&quot;);</span>
+        }
+<span class="fc" id="L89">        mention.markRead();</span>
+<span class="fc" id="L90">        return MentionResponse.from(mentions.save(mention));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

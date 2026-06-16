@@ -1,4 +1,5 @@
 com/compasschat/mood/Mood.class
+com/compasschat/ai/integration/AiResourceRecommendationClient$1.class
 com/compasschat/websocket/StompPrincipal.class
 com/compasschat/channel/dto/ChannelResponse.class
 com/compasschat/common/base/AuditableEntity.class
@@ -125,6 +126,7 @@ com/compasschat/admin/AdminController.class
 com/compasschat/auth/security/JwtService.class
 com/compasschat/volunteer/VolunteerRepository.class
 com/compasschat/channel/dto/UpdateChannelRequest.class
+com/compasschat/ai/integration/AiResourceRecommendationClient.class
 com/compasschat/ai/service/GroqProvider.class
 com/compasschat/channel/ChannelService.class
 com/compasschat/ai/controller/AiAgentController.class

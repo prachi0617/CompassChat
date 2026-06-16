@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AIContext.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Community Compass Java Service</a> &gt; <a href="index.source.html" class="el_package">com.compasschat.ai.context</a> &gt; <span class="el_source">AIContext.java</span></div><h1>AIContext.java</h1><pre class="source lang-java linenums">package com.compasschat.ai.context;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+<span class="fc" id="L7">public class AIContext {</span>
+
+    private String userMessage;
+<span class="fc" id="L10">    private IntentType intent = IntentType.UNKNOWN;</span>
+<span class="fc" id="L11">    private double sentiment = 0.0;</span>
+<span class="fc" id="L12">    private final List&lt;ContextFragment&gt; fragments = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L13">    private EscalationDecision escalation = EscalationDecision.none();</span>
+
+    public void addFragment(ContextFragment fragment) {
+<span class="pc bpc" id="L16" title="1 of 2 branches missed.">        if (fragment != null) fragments.add(fragment);</span>
+<span class="fc" id="L17">    }</span>
+
+<span class="nc" id="L19">    public String getUserMessage()             { return userMessage; }</span>
+<span class="fc" id="L20">    public void setUserMessage(String msg)     { this.userMessage = msg; }</span>
+
+<span class="fc" id="L22">    public IntentType getIntent()              { return intent; }</span>
+<span class="fc" id="L23">    public void setIntent(IntentType intent)   { this.intent = intent; }</span>
+
+<span class="nc" id="L25">    public double getSentiment()               { return sentiment; }</span>
+<span class="fc" id="L26">    public void setSentiment(double sentiment) { this.sentiment = sentiment; }</span>
+
+<span class="fc" id="L28">    public List&lt;ContextFragment&gt; getFragments(){ return Collections.unmodifiableList(fragments); }</span>
+
+<span class="fc" id="L30">    public EscalationDecision getEscalation()                  { return escalation; }</span>
+<span class="fc" id="L31">    public void setEscalation(EscalationDecision escalation)   { this.escalation = escalation; }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

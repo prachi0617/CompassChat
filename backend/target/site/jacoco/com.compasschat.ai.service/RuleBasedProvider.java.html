@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RuleBasedProvider.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Community Compass Java Service</a> &gt; <a href="index.source.html" class="el_package">com.compasschat.ai.service</a> &gt; <span class="el_source">RuleBasedProvider.java</span></div><h1>RuleBasedProvider.java</h1><pre class="source lang-java linenums">package com.compasschat.ai.service;
+
+import com.compasschat.ai.context.AIContext;
+import com.compasschat.ai.context.ContextFragment;
+import org.springframework.stereotype.Component;
+
+@Component
+<span class="fc" id="L8">public class RuleBasedProvider implements AiProvider {</span>
+
+    @Override
+    public String complete(String systemPrompt, String userMessage) {
+        // This overload is required by the interface but RuleBasedProvider
+        // works better with full AIContext. Call completeFromContext() directly.
+<span class="fc" id="L14">        return &quot;I'm here to help. Could you tell me more about what you need?&quot;;</span>
+    }
+
+    public String completeFromContext(AIContext context) {
+<span class="fc bfc" id="L18" title="All 2 branches covered.">        if (context.getEscalation().escalate()) {</span>
+<span class="fc" id="L19">            String reason = context.getEscalation().reason();</span>
+<span class="fc bfc" id="L20" title="All 2 branches covered.">            if (&quot;high_risk_sentiment&quot;.equals(reason)) {</span>
+<span class="fc" id="L21">                return &quot;I'm concerned about how you're feeling. You don't have to face this alone — &quot;</span>
+                        + &quot;would you like me to connect you with a live support agent right now?&quot;;
+            }
+<span class="fc" id="L24">            return &quot;I'll connect you with a live agent who can assist you directly. &quot;</span>
+                    + &quot;Please hold on — someone will be with you shortly.&quot;;
+        }
+
+<span class="fc bfc" id="L28" title="All 2 branches covered.">        if (context.getFragments().isEmpty()) {</span>
+<span class="fc" id="L29">            return &quot;I'm here to help with housing, healthcare, food assistance, youth programs, &quot;</span>
+                    + &quot;and more. What are you looking for today?&quot;;
+        }
+
+<span class="fc" id="L33">        StringBuilder response = new StringBuilder();</span>
+<span class="fc bfc" id="L34" title="All 2 branches covered.">        for (ContextFragment fragment : context.getFragments()) {</span>
+<span class="fc" id="L35">            response.append(fragment.content()).append(&quot;\n\n&quot;);</span>
+        }
+<span class="fc" id="L37">        response.append(&quot;Would you like more details or help with something specific?&quot;);</span>
+<span class="fc" id="L38">        return response.toString().trim();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -15,6 +15,7 @@
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/controller/AiAgentController.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/dto/ChatRequest.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/dto/ChatResponse.java
+/Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/integration/AiResourceRecommendationClient.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/integration/CivicContextClient.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/integration/FirstStepClient.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/ai/integration/HousingContextClient.java
@@ -65,6 +66,12 @@
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/common/enums/Role.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/common/utils/DateUtil.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/config/DataSeeder.java
+/Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/dm/DirectMessage.java
+/Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/dm/DirectMessageController.java
+/Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/dm/DirectMessageRepository.java
+/Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/dm/DirectMessageService.java
+/Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/dm/dto/DirectMessageResponse.java
+/Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/dm/dto/SendDirectMessageRequest.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/mention/Mention.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/mention/MentionController.java
 /Users/anitra/Projects/CompassChat/backend/src/main/java/com/compasschat/mention/MentionRepository.java
