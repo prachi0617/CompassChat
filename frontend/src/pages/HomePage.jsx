@@ -245,7 +245,7 @@ function HomePage() {
             <main className="home-layout">
                 <section className="top-section">
                     <button
-                        className="compass-folder-card"
+                        className="compass-logo-card"
                         onClick={() => {
                             setOpenFolder("compasschat");
                             setNotificationCount(0);
@@ -255,15 +255,23 @@ function HomePage() {
                             <div className="notification-badge">{notificationCount}</div>
                         )}
 
-                        <div className="folder-shape">
-                            <div className="folder-tab"></div>
-                            <div className="folder-body">
-                                <span>💬</span>
+                        <div className="card-logo-row">
+                            <img
+                                src="/images/Chat.jpg"
+                                alt="CompassChat logo"
+                                className="compass-logo"
+                            />
+
+                            <div>
+                                <h2>CompassChat</h2>
+                                <p className="card-subtitle">Community Chat</p>
                             </div>
                         </div>
 
-                        <h2>CompassChat</h2>
-                        <p>Open the Slack-style community chat workspace.</p>
+                        <p>
+                            Open the community chat workspace to see channels, messages, and new
+                            notifications.
+                        </p>
 
                         <div className="tag-row">
                             <span>channels</span>
