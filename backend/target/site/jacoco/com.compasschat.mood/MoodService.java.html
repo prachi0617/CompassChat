@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MoodService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Community Compass Java Service</a> &gt; <a href="index.source.html" class="el_package">com.compasschat.mood</a> &gt; <span class="el_source">MoodService.java</span></div><h1>MoodService.java</h1><pre class="source lang-java linenums"><span class="fc" id="L1">package com.compasschat.mood;</span>
+
+import com.compasschat.common.base.BaseService;
+import com.compasschat.common.enums.MoodType;
+import com.compasschat.common.base.exception.ResourceNotFoundException;
+import com.compasschat.mood.ResourceRecommendationService.RecommendedResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+@Service
+public class MoodService extends BaseService&lt;Mood, UUID&gt; {
+
+    private final MoodRepository moods;
+    private final ResourceRecommendationService recommender;
+
+    public MoodService(MoodRepository moods, ResourceRecommendationService recommender) {
+<span class="fc" id="L24">        super(moods, &quot;Mood&quot;);</span>
+<span class="fc" id="L25">        this.moods = moods;</span>
+<span class="fc" id="L26">        this.recommender = recommender;</span>
+<span class="fc" id="L27">    }</span>
+
+    @Transactional
+    public MoodLogResult logMood(UUID userId, MoodType moodType, String note) {
+<span class="fc" id="L31">        Mood mood = moods.save(new Mood(userId, moodType, note));</span>
+
+<span class="fc" id="L33">        List&lt;RecommendedResource&gt; resources = gatherResources(moodType, note);</span>
+<span class="fc" id="L34">        return new MoodLogResult(mood, resources);</span>
+    }
+
+    private List&lt;RecommendedResource&gt; gatherResources(MoodType moodType, String note) {
+<span class="fc" id="L38">        List&lt;RecommendedResource&gt; result = new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L40" title="All 2 branches covered.">        if (moodType.isDistressed()) {</span>
+<span class="fc" id="L41">            result.addAll(crisisResources());</span>
+        }
+
+        try {
+<span class="fc" id="L45">            result.addAll(recommender.recommend(moodType, note));</span>
+<span class="fc" id="L46">        } catch (Exception e) {</span>
+<span class="fc" id="L47">            System.err.println(&quot;Recommender failed: &quot; + e.getMessage());</span>
+        }
+
+<span class="fc" id="L50">        return result;</span>
+    }
+
+    private List&lt;RecommendedResource&gt; crisisResources() {
+<span class="fc" id="L54">        return List.of(</span>
+<span class="fc" id="L55">                new RecommendedResource(</span>
+<span class="fc" id="L56">                        &quot;988 Suicide &amp; Crisis Lifeline&quot;,</span>
+<span class="fc" id="L57">                        &quot;Free, confidential support 24/7. Call or text 988.&quot;,</span>
+<span class="fc" id="L58">                        &quot;https://988lifeline.org&quot;,</span>
+<span class="fc" id="L59">                        &quot;crisis_line&quot;</span>
+                ),
+<span class="fc" id="L61">                new RecommendedResource(</span>
+<span class="fc" id="L62">                        &quot;Crisis Text Line&quot;,</span>
+<span class="fc" id="L63">                        &quot;Text HOME to 741741 to connect with a counselor.&quot;,</span>
+<span class="fc" id="L64">                        &quot;https://www.crisistextline.org&quot;,</span>
+<span class="fc" id="L65">                        &quot;crisis_line&quot;</span>
+                )
+        );
+    }
+
+    // ----- READS (strictly scoped to the requesting user) -----
+
+    @Transactional(readOnly = true)
+    public Page&lt;Mood&gt; getHistoryForUser(UUID userId, UUID requesterId, Pageable pageable) {
+<span class="fc" id="L74">        requireSelf(userId, requesterId);</span>
+<span class="fc" id="L75">        return moods.findByUserIdOrderByCreatedAtDesc(userId, pageable);</span>
+    }
+
+    @Transactional(readOnly = true)
+    public Mood getOneForUser(UUID moodId, UUID requesterId) {
+<span class="fc" id="L80">        Mood m = moods.findById(moodId)</span>
+<span class="fc" id="L81">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Mood&quot;, moodId.toString()));</span>
+<span class="fc" id="L82">        requireSelf(m.getUserId(), requesterId);</span>
+<span class="fc" id="L83">        return m;</span>
+    }
+
+    private void requireSelf(UUID ownerId, UUID requesterId) {
+<span class="fc bfc" id="L87" title="All 2 branches covered.">        if (!ownerId.equals(requesterId)) {</span>
+<span class="fc" id="L88">            throw new AccessDeniedException(&quot;Mood logs are private&quot;);</span>
+        }
+<span class="fc" id="L90">    }</span>
+
+    /** Bundle returned from logMood - both the saved entry and the
+     *  resources, so the controller doesn't need two service calls. */
+    public record MoodLogResult(Mood mood, List&lt;RecommendedResource&gt; resources) {}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

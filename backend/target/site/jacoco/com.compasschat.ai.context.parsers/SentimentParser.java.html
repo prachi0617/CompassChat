@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SentimentParser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Community Compass Java Service</a> &gt; <a href="index.source.html" class="el_package">com.compasschat.ai.context.parsers</a> &gt; <span class="el_source">SentimentParser.java</span></div><h1>SentimentParser.java</h1><pre class="source lang-java linenums">package com.compasschat.ai.context.parsers;
+
+import org.springframework.stereotype.Component;
+
+import java.util.Map;
+
+@Component
+<span class="fc" id="L8">public class SentimentParser {</span>
+
+    // Scores range from -1.0 (severe distress) to +1.0 (very positive)
+<span class="fc" id="L11">    private static final Map&lt;String, Double&gt; LEXICON = Map.ofEntries(</span>
+<span class="fc" id="L12">            Map.entry(&quot;suicidal&quot;,    -1.0),</span>
+<span class="fc" id="L13">            Map.entry(&quot;suicide&quot;,     -1.0),</span>
+<span class="fc" id="L14">            Map.entry(&quot;hopeless&quot;,    -0.9),</span>
+<span class="fc" id="L15">            Map.entry(&quot;desperate&quot;,   -0.85),</span>
+<span class="fc" id="L16">            Map.entry(&quot;crisis&quot;,      -0.85),</span>
+<span class="fc" id="L17">            Map.entry(&quot;starving&quot;,    -0.8),</span>
+<span class="fc" id="L18">            Map.entry(&quot;homeless&quot;,    -0.8),</span>
+<span class="fc" id="L19">            Map.entry(&quot;evicted&quot;,     -0.75),</span>
+<span class="fc" id="L20">            Map.entry(&quot;scared&quot;,      -0.7),</span>
+<span class="fc" id="L21">            Map.entry(&quot;terrified&quot;,   -0.7),</span>
+<span class="fc" id="L22">            Map.entry(&quot;depressed&quot;,   -0.6),</span>
+<span class="fc" id="L23">            Map.entry(&quot;anxious&quot;,     -0.5),</span>
+<span class="fc" id="L24">            Map.entry(&quot;stressed&quot;,    -0.45),</span>
+<span class="fc" id="L25">            Map.entry(&quot;worried&quot;,     -0.4),</span>
+<span class="fc" id="L26">            Map.entry(&quot;sad&quot;,         -0.4),</span>
+<span class="fc" id="L27">            Map.entry(&quot;lonely&quot;,      -0.35),</span>
+<span class="fc" id="L28">            Map.entry(&quot;tired&quot;,       -0.25),</span>
+<span class="fc" id="L29">            Map.entry(&quot;overwhelmed&quot;, -0.5),</span>
+<span class="fc" id="L30">            Map.entry(&quot;frustrated&quot;,  -0.35),</span>
+<span class="fc" id="L31">            Map.entry(&quot;good&quot;,         0.4),</span>
+<span class="fc" id="L32">            Map.entry(&quot;great&quot;,        0.6),</span>
+<span class="fc" id="L33">            Map.entry(&quot;happy&quot;,        0.6),</span>
+<span class="fc" id="L34">            Map.entry(&quot;hopeful&quot;,      0.5),</span>
+<span class="fc" id="L35">            Map.entry(&quot;better&quot;,       0.35),</span>
+<span class="fc" id="L36">            Map.entry(&quot;grateful&quot;,     0.55),</span>
+<span class="fc" id="L37">            Map.entry(&quot;thank&quot;,        0.3)</span>
+<span class="fc" id="L38">    );</span>
+
+    /**
+     * Returns a sentiment score in [-1.0, 1.0].
+     * Scores below -0.7 should trigger escalation.
+     */
+    public double score(String message) {
+<span class="fc" id="L45">        String input = message.toLowerCase();</span>
+<span class="fc" id="L46">        double total = 0.0;</span>
+<span class="fc" id="L47">        int matched = 0;</span>
+
+<span class="fc bfc" id="L49" title="All 2 branches covered.">        for (Map.Entry&lt;String, Double&gt; entry : LEXICON.entrySet()) {</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">            if (input.contains(entry.getKey())) {</span>
+<span class="fc" id="L51">                total += entry.getValue();</span>
+<span class="fc" id="L52">                matched++;</span>
+            }
+        }
+
+<span class="fc bfc" id="L56" title="All 2 branches covered.">        if (matched == 0) return 0.0;</span>
+        // Average but keep it within [-1, 1]
+<span class="fc" id="L58">        return Math.max(-1.0, Math.min(1.0, total / matched));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
