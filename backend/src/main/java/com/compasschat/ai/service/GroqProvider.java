@@ -1,6 +1,7 @@
 package com.compasschat.ai.service;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -10,10 +11,15 @@ public class GroqProvider implements AiProvider {
     private final ChatClient chatClient;
     private final boolean enabled;
 
-    public GroqProvider(ChatClient.Builder builder,
+    /**
+     * ChatClient.Builder is optional so Spring does not force the OpenAiChatModel
+     * bean (and its mandatory-key check) when GROQ_API_KEY is absent.
+     */
+    public GroqProvider(@Autowired(required = false) ChatClient.Builder builder,
                         @Value("${spring.ai.openai.api-key:}") String apiKey) {
-        this.enabled = apiKey != null && !apiKey.isBlank();
-        this.chatClient = builder.build();
+        boolean keyPresent = apiKey != null && !apiKey.isBlank();
+        this.enabled = keyPresent && builder != null;
+        this.chatClient = this.enabled ? builder.build() : null;
     }
 
     public boolean isEnabled() {
