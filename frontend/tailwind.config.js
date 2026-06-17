@@ -5,58 +5,30 @@ export default {
         extend: {
             colors: {
                 mint: {
-                    50: '#F0FBF7',
-                    100: '#D7F4E7',
-                    300: '#7DD9B0',
-                    500: '#3DBE8A',
-                    700: '#1F8C61',
+                    50: '#EAF8F2',
+                    100: '#CDEFE0',
+                    500: '#2FBF86',
+                    700: '#159267',
                 },
                 pink: {
-                    50: '#FFF1F5',
-                    300: '#FBA5C0',
-                    500: '#EC4899',
-                    700: '#BE185D',
+                    50: '#FCEAF1',
+                    100: '#F8C9DA',
+                    700: '#C23A70',
+                    950: '#4A1026',
                 },
                 yellow: {
-                    50: '#FFFBEB',
-                    300: '#FCD34D',
-                    500: '#F59E0B',
+                    50: '#FFF7E8',
+                    700: '#C47A00',
+                    900: '#6B4200',
                 },
                 ink: {
-                    DEFAULT: '#0F172A',
-                    70: '#475569',
-                    50: '#94A3B8',
+                    DEFAULT: '#111827',
+                    70: '#374151',
+                    50: '#9CA3AF',
                 },
-            },
-            fontSize: {
-                meta: '0.75rem',
-                body: '0.9375rem',
             },
             fontFamily: {
-                display: ['"Sora"', '"Inter"', 'system-ui', 'sans-serif'],
-                body: ['"Inter"', 'system-ui', 'sans-serif'],
-            },
-            transitionTimingFunction: {
-                'panel-out': 'cubic-bezier(0.16, 1, 0.3, 1)',
-            },
-            keyframes: {
-                'slide-in': {
-                    '0%': { transform: 'translateX(100%)' },
-                    '100%': { transform: 'translateX(0)' },
-                },
-                'fade-in': {
-                    '0%': { opacity: '0' },
-                    '100%': { opacity: '1' },
-                },
-                'badge-pulse': {
-                    '0%, 100%': { transform: 'scale(1)' },
-                    '50%': { transform: 'scale(1.12)' },
-                },
-            },
-            animation: {
-                'slide-in': 'slide-in 250ms cubic-bezier(0.16, 1, 0.3, 1)',
-                'fade-in': 'fade-in 200ms ease-out',
-                'badge-pulse': 'badge-pulse 1.8s ease-in-out 3',
+                display: ['Georgia', 'serif'],
             },
         },
     },
