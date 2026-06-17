@@ -56,6 +56,9 @@ Community Compass Java Service,com.compasschat.common.base,AuditableEntity,16,16
 Community Compass Java Service,com.compasschat.common.base,BaseService,0,55,0,2,0,12,0,7,0,6
 Community Compass Java Service,com.compasschat.common.base,SubProjectClient,9,0,0,0,4,0,2,0,2,0
 Community Compass Java Service,com.compasschat.common.base,ApiResponse,0,33,0,0,0,4,0,4,0,4
+Community Compass Java Service,com.compasschat.dm,DirectMessageService,58,0,4,0,13,0,6,0,4,0
+Community Compass Java Service,com.compasschat.dm,DirectMessage,47,0,0,0,17,0,9,0,9,0
+Community Compass Java Service,com.compasschat.dm,DirectMessageController,82,0,4,0,21,0,8,0,6,0
 Community Compass Java Service,com.compasschat.notification,NotificationController,0,6,0,0,0,2,0,2,0,2
 Community Compass Java Service,com.compasschat.notification,NotificationService,10,0,0,0,4,0,2,0,2,0
 Community Compass Java Service,com.compasschat.notification,Notification,24,0,0,0,7,0,7,0,7,0
@@ -110,6 +113,8 @@ Community Compass Java Service,com.compasschat.ai.context,EscalationDecision,0,2
 Community Compass Java Service,com.compasschat.ai.context,ContextSource,0,74,0,0,0,8,0,1,0,1
 Community Compass Java Service,com.compasschat.ai.context,AIContext,6,51,1,1,2,14,3,9,2,9
 Community Compass Java Service,com.compasschat.ai.context,ContextFragment,0,9,0,0,0,1,0,1,0,1
+Community Compass Java Service,com.compasschat.dm.dto,DirectMessageResponse,37,0,0,0,8,0,2,0,2,0
+Community Compass Java Service,com.compasschat.dm.dto,SendDirectMessageRequest,6,0,0,0,1,0,1,0,1,0
 Community Compass Java Service,com.compasschat.websocket,WebSocketAuthInterceptor,13,206,6,28,1,45,6,20,0,8
 Community Compass Java Service,com.compasschat.websocket,WebSocketConfig,61,0,0,0,11,0,4,0,4,0
 Community Compass Java Service,com.compasschat.websocket,PresenceService,53,0,0,0,13,0,4,0,4,0
