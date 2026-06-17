@@ -4,7 +4,9 @@ com/compasschat/websocket/StompPrincipal.class
 com/compasschat/channel/dto/ChannelResponse.class
 com/compasschat/common/base/AuditableEntity.class
 com/compasschat/ai/service/AiIntent.class
+com/compasschat/dm/dto/DirectMessageResponse.class
 com/compasschat/common/enums/MoodType.class
+com/compasschat/dm/DirectMessageRepository.class
 com/compasschat/common/enums/ReminderType.class
 com/compasschat/websocket/ChatBroadcastListener.class
 com/compasschat/message/dto/UpdateMessageRequest.class
@@ -40,9 +42,11 @@ com/compasschat/ai/service/AiProvider.class
 com/compasschat/websocket/WebSocketMessageController.class
 com/compasschat/websocket/WebSocketConfig.class
 com/compasschat/admin/AdminUserController.class
+com/compasschat/dm/DirectMessageService.class
 com/compasschat/message/dto/MessageResponse.class
 com/compasschat/user/UserRepository.class
 com/compasschat/mood/MoodService$MoodLogResult.class
+com/compasschat/dm/DirectMessage.class
 com/compasschat/ai/integration/FirstStepClient.class
 com/compasschat/mention/MentionRepository.class
 com/compasschat/notification/Notification.class
@@ -53,6 +57,7 @@ com/compasschat/resources/ResourcesController.class
 com/compasschat/ai/context/parsers/KeywordRouter.class
 com/compasschat/mention/MentionService.class
 com/compasschat/auth/security/JwtAuthFilter.class
+com/compasschat/dm/DirectMessageController.class
 com/compasschat/auth/dto/AuthResponse.class
 com/compasschat/ai/context/parsers/SentimentParser.class
 com/compasschat/websocket/PresenceUpdate.class
@@ -70,6 +75,7 @@ com/compasschat/resources/ResourcesCacheService.class
 com/compasschat/admin/AdminAuditController.class
 com/compasschat/channel/dto/AddMemberRequest.class
 com/compasschat/common/enums/Role.class
+com/compasschat/dm/dto/SendDirectMessageRequest.class
 com/compasschat/channel/ChannelRepository.class
 com/compasschat/mention/MentionController.class
 com/compasschat/resources/ResourcesSearchService.class
