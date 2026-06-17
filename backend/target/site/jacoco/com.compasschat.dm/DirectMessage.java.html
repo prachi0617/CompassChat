@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DirectMessage.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Community Compass Java Service</a> &gt; <a href="index.source.html" class="el_package">com.compasschat.dm</a> &gt; <span class="el_source">DirectMessage.java</span></div><h1>DirectMessage.java</h1><pre class="source lang-java linenums">package com.compasschat.dm;
+
+import com.compasschat.common.base.AuditableEntity;
+import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Entity
+@Table(
+        name = &quot;direct_messages&quot;,
+        indexes = {
+                @Index(name = &quot;idx_dm_sender_recipient&quot;, columnList = &quot;senderId, recipientId, createdAt&quot;),
+                @Index(name = &quot;idx_dm_recipient_sender&quot;, columnList = &quot;recipientId, senderId, createdAt&quot;)
+        }
+)
+public class DirectMessage extends AuditableEntity {
+
+    @Column(nullable = false)
+    private UUID senderId;
+
+    @Column(nullable = false)
+    private UUID recipientId;
+
+    @Column(nullable = false, length = 4000)
+    private String content;
+
+    @Column
+    private LocalDateTime editedAt;
+
+    @Column(nullable = false)
+<span class="nc" id="L32">    private boolean deleted = false;</span>
+
+<span class="nc" id="L34">    protected DirectMessage() {}</span>
+
+<span class="nc" id="L36">    public DirectMessage(UUID senderId, UUID recipientId, String content) {</span>
+<span class="nc" id="L37">        this.senderId = senderId;</span>
+<span class="nc" id="L38">        this.recipientId = recipientId;</span>
+<span class="nc" id="L39">        this.content = content;</span>
+<span class="nc" id="L40">    }</span>
+
+    public void editContent(String newContent) {
+<span class="nc" id="L43">        this.content = newContent;</span>
+<span class="nc" id="L44">        this.editedAt = LocalDateTime.now();</span>
+<span class="nc" id="L45">    }</span>
+
+    public void markDeleted() {
+<span class="nc" id="L48">        this.deleted = true;</span>
+<span class="nc" id="L49">    }</span>
+
+<span class="nc" id="L51">    public UUID getSenderId()    { return senderId; }</span>
+<span class="nc" id="L52">    public UUID getRecipientId() { return recipientId; }</span>
+<span class="nc" id="L53">    public String getContent()   { return content; }</span>
+<span class="nc" id="L54">    public LocalDateTime getEditedAt() { return editedAt; }</span>
+<span class="nc" id="L55">    public boolean isDeleted()   { return deleted; }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
