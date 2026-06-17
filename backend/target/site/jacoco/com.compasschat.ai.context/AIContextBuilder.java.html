@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AIContextBuilder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Community Compass Java Service</a> &gt; <a href="index.source.html" class="el_package">com.compasschat.ai.context</a> &gt; <span class="el_source">AIContextBuilder.java</span></div><h1>AIContextBuilder.java</h1><pre class="source lang-java linenums">package com.compasschat.ai.context;
+
+import com.compasschat.ai.context.parsers.IntentParser;
+import com.compasschat.ai.context.parsers.KeywordRouter;
+import com.compasschat.ai.context.parsers.SentimentParser;
+import com.compasschat.ai.integration.CivicContextClient;
+import com.compasschat.ai.integration.HousingContextClient;
+import com.compasschat.ai.integration.KindConnectClient;
+import com.compasschat.ai.integration.YouthPathwayClient;
+import com.compasschat.ai.service.ResourceSearchService;
+import org.springframework.stereotype.Component;
+
+import java.util.UUID;
+
+@Component
+public class AIContextBuilder {
+
+    private final IntentParser intentParser;
+    private final SentimentParser sentimentParser;
+    private final KeywordRouter keywordRouter;
+    private final HousingContextClient housingClient;
+    private final YouthPathwayClient youthClient;
+    private final KindConnectClient kindConnectClient;
+    private final CivicContextClient civicClient;
+    private final ResourceSearchService resourceSearchService;
+
+<span class="fc" id="L27">    public AIContextBuilder(IntentParser intentParser,</span>
+                            SentimentParser sentimentParser,
+                            KeywordRouter keywordRouter,
+                            HousingContextClient housingClient,
+                            YouthPathwayClient youthClient,
+                            KindConnectClient kindConnectClient,
+                            CivicContextClient civicClient,
+                            ResourceSearchService resourceSearchService) {
+<span class="fc" id="L35">        this.intentParser = intentParser;</span>
+<span class="fc" id="L36">        this.sentimentParser = sentimentParser;</span>
+<span class="fc" id="L37">        this.keywordRouter = keywordRouter;</span>
+<span class="fc" id="L38">        this.housingClient = housingClient;</span>
+<span class="fc" id="L39">        this.youthClient = youthClient;</span>
+<span class="fc" id="L40">        this.kindConnectClient = kindConnectClient;</span>
+<span class="fc" id="L41">        this.civicClient = civicClient;</span>
+<span class="fc" id="L42">        this.resourceSearchService = resourceSearchService;</span>
+<span class="fc" id="L43">    }</span>
+
+    public AIContext build(String userMessage, UUID userId) {
+<span class="fc" id="L46">        AIContext context = new AIContext();</span>
+<span class="fc" id="L47">        context.setUserMessage(userMessage);</span>
+
+<span class="fc" id="L49">        IntentType intent = intentParser.parse(userMessage);</span>
+<span class="fc" id="L50">        context.setIntent(intent);</span>
+
+<span class="fc" id="L52">        double sentiment = sentimentParser.score(userMessage);</span>
+<span class="fc" id="L53">        context.setSentiment(sentiment);</span>
+
+<span class="fc bfc" id="L55" title="All 9 branches covered.">        switch (intent) {</span>
+            case HOUSING -&gt;
+<span class="fc" id="L57">                context.addFragment(new ContextFragment(ContextSource.HOUSING,</span>
+<span class="fc" id="L58">                        housingClient.getContext(userMessage)));</span>
+            case YOUTH -&gt;
+<span class="fc" id="L60">                context.addFragment(new ContextFragment(ContextSource.YOUTH,</span>
+<span class="fc" id="L61">                        youthClient.getContext(userMessage)));</span>
+            case CIVIC -&gt;
+<span class="fc" id="L63">                context.addFragment(new ContextFragment(ContextSource.CIVIC,</span>
+<span class="fc" id="L64">                        civicClient.getRelevantContext(userMessage)));</span>
+            case RESOURCES -&gt;
+<span class="fc" id="L66">                context.addFragment(new ContextFragment(ContextSource.RESOURCE_DIRECTORY,</span>
+<span class="fc" id="L67">                        resourceSearchService.search(userMessage)));</span>
+            case MOOD -&gt;
+<span class="fc" id="L69">                context.addFragment(new ContextFragment(ContextSource.WELLBEING,</span>
+<span class="fc" id="L70">                        kindConnectClient.getContext(userMessage)));</span>
+            case REMINDER -&gt;
+<span class="fc" id="L72">                context.addFragment(new ContextFragment(ContextSource.REMINDER,</span>
+<span class="fc" id="L73">                        &quot;Reminder support is available. Describe the appointment or task to set a reminder.&quot;));</span>
+            case CASEWORKER -&gt;
+<span class="fc" id="L75">                context.addFragment(new ContextFragment(ContextSource.CASEWORKER,</span>
+<span class="fc" id="L76">                        &quot;Caseworker workflow tools are available. You can look up client status or create a referral.&quot;));</span>
+            case ESCALATE -&gt;
+<span class="fc" id="L78">                context.setEscalation(EscalationDecision.requestedByUser());</span>
+            default -&gt;
+<span class="fc" id="L80">                context.addFragment(keywordRouter.route(userMessage));</span>
+        }
+
+        // High-risk sentiment overrides intent-based escalation decision
+<span class="fc bfc" id="L84" title="All 4 branches covered.">        if (sentiment &lt; -0.7 &amp;&amp; !context.getEscalation().escalate()) {</span>
+<span class="fc" id="L85">            context.setEscalation(EscalationDecision.highRisk());</span>
+        }
+
+<span class="fc" id="L88">        return context;</span>
+    }
+
+    /** Builds a system prompt string from context fragments for the AI provider. */
+    public String buildSystemPrompt(AIContext context) {
+<span class="fc" id="L93">        StringBuilder sb = new StringBuilder();</span>
+<span class="fc" id="L94">        sb.append(&quot;You are CompassChat, a community resource assistant serving Delaware residents. &quot;);</span>
+<span class="fc" id="L95">        sb.append(&quot;Be concise, empathetic, and actionable.\n\n&quot;);</span>
+
+<span class="fc bfc" id="L97" title="All 2 branches covered.">        if (!context.getFragments().isEmpty()) {</span>
+<span class="fc" id="L98">            sb.append(&quot;Relevant context:\n&quot;);</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">            for (ContextFragment fragment : context.getFragments()) {</span>
+<span class="fc" id="L100">                sb.append(&quot;--- &quot;).append(fragment.source()).append(&quot; ---\n&quot;);</span>
+<span class="fc" id="L101">                sb.append(fragment.content()).append(&quot;\n\n&quot;);</span>
+            }
+        }
+
+<span class="fc bfc" id="L105" title="All 2 branches covered.">        if (context.getEscalation().escalate()) {</span>
+<span class="fc" id="L106">            sb.append(&quot;IMPORTANT: This user may need immediate human support. &quot;);</span>
+<span class="fc" id="L107">            sb.append(&quot;Acknowledge their situation warmly and offer to connect them with a live agent.\n&quot;);</span>
+        }
+
+<span class="fc" id="L110">        return sb.toString();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

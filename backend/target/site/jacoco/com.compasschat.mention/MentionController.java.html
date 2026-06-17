@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MentionController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Community Compass Java Service</a> &gt; <a href="index.source.html" class="el_package">com.compasschat.mention</a> &gt; <span class="el_source">MentionController.java</span></div><h1>MentionController.java</h1><pre class="source lang-java linenums">package com.compasschat.mention;
+
+import com.compasschat.auth.security.JwtService;
+import com.compasschat.common.base.ApiResponse;
+import com.compasschat.mention.dto.MentionResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping(&quot;/api/mentions&quot;)
+public class MentionController {
+
+    private final MentionService mentionService;
+    private final JwtService jwtService;
+
+<span class="nc" id="L20">    public MentionController(MentionService mentionService, JwtService jwtService) {</span>
+<span class="nc" id="L21">        this.mentionService = mentionService;</span>
+<span class="nc" id="L22">        this.jwtService = jwtService;</span>
+<span class="nc" id="L23">    }</span>
+
+    /** All mentions for the current user (read + unread). */
+    @GetMapping(&quot;/me&quot;)
+    public ApiResponse&lt;List&lt;MentionResponse&gt;&gt; all(HttpServletRequest http) {
+<span class="nc" id="L28">        return ApiResponse.ok(mentionService.getAll(currentUserId(http)));</span>
+    }
+
+    /** Unread-only mentions for the current user. */
+    @GetMapping(&quot;/me/unread&quot;)
+    public ApiResponse&lt;List&lt;MentionResponse&gt;&gt; unread(HttpServletRequest http) {
+<span class="nc" id="L34">        return ApiResponse.ok(mentionService.getUnread(currentUserId(http)));</span>
+    }
+
+    /** Unread mention count badge — lightweight poll for the frontend. */
+    @GetMapping(&quot;/me/unread/count&quot;)
+    public ApiResponse&lt;Long&gt; unreadCount(HttpServletRequest http) {
+<span class="nc" id="L40">        return ApiResponse.ok(mentionService.countUnread(currentUserId(http)));</span>
+    }
+
+    /** Mark a single mention as read. */
+    @PostMapping(&quot;/{id}/read&quot;)
+    public ApiResponse&lt;MentionResponse&gt; markRead(@PathVariable UUID id, HttpServletRequest http) {
+<span class="nc" id="L46">        return ApiResponse.ok(mentionService.markRead(id, currentUserId(http)));</span>
+    }
+
+    private UUID currentUserId(HttpServletRequest http) {
+<span class="nc" id="L50">        return jwtService.getUserId(extractToken(http));</span>
+    }
+
+    private String extractToken(HttpServletRequest http) {
+<span class="nc" id="L54">        String header = http.getHeader(&quot;Authorization&quot;);</span>
+<span class="nc bnc" id="L55" title="All 4 branches missed.">        if (header == null || !header.startsWith(&quot;Bearer &quot;)) {</span>
+<span class="nc" id="L56">            throw new AccessDeniedException(&quot;Missing token&quot;);</span>
+        }
+<span class="nc" id="L58">        return header.substring(7);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

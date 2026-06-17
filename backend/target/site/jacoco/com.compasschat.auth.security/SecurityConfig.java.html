@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SecurityConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Community Compass Java Service</a> &gt; <a href="index.source.html" class="el_package">com.compasschat.auth.security</a> &gt; <span class="el_source">SecurityConfig.java</span></div><h1>SecurityConfig.java</h1><pre class="source lang-java linenums">package com.compasschat.auth.security;
+    
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    private final JwtAuthFilter jwtAuthFilter;
+
+<span class="nc" id="L19">    public SecurityConfig(JwtAuthFilter jwtAuthFilter) {</span>
+<span class="nc" id="L20">        this.jwtAuthFilter = jwtAuthFilter;</span>
+<span class="nc" id="L21">    }</span>
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+<span class="nc" id="L25">        http</span>
+            // CSRF protection is for cookie-based logins; we use wristbands, so off for the demo.
+<span class="nc" id="L27">            .csrf(csrf -&gt; csrf.disable())</span>
+
+            // &quot;Stateless&quot; = the club keeps NO memory of who's inside.
+            // Your wristband is your only proof, every single time.
+<span class="nc" id="L31">            .sessionManagement(s -&gt; s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))</span>
+
+<span class="nc" id="L33">            .authorizeHttpRequests(auth -&gt; auth</span>
+                // The front door and signup table are open to everyone:
+<span class="nc" id="L35">                .requestMatchers(&quot;/api/auth/**&quot;).permitAll()</span>
+                // The WebSocket handshake door is open; we check the wristband inside it:
+<span class="nc" id="L37">                .requestMatchers(&quot;/ws/**&quot;).permitAll()</span>
+                // H2's little database viewer, demo only:
+<span class="nc" id="L39">                .requestMatchers(&quot;/h2-console/**&quot;).permitAll()</span>
+                // EVERY other door requires a valid wristband:
+<span class="nc" id="L41">                .anyRequest().authenticated()</span>
+            )
+
+            // H2 console needs frames allowed (demo only)
+<span class="nc" id="L45">            .headers(h -&gt; h.frameOptions(f -&gt; f.sameOrigin()))</span>
+
+            // Put our wristband-checker BEFORE Spring's default password checker
+<span class="nc" id="L48">            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);</span>
+
+<span class="nc" id="L50">        return http.build();</span>
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+<span class="nc" id="L55">        return new BCryptPasswordEncoder();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

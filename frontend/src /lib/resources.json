@@ -1,0 +1,72 @@
+{
+    "subProjects": [
+        {
+            "slug": "homematch",
+            "name": "HomeMatch",
+            "developer": "Niciah Rymer-Hillian",
+            "tagline": "Personalized housing navigation with eligibility-based matching, interactive maps, and an AI Housing Assistant.",
+            "keywords": [
+                "housing",
+                "rent",
+                "apartment",
+                "eviction",
+                "landlord",
+                "lease",
+                "shelter",
+                "homeless",
+                "voucher",
+                "move"
+            ],
+            "accent": "mint"
+        },
+        {
+            "slug": "futurepath",
+            "name": "FuturePath",
+            "developer": "Shocka Holmes",
+            "tagline": "AI-assisted intake and structured guidance for young adults transitioning out of foster care.",
+            "keywords": [
+                "foster",
+                "youth",
+                "transition",
+                "independence",
+                "aging out",
+                "guardian",
+                "teen"
+            ],
+            "accent": "pink"
+        },
+        {
+            "slug": "kindconnect",
+            "name": "Kind Connect",
+            "developer": "Prachi Patel",
+            "tagline": "Community support and well-being resource discovery, wellness check-ins, and a volunteer network.",
+            "keywords": [
+                "volunteer",
+                "wellness",
+                "mental health",
+                "support group",
+                "counseling",
+                "checkin",
+                "wellbeing",
+                "mood"
+            ],
+            "accent": "yellow"
+        },
+        {
+            "slug": "firststep",
+            "name": "First Step",
+            "developer": "Anitra Johnson",
+            "tagline": "Community resources, policy updates, and news for everyone.",
+            "keywords": [
+                "news",
+                "policy",
+                "update",
+                "civic",
+                "announcement",
+                "legislation",
+                "benefits"
+            ],
+            "accent": "mint"
+        }
+    ]
+}

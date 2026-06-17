@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PresenceService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Community Compass Java Service</a> &gt; <a href="index.source.html" class="el_package">com.compasschat.websocket</a> &gt; <span class="el_source">PresenceService.java</span></div><h1>PresenceService.java</h1><pre class="source lang-java linenums">package com.compasschat.websocket;
+
+import com.compasschat.common.enums.PresenceStatus;
+import com.compasschat.user.UserRepository;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
+@Service
+public class PresenceService {
+
+<span class="nc" id="L15">    private final ConcurrentHashMap&lt;UUID, PresenceStatus&gt; statusMap = new ConcurrentHashMap&lt;&gt;();</span>
+    private final SimpMessagingTemplate broker;
+    private final UserRepository users;
+
+<span class="nc" id="L19">    public PresenceService(SimpMessagingTemplate broker, UserRepository users) {</span>
+<span class="nc" id="L20">        this.broker = broker;</span>
+<span class="nc" id="L21">        this.users = users;</span>
+<span class="nc" id="L22">    }</span>
+
+    public void setStatus(UUID userId, PresenceStatus status) {
+<span class="nc" id="L25">        statusMap.put(userId, status);</span>
+<span class="nc" id="L26">        String username = users.findById(userId)</span>
+<span class="nc" id="L27">                .map(u -&gt; u.getUsername())</span>
+<span class="nc" id="L28">                .orElse(userId.toString());</span>
+<span class="nc" id="L29">        broker.convertAndSend(&quot;/topic/presence&quot;,</span>
+<span class="nc" id="L30">                new PresenceUpdate(userId, username, status, LocalDateTime.now()));</span>
+<span class="nc" id="L31">    }</span>
+
+    public PresenceStatus getStatus(UUID userId) {
+<span class="nc" id="L34">        return statusMap.getOrDefault(userId, PresenceStatus.OFFLINE);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
