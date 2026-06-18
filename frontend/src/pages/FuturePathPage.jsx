@@ -1,18 +1,24 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Compass, MessageCircle } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Compass } from 'lucide-react'
 import ContactCardModal from '../components/community-compass/ContactCardModal'
 
 export default function FuturePathPage() {
-    const [showContact, setShowContact] = useState(false)
+    const navigate = useNavigate()
+    const [showContact, setShowContact] = useState(true)
 
     const contact = {
         name: 'Shocka Holmes',
         initials: 'SH',
-        role: 'Youth Transition Support',
-        title: 'Project Support Team',
+        role: 'Career Navigation Lead',
+        title: 'Project Builder',
         project: 'FuturePath',
-        email: 'futurepath@example.com',
+        email: 'Shockah12@gmail.com',
+    }
+
+    function handleClose() {
+        setShowContact(false)
+        navigate('/')
     }
 
     return (
@@ -20,44 +26,27 @@ export default function FuturePathPage() {
             <div className="mx-auto max-w-4xl">
                 <Link
                     to="/"
-                    className="mb-6 inline-block text-sm font-semibold text-mint-700 no-underline hover:underline"
+                    className="mb-6 inline-flex items-center text-2xl font-bold text-mint-700 no-underline hover:text-mint-800"
+                    aria-label="Back to Community Compass"
                 >
-                    ← Back to Community Compass
+                    ←
                 </Link>
 
                 <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-                    <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-pink-50 text-pink-700">
+                    <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-mint-50 text-mint-700">
                         <Compass size={30} />
                     </div>
 
-                    <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-pink-700">
-                        Sub-project
-                    </p>
-
-                    <h1 className="font-display text-4xl font-semibold text-ink">
+                    <h1 className="text-2xl font-bold text-ink">
                         FuturePath
                     </h1>
-
-                    <p className="mt-4 max-w-2xl text-base leading-8 text-ink-70">
-                        Guidance for young adults transitioning out of foster care with
-                        support resources, planning tools, and next-step guidance.
-                    </p>
-
-                    <button
-                        type="button"
-                        onClick={() => setShowContact(true)}
-                        className="mt-8 inline-flex items-center gap-2 rounded-full bg-mint-500 px-5 py-3 text-sm font-bold text-white shadow-sm hover:bg-mint-700"
-                    >
-                        <MessageCircle size={18} />
-                        Contact FuturePath
-                    </button>
                 </section>
             </div>
 
             {showContact && (
                 <ContactCardModal
                     contact={contact}
-                    onClose={() => setShowContact(false)}
+                    onClose={handleClose}
                 />
             )}
         </div>
