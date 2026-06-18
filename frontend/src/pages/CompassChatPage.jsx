@@ -1,150 +1,88 @@
-import { Link } from 'react-router-dom'
-import { Send } from 'lucide-react'
-import './CompassChatPage.css'
+import { useState } from 'react'
+import { Home, Compass, HeartHandshake, Newspaper } from 'lucide-react'
+import ContactCardModal from '../components/community-compass/ContactCardModal'
+import subProjectData from '../lib/resources.json'
 
-const channels = [
-    '# compass-chat',
-    '# community-support',
-    '# food-help',
-    '# shelter-help',
-    '# volunteer-help',
-    '# admin-alerts',
-]
-
-const directMessages = ['Admin Team', 'Volunteer Team', 'AI Agent']
-
-const messages = [
-    {
-        avatar: 'C',
-        name: 'CompassChat Bot',
-        time: '9:20 AM',
-        mention: '@channel',
-        text: 'Welcome to #compass-chat. This is the main community support channel.',
-    },
-    {
-        avatar: 'C',
-        name: 'Case Worker',
-        time: '9:25 AM',
-        mention: '@admin',
-        text: 'A client needs food and shelter resources today.',
-    },
-    {
-        avatar: 'V',
-        name: 'Volunteer Team',
-        time: '9:30 AM',
-        mention: '@volunteer',
-        text: 'I can help with groceries or a friendly call today.',
-    },
-]
-
-export default function CompassChatPage() {
-    return (
-        <div className="compass-chat-page">
-            <aside className="compass-chat-sidebar">
-                <Link to="/" className="back-dashboard-btn">
-                    ← Back to Dashboard
-                </Link>
-
-                <div className="workspace-block">
-                    <h1>CompassChat</h1>
-                    <p>Community Workspace</p>
-                </div>
-
-                <div className="sidebar-group">
-                    <p className="sidebar-title">CHANNELS</p>
-
-                    {channels.map((channel, index) => (
-                        <button
-                            key={channel}
-                            className={index === 0 ? 'sidebar-link active' : 'sidebar-link'}
-                        >
-                            {channel}
-                        </button>
-                    ))}
-                </div>
-
-                <div className="sidebar-group">
-                    <p className="sidebar-title">DIRECT MESSAGES</p>
-
-                    {directMessages.map((dm) => (
-                        <button key={dm} className="sidebar-link">
-                            {dm}
-                        </button>
-                    ))}
-                </div>
-            </aside>
-
-            <main className="compass-chat-main">
-                <header className="channel-header">
-                    <div>
-                        <h2># compass-chat</h2>
-                        <p>Community chat for support messages and notifications</p>
-                    </div>
-
-                    <div className="channel-auth">
-                        <button className="channel-login">Login</button>
-                        <button className="channel-register">Register</button>
-                    </div>
-                </header>
-
-                <div className="channel-alert">
-                    Using demo data until you log in. New chat notification: 0 unread messages
-                </div>
-
-                <div className="today-divider">
-                    <span>Today</span>
-                </div>
-
-                <section className="channel-messages">
-                    {messages.map((message) => (
-                        <MessageItem key={message.time} message={message} />
-                    ))}
-                </section>
-
-                <form className="channel-composer">
-                    <div className="composer-toolbar-dark">
-                        <button type="button">B</button>
-                        <button type="button">I</button>
-                        <button type="button">Link</button>
-                        <button type="button">List</button>
-                        <button type="button">Code</button>
-                    </div>
-
-                    <div className="composer-bottom">
-                        <input placeholder="Message #compass-chat" />
-                        <button type="submit">
-                            <Send size={15} />
-                            Send
-                        </button>
-                    </div>
-                </form>
-            </main>
-        </div>
-    )
+const ICONS = {
+    homematch: <Home size={20} />,
+    futurepath: <Compass size={20} />,
+    kindconnect: <HeartHandshake size={20} />,
+    firststep: <Newspaper size={20} />,
 }
 
-function MessageItem({ message }) {
+const CONTACTS = {
+    homematch: {
+        name: 'Niciah Rymer-Hillian',
+        initials: 'NR',
+        role: 'Housing Navigation Lead',
+        title: 'Project Builder',
+        project: 'HomeMatch',
+        email: 'niciah@example.com',
+    },
+    futurepath: {
+        name: 'Shocka Homes',
+        initials: 'SH',
+        role: 'Youth Transition Support',
+        title: 'Project Support Team',
+        project: 'FuturePath',
+        email: 'futurepath@example.com',
+    },
+    kindconnect: {
+        name: 'Prachi Patel',
+        initials: 'PP',
+        role: 'Well-being Support',
+        title: 'Community Care Team',
+        project: 'Kind Connect',
+        email: 'kindconnect@example.com',
+    },
+    firststep: {
+        name: 'Anitra Johnson',
+        initials: 'AJ',
+        role: 'Community Resource Support',
+        title: 'Resource Navigation Team',
+        project: 'First Step',
+        email: 'firststep@example.com',
+    },
+}
+
+export default function Dashboard() {
+    const [selectedContact, setSelectedContact] = useState(null)
+
     return (
-        <div className="message-item">
-            <div className="message-avatar">{message.avatar}</div>
+        <div className="max-w-5xl mx-auto px-6 py-16">
+            <div className="max-w-2xl mb-12">
+                <h1 className="font-display font-semibold text-3xl sm:text-4xl text-ink mb-3">
+                    One compass, four ways forward.
+                </h1>
 
-            <div className="message-body">
-                <div className="message-top">
-                    <strong>{message.name}</strong>
-                    <span>{message.time}</span>
-                </div>
-
-                <p>
-                    <span className="message-mention">{message.mention}</span>{' '}
-                    {message.text}
+                <p className="text-body text-ink-70 leading-relaxed">
+                    Community Compass connects you to housing navigation, youth transition support,
+                    well-being resources, and civic updates — all from one trusted starting point.
                 </p>
-
-                <div className="message-reactions">
-                    <button>Done 1</button>
-                    <button>Like 1</button>
-                    <button>Seen 2</button>
-                </div>
             </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                {subProjectData.subProjects.map((p) => (
+                    <SubProjectCard
+                        key={p.slug}
+                        name={p.name}
+                        tagline={p.tagline}
+                        accent={p.accent}
+                        icon={ICONS[p.slug]}
+                        onClick={() => {
+                            console.log('Clicked card:', p.slug)
+                            setSelectedContact(CONTACTS[p.slug])
+                        }}
+                    />
+                ))}
+            </div>
+
+            {selectedContact && (
+                <ContactCardModal
+                    contact={selectedContact}
+                    onClose={() => setSelectedContact(null)}
+                />
+            )}
         </div>
     )
 }

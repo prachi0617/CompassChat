@@ -94,13 +94,11 @@ export default function DashboardPage() {
 
                     <div className="chat-list">
                         <AssistantMessage>
-                            It sounds like things feel overwhelming right now. I found
-                            some support that might help.
+
                         </AssistantMessage>
 
                         <AssistantCard
-                            title="You're not alone"
-                            body="Call or text 988 - Suicide & Crisis Lifeline"
+
                         />
 
                         <ResourceCard

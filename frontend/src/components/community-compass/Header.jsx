@@ -3,10 +3,10 @@ import logo from '../../assets/Chat.jpg'
 import Button from '../ui/Button'
 
 const NAV_LINKS = [
-    { to: '/homematch', label: 'HomeMatch' },
-    { to: '/futurepath', label: 'FuturePath' },
-    { to: '/kindconnect', label: 'Kind Connect' },
-    { to: '/firststep', label: 'First Step' },
+    { to: '/', label: 'HomeMatch' },
+    { to: '/', label: 'FuturePath' },
+    { to: '/', label: 'Kind Connect' },
+    { to: '/', label: 'First Step' },
 ]
 
 export default function Header() {
