@@ -7,10 +7,23 @@ import {
     isSocketConnected,
 } from '../lib/websocket'
 
+export const AI_SUBPROJECT_CHANNELS = [
+    { id: 'ai-homematch-help', name: 'homematch-help', slug: 'homematch', type: 'AI_CHANNEL' },
+    { id: 'ai-futurepath-help', name: 'futurepath-help', slug: 'futurepath', type: 'AI_CHANNEL' },
+    { id: 'ai-kindconnect-help', name: 'kindconnect-help', slug: 'kindconnect', type: 'AI_CHANNEL' },
+    { id: 'ai-firststep-help', name: 'firststep-help', slug: 'firststep', type: 'AI_CHANNEL' },
+]
+
+const AI_CHANNEL_IDS = new Set(AI_SUBPROJECT_CHANNELS.map((c) => c.id))
+
 const MOCK_CHANNELS = [
     { id: 'mock-general', name: 'general', type: 'CHANNEL', memberCount: 12 },
     { id: 'mock-case-workers', name: 'case-workers', type: 'CHANNEL', memberCount: 5 },
     { id: 'mock-housing-team', name: 'housing-team', type: 'CHANNEL', memberCount: 7 },
+    { id: 'mock-homematch-help', name: 'homematch-help', type: 'CHANNEL', memberCount: 3 },
+    { id: 'mock-futurepath-help', name: 'futurepath-help', type: 'CHANNEL', memberCount: 2 },
+    { id: 'mock-kindconnect-help', name: 'kindconnect-help', type: 'CHANNEL', memberCount: 4 },
+    { id: 'mock-firststep-help', name: 'firststep-help', type: 'CHANNEL', memberCount: 2 },
 ]
 
 const MOCK_DMS = [
@@ -76,13 +89,17 @@ export const useChatStore = create((set, get) => ({
         })
     },
 
+    isAiChannel: (id) => AI_CHANNEL_IDS.has(id),
+    getAiChannelSlug: (id) => AI_SUBPROJECT_CHANNELS.find((c) => c.id === id)?.slug ?? null,
+
     selectConversation: async (conversationId) => {
         const prev = get().activeConversationId
-        if (prev && get().mode === 'live') unsubscribeFromChannel(prev)
+        if (prev && get().mode === 'live' && !AI_CHANNEL_IDS.has(prev)) unsubscribeFromChannel(prev)
 
         set({ activeConversationId: conversationId })
 
         if (conversationId === null) return // AI Assistant — no fetch needed
+        if (AI_CHANNEL_IDS.has(conversationId)) return // AI sub-project channel — handled by useAIStore
 
         if (get().mode === 'live') {
             try {
@@ -136,6 +153,38 @@ export const useChatStore = create((set, get) => ({
                 [conversationId]: [...(state.messagesByConversation[conversationId] || []), message],
             },
         }))
+    },
+
+    switchToSubProjectChannel: (slug, contextMessage) => {
+        const channelName = `${slug}-help`
+        const existing = get().channels.find((c) => c.name === channelName)
+        const targetId = existing?.id ?? `mock-${slug}-help`
+
+        if (!get().messagesByConversation[targetId]) {
+            set((state) => ({
+                messagesByConversation: { ...state.messagesByConversation, [targetId]: [] },
+            }))
+        }
+
+        set({ activeConversationId: targetId })
+
+        if (contextMessage) {
+            const systemMsg = {
+                id: `sys-${Date.now()}`,
+                body: `📋 Context from AI Assistant: ${contextMessage}`,
+                sender: { displayName: 'Community Compass AI' },
+                createdAt: new Date().toISOString(),
+                isMock: true,
+                isSystem: true,
+            }
+            set((state) => ({
+                messagesByConversation: {
+                    ...state.messagesByConversation,
+                    [targetId]: [...(state.messagesByConversation[targetId] ?? []), systemMsg],
+                },
+            }))
+        }
+        return targetId
     },
 
     switchToAdminDm: (contextMessage) => {

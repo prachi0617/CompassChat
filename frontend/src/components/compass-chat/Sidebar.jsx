@@ -1,5 +1,6 @@
-import { Star } from 'lucide-react'
+import { Star, Hash } from 'lucide-react'
 import ConversationListItem from './ConversationListItem'
+import { AI_SUBPROJECT_CHANNELS } from '../../stores/useChatStore'
 
 export default function Sidebar({
     channels,
@@ -11,16 +12,18 @@ export default function Sidebar({
     aiUnreadCount,
 }) {
     return (
-        <div className="w-44 sm:w-48 border-r border-ink/8 bg-ink/[0.02] flex flex-col h-full shrink-0 py-3">
+        <div className="w-44 sm:w-48 border-r border-ink/8 bg-ink/[0.02] flex flex-col h-full shrink-0 py-3 overflow-y-auto">
             <div className="px-3 pb-2">
                 <p className="text-meta font-semibold text-ink-50 uppercase tracking-wide">Community Compass</p>
             </div>
 
-            <div className="px-2 mb-3">
+            {/* AI Assistant — main */}
+            <div className="px-2 mb-1">
                 <button
                     onClick={onSelectAi}
-                    className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-body text-left transition ${isAiActive ? 'bg-yellow-50 text-ink font-medium' : 'text-ink-70 hover:bg-ink/5'
-                        }`}
+                    className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-body text-left transition ${
+                        isAiActive && activeId === null ? 'bg-yellow-50 text-ink font-medium' : 'text-ink-70 hover:bg-ink/5'
+                    }`}
                 >
                     <Star size={15} className="text-yellow-500 shrink-0" fill="currentColor" />
                     <span className="truncate flex-1">AI Assistant</span>
@@ -32,6 +35,26 @@ export default function Sidebar({
                 </button>
             </div>
 
+            {/* Sub-project help channels */}
+            <div className="px-3 mb-1 mt-2">
+                <p className="text-meta font-semibold text-ink-50 uppercase tracking-wide">More Resources</p>
+            </div>
+            <div className="px-2 space-y-0.5 mb-3">
+                {AI_SUBPROJECT_CHANNELS.map((c) => (
+                    <button
+                        key={c.id}
+                        onClick={() => onSelectConversation(c.id)}
+                        className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-body text-left transition ${
+                            activeId === c.id ? 'bg-mint-100 text-mint-700 font-medium' : 'text-ink-70 hover:bg-ink/5'
+                        }`}
+                    >
+                        <Hash size={13} className="shrink-0 text-ink-50" />
+                        <span className="truncate flex-1 text-[13px]">{c.name}</span>
+                    </button>
+                ))}
+            </div>
+
+            {/* Channels */}
             <div className="px-3 mb-1">
                 <p className="text-meta font-semibold text-ink-50 uppercase tracking-wide">Channels</p>
             </div>
@@ -47,6 +70,7 @@ export default function Sidebar({
                 ))}
             </div>
 
+            {/* Direct messages */}
             <div className="px-3 mb-1">
                 <p className="text-meta font-semibold text-ink-50 uppercase tracking-wide">Direct messages</p>
             </div>
