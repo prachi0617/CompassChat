@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useAIStore } from '../../../stores/useAIStore'
 import { useChatStore } from '../../../stores/useChatStore'
+import { api } from '../../../lib/api'
 import Composer from '../Composer'
 import SmartSuggestion from './SmartSuggestion'
 import ResourceCard from './ResourceCard'
@@ -136,7 +137,8 @@ export default function AIConversation() {
         bottomRef.current?.scrollIntoView({ block: 'end' })
     }, [messages, isThinking])
 
-    const handleEscalate = (contextMessage) => {
+    const handleEscalate = async (contextMessage) => {
+        try { await api.aiEscalate(contextMessage) } catch { /* proceed to DM regardless */ }
         switchToAdminDm(contextMessage)
     }
 

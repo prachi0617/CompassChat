@@ -24,13 +24,13 @@ public class User extends AuditableEntity {
     @Column(nullable = false)
     private String passwordHash;
 
-    @Enumerated(EnumType.STRING)
+<span class="pc" id="L27">    @Enumerated(EnumType.STRING)</span>
     @Column(nullable = false)
-<span class="pc" id="L29">    private Role role = Role.MEMBER;</span>
+    private Role role = Role.MEMBER;
 
-    @Enumerated(EnumType.STRING)
+<span class="pc" id="L31">    @Enumerated(EnumType.STRING)</span>
     @Column(nullable = false)
-<span class="pc" id="L33">    private PresenceStatus presence = PresenceStatus.OFFLINE;</span>
+    private PresenceStatus presence = PresenceStatus.OFFLINE;
 
     @Column
     private String assignedSubProject;

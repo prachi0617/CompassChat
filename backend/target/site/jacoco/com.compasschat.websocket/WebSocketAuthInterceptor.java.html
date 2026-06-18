@@ -55,8 +55,8 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
 <span class="fc" id="L55">        String role = jwtService.getRole(token);</span>
 
 <span class="fc" id="L57">        accessor.setUser(new UsernamePasswordAuthenticationToken(</span>
-<span class="fc" id="L58">                new StompPrincipal(userId, username),</span>
-<span class="fc" id="L59">                null,</span>
+                new StompPrincipal(userId, username),
+                null,
 <span class="fc" id="L60">                List.of(new SimpleGrantedAuthority(&quot;ROLE_&quot; + role))));</span>
 <span class="fc" id="L61">    }</span>
 

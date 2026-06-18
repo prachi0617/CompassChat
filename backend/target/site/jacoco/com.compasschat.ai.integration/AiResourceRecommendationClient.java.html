@@ -3,97 +3,110 @@
 import com.compasschat.ai.service.GroqProvider;
 import com.compasschat.common.enums.MoodType;
 import com.compasschat.mood.ResourceRecommendationService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Implements ResourceRecommendationService by delegating to Groq when available,
- * falling back to curated keyword-based suggestions when Groq is not configured.
+ * falling back to Service_Directory_cleaned.json keyword search otherwise.
  */
 @Service
 public class AiResourceRecommendationClient implements ResourceRecommendationService {
 
+<span class="fc" id="L23">    private static final ObjectMapper MAPPER = new ObjectMapper();</span>
+
     private final GroqProvider groqProvider;
 
-<span class="fc" id="L19">    public AiResourceRecommendationClient(GroqProvider groqProvider) {</span>
-<span class="fc" id="L20">        this.groqProvider = groqProvider;</span>
-<span class="fc" id="L21">    }</span>
+<span class="fc" id="L27">    public AiResourceRecommendationClient(GroqProvider groqProvider) {</span>
+<span class="fc" id="L28">        this.groqProvider = groqProvider;</span>
+<span class="fc" id="L29">    }</span>
 
     @Override
     public List&lt;RecommendedResource&gt; recommend(MoodType moodType, String note) {
-<span class="fc bfc" id="L25" title="All 2 branches covered.">        if (groqProvider.isEnabled()) {</span>
+<span class="fc bfc" id="L33" title="All 2 branches covered.">        if (groqProvider.isEnabled()) {</span>
             try {
-<span class="fc" id="L27">                return recommendViaGroq(moodType, note);</span>
-<span class="fc" id="L28">            } catch (Exception ignored) {</span>
-                // fall through to rule-based
+<span class="fc" id="L35">                return recommendViaGroq(moodType, note);</span>
+<span class="fc" id="L36">            } catch (Exception ignored) {</span>
+                // fall through to directory search
             }
         }
-<span class="fc" id="L32">        return ruleBasedRecommendations(moodType);</span>
+<span class="fc" id="L40">        return searchDirectory(keywordsFor(moodType));</span>
     }
 
     private List&lt;RecommendedResource&gt; recommendViaGroq(MoodType moodType, String note) {
-<span class="fc" id="L36">        String prompt = String.format(</span>
-<span class="fc" id="L37">                &quot;A user logged their mood as %s with the note: \&quot;%s\&quot;. &quot; +</span>
+<span class="fc" id="L44">        String prompt = String.format(</span>
+<span class="fc" id="L45">                &quot;A user logged their mood as %s with the note: \&quot;%s\&quot;. &quot; +</span>
                 &quot;List 1-2 Delaware community resources that could help them right now. &quot; +
                 &quot;Reply as plain text: one resource per line, format: Title | Short description | URL&quot;,
-<span class="pc bpc" id="L40" title="1 of 2 branches missed.">                moodType.name(), note == null ? &quot;&quot; : note</span>
+<span class="pc bpc" id="L48" title="1 of 2 branches missed.">                moodType.name(), note == null ? &quot;&quot; : note</span>
         );
 
-<span class="fc" id="L43">        String raw = groqProvider.complete(</span>
-<span class="fc" id="L44">                &quot;You are CompassChat, a community resource assistant for Delaware residents. &quot; +</span>
+<span class="fc" id="L51">        String raw = groqProvider.complete(</span>
+<span class="fc" id="L52">                &quot;You are CompassChat, a community resource assistant for Delaware residents. &quot; +</span>
                 &quot;Be concise and empathetic.&quot;,
-<span class="fc" id="L46">                prompt</span>
+<span class="fc" id="L54">                prompt</span>
         );
 
-<span class="fc" id="L49">        return parseGroqResponse(raw);</span>
+<span class="fc" id="L57">        return parseGroqResponse(raw);</span>
     }
 
     private List&lt;RecommendedResource&gt; parseGroqResponse(String raw) {
-<span class="fc" id="L53">        return raw.lines()</span>
-<span class="fc" id="L54">                .map(String::trim)</span>
-<span class="fc" id="L55">                .filter(l -&gt; l.contains(&quot;|&quot;))</span>
-<span class="fc" id="L56">                .map(l -&gt; {</span>
-<span class="fc" id="L57">                    String[] parts = l.split(&quot;\\|&quot;, 3);</span>
-<span class="fc" id="L58">                    return new RecommendedResource(</span>
-<span class="fc" id="L59">                            parts[0].trim(),</span>
-<span class="pc bpc" id="L60" title="1 of 2 branches missed.">                            parts.length &gt; 1 ? parts[1].trim() : &quot;&quot;,</span>
-<span class="pc bpc" id="L61" title="1 of 2 branches missed.">                            parts.length &gt; 2 ? parts[2].trim() : &quot;&quot;,</span>
-<span class="fc" id="L62">                            &quot;groq&quot;</span>
+<span class="fc" id="L61">        return raw.lines()</span>
+<span class="fc" id="L62">                .map(String::trim)</span>
+<span class="fc" id="L63">                .filter(l -&gt; l.contains(&quot;|&quot;))</span>
+<span class="fc" id="L64">                .map(l -&gt; {</span>
+<span class="fc" id="L65">                    String[] parts = l.split(&quot;\\|&quot;, 3);</span>
+<span class="fc" id="L66">                    return new RecommendedResource(</span>
+<span class="fc" id="L67">                            parts[0].trim(),</span>
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">                            parts.length &gt; 1 ? parts[1].trim() : &quot;&quot;,</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">                            parts.length &gt; 2 ? parts[2].trim() : &quot;&quot;,</span>
+<span class="fc" id="L70">                            &quot;groq&quot;</span>
                     );
                 })
-<span class="fc" id="L65">                .limit(2)</span>
-<span class="fc" id="L66">                .toList();</span>
+<span class="fc" id="L73">                .limit(2)</span>
+<span class="fc" id="L74">                .toList();</span>
     }
 
-    private List&lt;RecommendedResource&gt; ruleBasedRecommendations(MoodType moodType) {
-<span class="fc bfc" id="L70" title="All 4 branches covered.">        return switch (moodType) {</span>
-<span class="fc" id="L71">            case ANXIOUS, STRESSED, SAD, LONELY -&gt; List.of(</span>
-<span class="fc" id="L72">                    new RecommendedResource(</span>
-<span class="fc" id="L73">                            &quot;Delaware 211 Helpline&quot;,</span>
-<span class="fc" id="L74">                            &quot;Free, confidential help connecting you to local health and human services.&quot;,</span>
-<span class="fc" id="L75">                            &quot;https://www.delaware211.org&quot;,</span>
-<span class="fc" id="L76">                            &quot;rule_based&quot;</span>
-                    )
-            );
-<span class="fc" id="L79">            case OVERWHELMED, DISTRESSED -&gt; List.of(</span>
-<span class="fc" id="L80">                    new RecommendedResource(</span>
-<span class="fc" id="L81">                            &quot;NAMI Delaware&quot;,</span>
-<span class="fc" id="L82">                            &quot;Mental health support, education, and advocacy for Delawareans.&quot;,</span>
-<span class="fc" id="L83">                            &quot;https://namide.org&quot;,</span>
-<span class="fc" id="L84">                            &quot;rule_based&quot;</span>
-                    )
-            );
-<span class="fc" id="L87">            case TIRED -&gt; List.of(</span>
-<span class="fc" id="L88">                    new RecommendedResource(</span>
-<span class="fc" id="L89">                            &quot;Delaware Health &amp; Social Services&quot;,</span>
-<span class="fc" id="L90">                            &quot;Programs supporting physical and emotional wellbeing across Delaware.&quot;,</span>
-<span class="fc" id="L91">                            &quot;https://dhss.delaware.gov&quot;,</span>
-<span class="fc" id="L92">                            &quot;rule_based&quot;</span>
-                    )
-            );
-<span class="fc" id="L95">            default -&gt; List.of();</span>
+    private List&lt;String&gt; keywordsFor(MoodType moodType) {
+<span class="fc bfc" id="L78" title="All 4 branches covered.">        return switch (moodType) {</span>
+<span class="fc" id="L79">            case ANXIOUS, STRESSED, SAD, LONELY -&gt; List.of(&quot;MENTAL HEALTH&quot;, &quot;SUPPORT GROUP&quot;);</span>
+<span class="fc" id="L80">            case OVERWHELMED, DISTRESSED        -&gt; List.of(&quot;MENTAL HEALTH&quot;, &quot;SUBSTANCE USE&quot;);</span>
+<span class="fc" id="L81">            case TIRED                          -&gt; List.of(&quot;HEALTHCARE/MEDICAL&quot;, &quot;MENTAL HEALTH&quot;);</span>
+<span class="fc" id="L82">            default                             -&gt; List.of(&quot;RESOURCE INFORMATION&quot;, &quot;SUPPORT GROUP&quot;);</span>
         };
+    }
+
+    private List&lt;RecommendedResource&gt; searchDirectory(List&lt;String&gt; typeKeywords) {
+        try {
+<span class="fc" id="L88">            InputStream stream = new ClassPathResource(&quot;data/Service_Directory_cleaned.json&quot;)</span>
+<span class="fc" id="L89">                    .getInputStream();</span>
+<span class="fc" id="L90">            JsonNode root = MAPPER.readTree(stream);</span>
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">            JsonNode services = root.has(&quot;services&quot;) ? root.path(&quot;services&quot;) : root;</span>
+
+<span class="fc" id="L93">            List&lt;RecommendedResource&gt; results = new ArrayList&lt;&gt;();</span>
+<span class="pc bpc" id="L94" title="1 of 2 branches missed.">            for (JsonNode s : services) {</span>
+<span class="fc" id="L95">                String type = s.path(&quot;typeOfService&quot;).asText(&quot;&quot;).toUpperCase();</span>
+<span class="fc bfc" id="L96" title="All 2 branches covered.">                if (typeKeywords.stream().anyMatch(type::contains)) {</span>
+<span class="fc" id="L97">                    results.add(new RecommendedResource(</span>
+<span class="fc" id="L98">                            s.path(&quot;organizationName&quot;).asText(),</span>
+<span class="fc" id="L99">                            s.path(&quot;servicesDescription&quot;).asText(),</span>
+<span class="fc" id="L100">                            s.path(&quot;website&quot;).asText(s.path(&quot;fullAddress&quot;).asText(&quot;&quot;)),</span>
+<span class="fc" id="L101">                            &quot;service_directory&quot;</span>
+                    ));
+<span class="fc bfc" id="L103" title="All 2 branches covered.">                    if (results.size() == 2) break;</span>
+                }
+            }
+<span class="fc" id="L106">            return results;</span>
+<span class="nc" id="L107">        } catch (IOException e) {</span>
+<span class="nc" id="L108">            return List.of();</span>
+        }
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

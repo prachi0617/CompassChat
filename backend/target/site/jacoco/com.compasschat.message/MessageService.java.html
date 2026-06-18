@@ -46,7 +46,7 @@ public class MessageService extends BaseService&lt;Message, UUID&gt; {
 <span class="fc" id="L46">        Message msg = messages.save(new Message(senderId, channelId, content));</span>
 <span class="fc" id="L47">        auditLogs.save(new MessageAuditLog(</span>
 <span class="fc" id="L48">                msg.getId(), AuditAction.CREATED, senderId,</span>
-<span class="fc" id="L49">                null, content));</span>
+                null, content));
 <span class="fc" id="L50">        eventPublisher.publishEvent(new MessagePostedEvent(msg.getId()));</span>
 <span class="fc" id="L51">        mentionService.extractAndSave(msg.getId(), channelId, senderId, content);</span>
 <span class="fc" id="L52">        return msg;</span>
@@ -68,7 +68,7 @@ public class MessageService extends BaseService&lt;Message, UUID&gt; {
 
 <span class="fc" id="L69">        auditLogs.save(new MessageAuditLog(</span>
 <span class="fc" id="L70">                msg.getId(), AuditAction.EDITED, requesterId,</span>
-<span class="fc" id="L71">                previous, newContent</span>
+                previous, newContent
         ));
 <span class="fc" id="L73">        return msg;</span>
     }

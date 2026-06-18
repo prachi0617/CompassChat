@@ -3,16 +3,24 @@ package com.compasschat.ai.integration;
 import com.compasschat.ai.service.GroqProvider;
 import com.compasschat.common.enums.MoodType;
 import com.compasschat.mood.ResourceRecommendationService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Implements ResourceRecommendationService by delegating to Groq when available,
- * falling back to curated keyword-based suggestions when Groq is not configured.
+ * falling back to Service_Directory_cleaned.json keyword search otherwise.
  */
 @Service
 public class AiResourceRecommendationClient implements ResourceRecommendationService {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final GroqProvider groqProvider;
 
@@ -26,10 +34,10 @@ public class AiResourceRecommendationClient implements ResourceRecommendationSer
             try {
                 return recommendViaGroq(moodType, note);
             } catch (Exception ignored) {
-                // fall through to rule-based
+                // fall through to directory search
             }
         }
-        return ruleBasedRecommendations(moodType);
+        return searchDirectory(keywordsFor(moodType));
     }
 
     private List<RecommendedResource> recommendViaGroq(MoodType moodType, String note) {
@@ -66,33 +74,38 @@ public class AiResourceRecommendationClient implements ResourceRecommendationSer
                 .toList();
     }
 
-    private List<RecommendedResource> ruleBasedRecommendations(MoodType moodType) {
+    private List<String> keywordsFor(MoodType moodType) {
         return switch (moodType) {
-            case ANXIOUS, STRESSED, SAD, LONELY -> List.of(
-                    new RecommendedResource(
-                            "Delaware 211 Helpline",
-                            "Free, confidential help connecting you to local health and human services.",
-                            "https://www.delaware211.org",
-                            "rule_based"
-                    )
-            );
-            case OVERWHELMED, DISTRESSED -> List.of(
-                    new RecommendedResource(
-                            "NAMI Delaware",
-                            "Mental health support, education, and advocacy for Delawareans.",
-                            "https://namide.org",
-                            "rule_based"
-                    )
-            );
-            case TIRED -> List.of(
-                    new RecommendedResource(
-                            "Delaware Health & Social Services",
-                            "Programs supporting physical and emotional wellbeing across Delaware.",
-                            "https://dhss.delaware.gov",
-                            "rule_based"
-                    )
-            );
-            default -> List.of();
+            case ANXIOUS, STRESSED, SAD, LONELY -> List.of("MENTAL HEALTH", "SUPPORT GROUP");
+            case OVERWHELMED, DISTRESSED        -> List.of("MENTAL HEALTH", "SUBSTANCE USE");
+            case TIRED                          -> List.of("HEALTHCARE/MEDICAL", "MENTAL HEALTH");
+            default                             -> List.of("RESOURCE INFORMATION", "SUPPORT GROUP");
         };
+    }
+
+    private List<RecommendedResource> searchDirectory(List<String> typeKeywords) {
+        try {
+            InputStream stream = new ClassPathResource("data/Service_Directory_cleaned.json")
+                    .getInputStream();
+            JsonNode root = MAPPER.readTree(stream);
+            JsonNode services = root.has("services") ? root.path("services") : root;
+
+            List<RecommendedResource> results = new ArrayList<>();
+            for (JsonNode s : services) {
+                String type = s.path("typeOfService").asText("").toUpperCase();
+                if (typeKeywords.stream().anyMatch(type::contains)) {
+                    results.add(new RecommendedResource(
+                            s.path("organizationName").asText(),
+                            s.path("servicesDescription").asText(),
+                            s.path("website").asText(s.path("fullAddress").asText("")),
+                            "service_directory"
+                    ));
+                    if (results.size() == 2) break;
+                }
+            }
+            return results;
+        } catch (IOException e) {
+            return List.of();
+        }
     }
 }

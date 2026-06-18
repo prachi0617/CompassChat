@@ -56,10 +56,16 @@ export const api = {
             body: payload,
         }),
 
-    aiChat: (message) =>
+    aiChat: (message, history = []) =>
         request('/ai/chat', {
             method: 'POST',
-            body: { message },
+            body: { message, history },
+        }),
+
+    aiEscalate: (contextMessage) =>
+        request('/ai/escalate', {
+            method: 'POST',
+            body: { contextMessage },
         }),
 }
 
