@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 
 import './DashboardPage.css'
+import { useState } from 'React'
 
 const projects = [
     {
@@ -43,84 +44,63 @@ export default function DashboardPage() {
     return (
         <div className="dashboard-page">
             <header className="dashboard-header">
-
                 <nav className="main-nav">
                     <a href="/homematch">HomeMatch</a>
                     <a href="/futurepath">FuturePath</a>
                     <a href="/kindconnect">Kind Connect</a>
                     <a href="/firststep">First Step</a>
                 </nav>
-
             </header>
 
             <main className="dashboard-main">
+                {/* LEFT SIDE: BIG AI ASSISTANT */}
                 <section className="left-section">
                     <div className="hero">
-                        <h1>
-                            One compass, four <br />
-                            ways forward.
-                        </h1>
+                        <h1>CompassChat</h1>
 
                         <p>
-                            Community Compass connects you to housing navigation,
-                            youth transition support, well-being resources, and civic
-                            updates.
+                            AI Assistant for Community Compass.
                         </p>
                     </div>
 
-                    <div className="project-grid">
-                        {projects.map((project) => (
-                            <a
-                                key={project.slug}
-                                href={`/${project.slug}`}
-                                className="project-card"
-                            >
-                                <div className={`project-icon ${project.color}`}>
-                                    {project.icon}
-                                </div>
+                    <aside className="ai-panel">
+                        <h2>Community - Chat</h2>
 
-                                <div>
-                                    <h2>{project.name}</h2>
-                                    <p>{project.tagline}</p>
-                                </div>
-                            </a>
-                        ))}
-                    </div>
+                        <div className="chat-list">
+
+
+
+                        </div>
+
+                        <div className="chat-input-row">
+                            <span>Ask the AI Assistant...</span>
+
+                            <button>
+                                <Send size={24} />
+                            </button>
+                        </div>
+                    </aside>
                 </section>
 
-                <aside className="ai-panel">
-                    <h2>AI Assistant</h2>
+                {/* RIGHT SIDE: 4 SMALL CARDS */}
+                <section className="project-grid">
+                    {projects.map((project) => (
+                        <a
+                            key={project.slug}
+                            href={`/${project.slug}`}
+                            className="project-card"
+                        >
+                            <div className={`project-icon ${project.color}`}>
+                                {project.icon}
+                            </div>
 
-
-                    <div className="chat-list">
-                        <AssistantMessage>
-                            It sounds like things feel overwhelming right now. I found
-                            some support that might help.
-                        </AssistantMessage>
-
-                        <AssistantCard
-                            title="You're not alone"
-                            body="Call or text 988 - Suicide & Crisis Lifeline"
-                        />
-
-                        <ResourceCard
-                            title="HomeMatch"
-                            body="Personalized housing navigation and matching."
-                        />
-
-                        <UserMessage>
-                            I'm feeling overwhelmed and need help finding housing.
-                        </UserMessage>
-                    </div>
-
-                    <div className="chat-input-row">
-                        <span>Ask the AI Assistant...</span>
-
-                        <button>
-                            <Send size={24} />
-                        </button>
-                    </div>
-                </aside>
+                            <div>
+                                <h2>{project.name}</h2>
+                                <p>{project.tagline}</p>
+                            </div>
+                        </a>
+                    ))}
+                </section>
             </main>
         </div>
     )

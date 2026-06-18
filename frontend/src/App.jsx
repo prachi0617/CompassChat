@@ -6,10 +6,10 @@ import HomeMatchPage from './pages/HomeMatchPage'
 import FuturePathPage from './pages/FuturePathPage'
 import KindConnectPage from './pages/KindConnectPage'
 import FirstStepPage from './pages/FirstStepPage'
+import CompassChatPage from './pages/CompassChatPage'
 import Toast from './components/ui/Toast'
 import { useAuthStore } from './stores/useAuthStore'
 import { subscribeToErrors } from './lib/websocket'
-import CompassChatPage from './pages/CompassChatPage'
 
 export default function App() {
     const boot = useAuthStore((s) => s.boot)
@@ -22,9 +22,11 @@ export default function App() {
 
     useEffect(() => {
         if (status !== 'ready') return
+
         const sub = subscribeToErrors((err) => {
             setToastMessage(err?.message || 'Something went wrong. Please try again.')
         })
+
         return () => sub?.unsubscribe()
     }, [status])
 
@@ -40,7 +42,11 @@ export default function App() {
                     <Route path="/compass-chat" element={<CompassChatPage />} />
                 </Route>
             </Routes>
-            <Toast message={toastMessage} onDismiss={() => setToastMessage(null)} />
+
+            <Toast
+                message={toastMessage}
+                onDismiss={() => setToastMessage(null)}
+            />
         </>
     )
 }
