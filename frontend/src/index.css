@@ -65,5 +65,11 @@ h4 {
     *::after {
         animation-duration: 0.001ms !important;
         transition-duration: 0.001ms !important;
+
+        textarea,
+        input,
+        button {
+            pointer-events: auto;
+        }
     }
 }

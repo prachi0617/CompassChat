@@ -26,3 +26,26 @@ replay_pid*
 # Maven
 backend/target/
 
+# OS files
+.DS_Store
+
+# Logs
+*.log
+
+# Node / frontend build outputs
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+
+# Frontend env files (keep secrets out of git)
+frontend/.env
+frontend/.env.*
+
+# Editor / IDE
+.idea/
+.vscode/
+
+# Misc
+Thumbs.db
+
+
