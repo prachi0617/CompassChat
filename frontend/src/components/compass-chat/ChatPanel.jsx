@@ -18,6 +18,7 @@ export default function ChatPanel({ isOpen, onClose }) {
         loadConversations,
         selectConversation,
         sendMessage,
+        clearConversation,
         isAiChannel,
     } = useChatStore()
 
@@ -72,17 +73,6 @@ export default function ChatPanel({ isOpen, onClose }) {
 
     return (
         <>
-            <div
-                onClick={onClose}
-                aria-hidden="true"
-                style={{
-                    position: 'fixed', inset: 0, zIndex: 900,
-                    background: 'rgba(17,24,39,0.2)',
-                    opacity: isOpen ? 1 : 0,
-                    pointerEvents: isOpen ? 'auto' : 'none',
-                    transition: 'opacity 200ms ease',
-                }}
-            />
 
             <div
                 role="dialog"
@@ -111,7 +101,7 @@ export default function ChatPanel({ isOpen, onClose }) {
 
                 <DemoBanner />
 
-                <div className="flex flex-1 overflow-hidden">
+                <div className="flex flex-1 overflow-x-auto overflow-y-hidden">
                     <Sidebar
                         channels={channels}
                         dms={dms}
@@ -134,6 +124,7 @@ export default function ChatPanel({ isOpen, onClose }) {
                                 <Composer
                                     onSend={(body) => sendMessage(activeConversationId, body)}
                                     placeholder={`Message ${activeName}`}
+                                    onClear={() => clearConversation(activeConversationId)}
                                 />
                             </>
                         )}

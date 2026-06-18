@@ -152,7 +152,14 @@ export const useAIStore = create((set, get) => ({
 
         try {
             const history = buildHistory(get().messagesByChannel[activeId] ?? [])
-            const backendResponse = await api.aiChat(userText, history)
+
+            // Prepend sub-project context so the backend knows which channel the user is in
+            const activeChannel = AI_SUBPROJECT_CHANNELS.find((c) => c.id === activeId)
+            const contextualHistory = activeChannel
+                ? [`Context: User is in the ${activeChannel.slug} help channel (${activeChannel.name}).`, ...history]
+                : history
+
+            const backendResponse = await api.aiChat(userText, contextualHistory)
 
             const { text: aiText, intent: backendIntent, liveAgentSuggested } = extractAiPayload(backendResponse)
 
@@ -200,6 +207,27 @@ export const useAIStore = create((set, get) => ({
             if (mapped?.intent === 'MOOD') {
                 const frontendMood = classifyIntent(userText)
                 get()._appendMoodResources(frontendMood.moodType || 'NEUTRAL', userText)
+            }
+
+            // Secondary fallback: if backend gave no recognized resource intent, use frontend classifier
+            if (!mapped || mapped.intent === 'GENERAL') {
+                const secondary = activeChannel
+                    ? { intent: 'RESOURCE', subProject: activeChannel.slug }
+                    : classifyIntent(userText)
+                if (secondary.intent === 'RESOURCE') {
+                    const project = findSubProject(secondary.subProject)
+                    if (project) {
+                        newMessages.push({
+                            id: `ai-${Date.now()}-handoff-fallback`,
+                            from: 'ai',
+                            type: 'handoff-cta',
+                            projectName: project.name,
+                            projectSlug: project.slug,
+                            contextMessage: `User asked about ${project.name}: "${userText}"`,
+                            createdAt: new Date().toISOString(),
+                        })
+                    }
+                }
             }
 
             set((state) => {
@@ -359,5 +387,13 @@ export const useAIStore = create((set, get) => ({
         } catch {
             // silent — text response was already displayed
         }
+    },
+
+    clearMessages: () => {
+        const id = get().activeAiChannelId
+        const reset = id === null ? welcomeMessage() : subProjectWelcomeMessage(id)
+        set((state) => ({
+            messagesByChannel: { ...state.messagesByChannel, [id]: [reset] },
+        }))
     },
 }))

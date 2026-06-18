@@ -13,7 +13,7 @@ function SkeletonBubble({ align = 'left' }) {
     )
 }
 
-export default function MessageThread({ messages, loading, currentUserName = 'Demo User' }) {
+export default function MessageThread({ messages, loading, currentUserName = 'Guest User' }) {
     const bottomRef = useRef(null)
 
     useEffect(() => {

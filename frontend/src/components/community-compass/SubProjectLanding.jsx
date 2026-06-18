@@ -34,19 +34,18 @@ export default function SubProjectLanding({ name, tagline, developer, accent = '
                 <ArrowLeft size={14} /> Back to Community Compass
             </Link>
 
-            <span className={`inline-block text-meta font-semibold px-3 py-1 rounded-full mb-4 ${a.bg} ${a.text}`}>
-                Sub-project
-            </span>
             <h1 className="font-display font-semibold text-3xl sm:text-4xl text-ink mb-4">{name}</h1>
             <p className="text-body text-ink-70 leading-relaxed max-w-xl mb-10">{tagline}</p>
 
-            <div className="rounded-2xl border border-ink/8 bg-white p-6 flex items-center gap-4 max-w-md">
-                <Avatar name={developer} size={48} />
-                <div className="flex-1 min-w-0">
-                    <p className="text-meta text-ink-50 mb-0.5">Built by</p>
-                    <p className="font-display font-semibold text-ink truncate">{developer}</p>
+            <div className="rounded-2xl border border-ink/8 bg-white p-6 flex flex-col sm:flex-row sm:items-center gap-4 max-w-lg">
+                <div className="flex items-center gap-4 min-w-0">
+                    <Avatar name={developer} size={48} />
+                    <div>
+                        <p className="text-meta text-ink-50 mb-0.5">Built by</p>
+                        <p className="font-display font-semibold text-ink">{developer}</p>
+                    </div>
                 </div>
-                <Button variant="primary" size="sm" onClick={handleSpeak}>
+                <Button variant="primary" size="sm" onClick={handleSpeak} className="shrink-0 sm:ml-auto">
                     <UserRound size={14} />
                     Speak with {developer.split(' ')[0]}
                 </Button>

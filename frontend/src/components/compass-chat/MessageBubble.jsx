@@ -37,7 +37,7 @@ export default function MessageBubble({ message, isOwn }) {
                 >
                     {message.body}
                 </p>
-                <div className={`flex items-center gap-1.5 mt-1 ${isOwn ? 'flex-row-reverse' : ''}`}>
+                <div className={`flex flex-wrap items-center gap-1.5 mt-1 ${isOwn ? 'flex-row-reverse' : ''}`}>
                     <Pill
                         tone={reactions.done ? 'mint' : 'neutral'}
                         icon={<Check size={11} />}
