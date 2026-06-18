@@ -27,6 +27,18 @@ export default {
                     70: '#374151',
                     50: '#9CA3AF',
                 },
+                blue: {
+                    50: '#EFF6FF',
+                    100: '#DBEAFE',
+                    600: '#2563EB',
+                    700: '#1D4ED8',
+                },
+                orange: {
+                    50: '#FFF7ED',
+                    100: '#FFEDD5',
+                    600: '#EA580C',
+                    700: '#C2410C',
+                },
             },
             fontFamily: {
                 display: ['Georgia', 'serif'],

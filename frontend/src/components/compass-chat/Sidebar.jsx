@@ -12,7 +12,7 @@ export default function Sidebar({
     aiUnreadCount,
 }) {
     return (
-        <div className="w-44 sm:w-48 border-r border-ink/8 bg-ink/[0.02] flex flex-col h-full shrink-0 py-3 overflow-y-auto">
+        <div className="w-44 sm:w-48 border-r border-pink-100 bg-pink-50 flex flex-col h-full shrink-0 py-3 overflow-y-auto">
             <div className="px-3 pb-2">
                 <p className="text-meta font-semibold text-ink-50 uppercase tracking-wide">Community Compass</p>
             </div>

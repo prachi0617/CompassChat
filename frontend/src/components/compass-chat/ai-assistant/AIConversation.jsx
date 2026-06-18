@@ -36,15 +36,15 @@ function Dot({ delay }) {
 
 function QuickActions({ onAction }) {
     const actions = [
-        { label: 'How are you feeling?', prompt: 'I want to share how I am feeling.' },
-        { label: 'Find housing help', prompt: 'I need help with housing.' },
+        { label: 'How you are feeling', prompt: 'I want to share how I am feeling.' },
+        { label: 'Help finding housing', prompt: 'I need help with housing.' },
         { label: 'Youth resources', prompt: 'I need youth transition resources.' },
-        { label: 'Suggest resources', prompt: 'Suggest some resources that might help me right now.' },
+        { label: 'Food', prompt: 'I need help finding food and meals.' },
     ]
     return (
         <div style={{ padding: '10px 16px 4px' }}>
             <p style={{ margin: '0 0 6px', fontSize: 11.5, color: '#94A3B8', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Try asking
+                If you need help with
             </p>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-start' }}>
                 {actions.map((a) => (
@@ -120,7 +120,7 @@ function AiMessageRow({ message, onEscalate, onLiveAgent }) {
 }
 
 export default function AIConversation() {
-    const { isThinking, addUserMessage, markRead } = useAIStore()
+    const { isThinking, addUserMessage, markRead, clearMessages } = useAIStore()
     const activeAiChannelId = useAIStore((s) => s.activeAiChannelId)
     const messagesByChannel = useAIStore((s) => s.messagesByChannel)
     const messages = messagesByChannel[activeAiChannelId] ?? []
@@ -166,7 +166,7 @@ export default function AIConversation() {
                 {isThinking && <ThinkingIndicator />}
                 <div ref={bottomRef} />
             </div>
-            <Composer onSend={addUserMessage} placeholder="Ask the AI Assistant..." />
+            <Composer onSend={addUserMessage} placeholder="Ask the AI Assistant..." onClear={clearMessages} />
         </div>
     )
 }

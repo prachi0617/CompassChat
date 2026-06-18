@@ -23,30 +23,11 @@ export default function Header() {
                 className="flex shrink-0 items-center gap-3 no-underline"
                 style={{ height: '64px' }}
             >
-                <div
-                    style={{
-                        width: '44px',
-                        height: '44px',
-                        minWidth: '44px',
-                        maxWidth: '44px',
-                        overflow: 'hidden',
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                    }}
-                >
-                    <img
-                        src={logo}
-                        alt="Community Compass logo"
-                        style={{
-                            width: '120px',
-                            height: '90px',
-
-                            display: 'block',
-                        }}
-                    />
-                </div>
+                <img
+                    src={logo}
+                    alt="Community Compass logo"
+                    style={{ width: '44px', height: '44px', objectFit: 'contain', display: 'block' }}
+                />
 
                 <span className="font-display text-lg font-semibold tracking-tight text-ink">
                     Community Compass

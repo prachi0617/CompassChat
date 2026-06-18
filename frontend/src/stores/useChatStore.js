@@ -35,15 +35,15 @@ function buildMockMessages() {
     const now = Date.now()
     const lines = [
         ['Jordan Reyes', 'Morning! Reminder that the housing voucher clinic is at 10am today.'],
-        ['Demo User', 'Thanks for the heads up — I will be there.'],
+        ['Guest User', 'Thanks for the heads up — I will be there.'],
         ['Sam Okafor', 'Does anyone have the updated intake form?'],
         ['Jordan Reyes', "Yep, I'll drop it in here in a sec."],
         ['Jordan Reyes', 'intake-form-v3.pdf'],
-        ['Demo User', 'Got it, thank you!'],
+        ['Guest User', 'Got it, thank you!'],
         ['Sam Okafor', "I'll review with the client this afternoon."],
         ['Priya Nair', 'Quick one — is the wellness check-in still on for Friday?'],
         ['Jordan Reyes', 'Yes, confirmed for Friday at 2pm.'],
-        ['Demo User', 'Perfect, see everyone there 👋'],
+        ['Guest User', 'Perfect, see everyone there 👋'],
     ]
     return lines.map(([sender, body], i) => ({
         id: `mock-msg-${i}`,
@@ -143,7 +143,7 @@ export const useChatStore = create((set, get) => ({
         const message = {
             id: `local-${Date.now()}`,
             body,
-            sender: { displayName: 'Demo User' },
+            sender: { displayName: 'Guest User' },
             createdAt: new Date().toISOString(),
             isMock: true,
         }
@@ -171,7 +171,7 @@ export const useChatStore = create((set, get) => ({
         if (contextMessage) {
             const systemMsg = {
                 id: `sys-${Date.now()}`,
-                body: `📋 Context from AI Assistant: ${contextMessage}`,
+                body: contextMessage,
                 sender: { displayName: 'Community Compass AI' },
                 createdAt: new Date().toISOString(),
                 isMock: true,
@@ -185,6 +185,12 @@ export const useChatStore = create((set, get) => ({
             }))
         }
         return targetId
+    },
+
+    clearConversation: (conversationId) => {
+        set((state) => ({
+            messagesByConversation: { ...state.messagesByConversation, [conversationId]: [] },
+        }))
     },
 
     switchToAdminDm: (contextMessage) => {
