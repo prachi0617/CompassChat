@@ -43,12 +43,6 @@ export default function DashboardPage() {
     return (
         <div className="dashboard-page">
             <header className="dashboard-header">
-                <div className="brand">
-                    <div className="brand-logo">
-                        <Compass size={26} />
-                    </div>
-
-                </div>
 
                 <nav className="main-nav">
                     <a href="/homematch">HomeMatch</a>
@@ -97,9 +91,6 @@ export default function DashboardPage() {
                 <aside className="ai-panel">
                     <h2>AI Assistant</h2>
 
-                    <div className="demo-banner">
-                        Demo mode - messages persist to the backend.
-                    </div>
 
                     <div className="chat-list">
                         <AssistantMessage>

@@ -4,12 +4,9 @@ function getToken() {
     return localStorage.getItem('cc_demo_token')
 }
 
-/**
- * Fetch wrapper that automatically attaches the demo JWT as a Bearer token.
- * Throws an Error with .status and parsed .body on non-2xx responses.
- */
 async function request(path, { method = 'GET', body, auth = true } = {}) {
     const headers = { 'Content-Type': 'application/json' }
+
     if (auth) {
         const token = getToken()
         if (token) headers['Authorization'] = `Bearer ${token}`
@@ -27,7 +24,10 @@ async function request(path, { method = 'GET', body, auth = true } = {}) {
     const data = isJson ? await res.json() : await res.text()
 
     if (!res.ok) {
-        const message = (isJson && (data?.error || data?.message)) || `Request failed (${res.status})`
+        const message =
+            (isJson && (data?.error || data?.message)) ||
+            `Request failed (${res.status})`
+
         const error = new Error(message)
         error.status = res.status
         error.body = data
@@ -38,13 +38,29 @@ async function request(path, { method = 'GET', body, auth = true } = {}) {
 }
 
 export const api = {
-    login: (payload) => request('/auth/login', { method: 'POST', body: payload, auth: false }),
+    login: (payload) =>
+        request('/auth/login', {
+            method: 'POST',
+            body: payload,
+            auth: false,
+        }),
 
     myChannels: () => request('/channels/mine'),
+
     channelMessages: (channelId, page = 0, size = 50) =>
         request(`/channels/${channelId}/messages?page=${page}&size=${size}`),
 
-    postMood: (payload) => request('/moods', { method: 'POST', body: payload }),
+    postMood: (payload) =>
+        request('/moods', {
+            method: 'POST',
+            body: payload,
+        }),
+
+    aiChat: (message) =>
+        request('/ai/chat', {
+            method: 'POST',
+            body: { message },
+        }),
 }
 
 export { getToken, BASE_URL }
