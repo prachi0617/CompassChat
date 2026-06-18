@@ -15,8 +15,8 @@ public class GroqProvider implements AiProvider {
      * ChatClient.Builder is optional so Spring does not force the OpenAiChatModel
      * bean (and its mandatory-key check) when GROQ_API_KEY is absent.
      */
-<span class="fc" id="L18">    public GroqProvider(@Autowired(required = false) ChatClient.Builder builder,</span>
-                        @Value(&quot;${spring.ai.openai.api-key:}&quot;) String apiKey) {
+    public GroqProvider(@Autowired(required = false) ChatClient.Builder builder,
+<span class="fc" id="L19">                        @Value(&quot;${spring.ai.openai.api-key:}&quot;) String apiKey) {</span>
 <span class="fc bfc" id="L20" title="All 4 branches covered.">        boolean keyPresent = apiKey != null &amp;&amp; !apiKey.isBlank();</span>
 <span class="pc bpc" id="L21" title="1 of 4 branches missed.">        this.enabled = keyPresent &amp;&amp; builder != null;</span>
 <span class="pc bpc" id="L22" title="1 of 2 branches missed.">        this.chatClient = this.enabled ? builder.build() : null;</span>

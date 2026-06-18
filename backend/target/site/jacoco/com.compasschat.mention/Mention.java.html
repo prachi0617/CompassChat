@@ -32,8 +32,8 @@ public class Mention extends AuditableEntity {
     @Column(nullable = false)
     private UUID mentionedUserId;
 
-    @Column(nullable = false)
-<span class="pc" id="L36">    private boolean read = false;</span>
+<span class="pc" id="L35">    @Column(nullable = false)</span>
+    private boolean read = false;
 
 <span class="nc" id="L38">    protected Mention() {}</span>
 

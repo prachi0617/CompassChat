@@ -14,9 +14,9 @@ public class Channel extends AuditableEntity {
     @Column(length = 1000)
     private String description;
 
-    @Enumerated(EnumType.STRING)
+<span class="pc" id="L17">    @Enumerated(EnumType.STRING)</span>
     @Column(nullable = false)
-<span class="pc" id="L19">    private ChannelType type = ChannelType.PUBLIC;</span>
+    private ChannelType type = ChannelType.PUBLIC;
 
     @Column(length = 500)
     private String purpose;
@@ -24,8 +24,8 @@ public class Channel extends AuditableEntity {
     @Column
     private String linkedSubProject;
 
-    @Column(nullable = false)
-<span class="pc" id="L28">    private boolean archived = false;</span>
+<span class="pc" id="L27">    @Column(nullable = false)</span>
+    private boolean archived = false;
 
 <span class="nc" id="L30">    protected Channel() {}</span>
 

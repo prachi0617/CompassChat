@@ -2,6 +2,9 @@ package com.compasschat.ai.controller;
 
 import com.compasschat.ai.dto.ChatRequest;
 import com.compasschat.ai.dto.ChatResponse;
+import com.compasschat.ai.dto.EscalateRequest;
+import com.compasschat.ai.dto.EscalateResponse;
+import com.compasschat.ai.escalation.EscalationService;
 import com.compasschat.ai.service.AiAgentService;
 import com.compasschat.auth.security.JwtService;
 import com.compasschat.common.base.ApiResponse;
@@ -16,10 +19,14 @@ import java.util.UUID;
 public class AiAgentController {
 
     private final AiAgentService aiAgentService;
+    private final EscalationService escalationService;
     private final JwtService jwtService;
 
-    public AiAgentController(AiAgentService aiAgentService, JwtService jwtService) {
+    public AiAgentController(AiAgentService aiAgentService,
+                             EscalationService escalationService,
+                             JwtService jwtService) {
         this.aiAgentService = aiAgentService;
+        this.escalationService = escalationService;
         this.jwtService = jwtService;
     }
 
@@ -27,7 +34,14 @@ public class AiAgentController {
     public ApiResponse<ChatResponse> chat(@RequestBody ChatRequest request,
                                           HttpServletRequest http) {
         UUID userId = jwtService.getUserId(extractToken(http));
-        return ApiResponse.ok(aiAgentService.processMessage(request.message(), userId));
+        return ApiResponse.ok(aiAgentService.processMessage(request.message(), userId, request.history()));
+    }
+
+    @PostMapping("/escalate")
+    public ApiResponse<EscalateResponse> escalate(@RequestBody EscalateRequest request,
+                                                   HttpServletRequest http) {
+        UUID userId = jwtService.getUserId(extractToken(http));
+        return ApiResponse.ok(escalationService.escalate(userId, request.contextMessage()));
     }
 
     private String extractToken(HttpServletRequest http) {

@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 <span class="fc" id="L33">        StringBuilder response = new StringBuilder();</span>
 <span class="fc bfc" id="L34" title="All 2 branches covered.">        for (ContextFragment fragment : context.getFragments()) {</span>
 <span class="fc" id="L35">            response.append(fragment.content()).append(&quot;\n\n&quot;);</span>
-        }
+<span class="fc" id="L36">        }</span>
 <span class="fc" id="L37">        response.append(&quot;Would you like more details or help with something specific?&quot;);</span>
 <span class="fc" id="L38">        return response.toString().trim();</span>
     }

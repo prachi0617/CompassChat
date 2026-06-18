@@ -35,8 +35,8 @@ public class MessageAuditLog extends AuditableEntity {
 
 <span class="nc" id="L36">    protected MessageAuditLog() {} // JPA</span>
 
-<span class="fc" id="L38">    public MessageAuditLog(UUID messageId, AuditAction action, UUID performedBy,</span>
-                           String previousContent, String newContent) {
+    public MessageAuditLog(UUID messageId, AuditAction action, UUID performedBy,
+<span class="fc" id="L39">                           String previousContent, String newContent) {</span>
 <span class="fc" id="L40">        this.messageId = messageId;</span>
 <span class="fc" id="L41">        this.action = action;</span>
 <span class="fc" id="L42">        this.performedBy = performedBy;</span>

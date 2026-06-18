@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,6 +24,7 @@ class AiAgentServiceTest {
 
     @Mock private AIContextBuilder contextBuilder;
     @Mock private GroqProvider groqProvider;
+    @Mock private OllamaProvider ollamaProvider;
     @Mock private RuleBasedProvider ruleBasedProvider;
 
     private AiAgentService service;
@@ -30,7 +32,7 @@ class AiAgentServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new AiAgentService(contextBuilder, groqProvider, ruleBasedProvider);
+        service = new AiAgentService(contextBuilder, groqProvider, ollamaProvider, ruleBasedProvider);
     }
 
     private AIContext contextWithEscalation(boolean escalate) {
@@ -46,7 +48,7 @@ class AiAgentServiceTest {
         when(contextBuilder.build(anyString(), any())).thenReturn(ctx);
         when(ruleBasedProvider.completeFromContext(ctx)).thenReturn("Please call 988");
 
-        ChatResponse response = service.processMessage("I want to die", userId);
+        ChatResponse response = service.processMessage("I want to die", userId, List.of());
 
         assertNotNull(response);
         assertTrue(response.liveAgentSuggested());
@@ -58,11 +60,11 @@ class AiAgentServiceTest {
     void shouldUseGroq_whenContextIsNotEscalatedAndGroqIsEnabled() {
         AIContext ctx = contextWithEscalation(false);
         when(contextBuilder.build(anyString(), any())).thenReturn(ctx);
-        when(contextBuilder.buildSystemPrompt(ctx)).thenReturn("system prompt");
+        when(contextBuilder.buildSystemPromptWithHistory(any(), any())).thenReturn("system prompt");
         when(groqProvider.isEnabled()).thenReturn(true);
         when(groqProvider.complete(anyString(), anyString())).thenReturn("AI response");
 
-        ChatResponse response = service.processMessage("I need housing help", userId);
+        ChatResponse response = service.processMessage("I need housing help", userId, List.of());
 
         assertEquals("AI response", response.response());
         assertFalse(response.liveAgentSuggested());
@@ -72,12 +74,13 @@ class AiAgentServiceTest {
     void shouldFallBackToRuleBased_whenGroqThrowsException() {
         AIContext ctx = contextWithEscalation(false);
         when(contextBuilder.build(anyString(), any())).thenReturn(ctx);
-        when(contextBuilder.buildSystemPrompt(ctx)).thenReturn("system prompt");
+        when(contextBuilder.buildSystemPromptWithHistory(any(), any())).thenReturn("system prompt");
         when(groqProvider.isEnabled()).thenReturn(true);
         when(groqProvider.complete(anyString(), anyString())).thenThrow(new RuntimeException("timeout"));
+        when(ollamaProvider.isEnabled()).thenReturn(false);
         when(ruleBasedProvider.completeFromContext(ctx)).thenReturn("Rule-based response");
 
-        ChatResponse response = service.processMessage("hello", userId);
+        ChatResponse response = service.processMessage("hello", userId, List.of());
 
         assertEquals("Rule-based response", response.response());
     }
@@ -86,13 +89,30 @@ class AiAgentServiceTest {
     void shouldUseRuleBased_whenContextIsNotEscalatedAndGroqIsDisabled() {
         AIContext ctx = contextWithEscalation(false);
         when(contextBuilder.build(anyString(), any())).thenReturn(ctx);
+        when(contextBuilder.buildSystemPromptWithHistory(any(), any())).thenReturn("system prompt");
         when(groqProvider.isEnabled()).thenReturn(false);
+        when(ollamaProvider.isEnabled()).thenReturn(false);
         when(ruleBasedProvider.completeFromContext(ctx)).thenReturn("Rule-based response");
 
-        ChatResponse response = service.processMessage("I need resources", userId);
+        ChatResponse response = service.processMessage("I need resources", userId, List.of());
 
         assertEquals("Rule-based response", response.response());
         assertFalse(response.liveAgentSuggested());
         verify(groqProvider, never()).complete(anyString(), anyString());
+    }
+
+    @Test
+    void shouldUseOllama_whenGroqDisabledAndOllamaEnabled() {
+        AIContext ctx = contextWithEscalation(false);
+        when(contextBuilder.build(anyString(), any())).thenReturn(ctx);
+        when(contextBuilder.buildSystemPromptWithHistory(any(), any())).thenReturn("system prompt");
+        when(groqProvider.isEnabled()).thenReturn(false);
+        when(ollamaProvider.isEnabled()).thenReturn(true);
+        when(ollamaProvider.complete(anyString(), anyString())).thenReturn("Ollama response");
+
+        ChatResponse response = service.processMessage("help me", userId, List.of());
+
+        assertEquals("Ollama response", response.response());
+        verify(ruleBasedProvider, never()).completeFromContext(any());
     }
 }
