@@ -1,52 +1,53 @@
 package com.compasschat.ai.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class ResourceSearchService {
 
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
     public String search(String query) {
-
         try {
+            InputStream stream = new ClassPathResource("data/Service_Directory_cleaned.json")
+                    .getInputStream();
+            JsonNode root = MAPPER.readTree(stream);
+            JsonNode services = root.has("services") ? root.path("services") : root;
 
-            ClassPathResource resource =
-                    new ClassPathResource(
-                            "data/Service_Directory_cleaned.json"
-                    );
+            String lower = query.toLowerCase();
+            List<String> matches = new ArrayList<>();
 
-            String json =
-                    Files.readString(
-                            resource.getFile().toPath()
-                    );
-
-            String lower =
-                    query.toLowerCase();
-
-            if (lower.contains("food")) {
-                return "Food assistance resources found.";
+            for (JsonNode s : services) {
+                String type = s.path("typeOfService").asText("").toLowerCase();
+                String desc = s.path("servicesDescription").asText("").toLowerCase();
+                if (type.contains(lower) || desc.contains(lower)) {
+                    matches.add(format(s));
+                    if (matches.size() == 3) break;
+                }
             }
 
-            if (lower.contains("housing")) {
-                return "Housing assistance resources found.";
-            }
+            return matches.isEmpty()
+                    ? "Community resources available — contact Delaware 211 for personalized help."
+                    : String.join("\n\n", matches);
 
-            if (lower.contains("transportation")) {
-                return "Transportation resources found.";
-            }
-
-            if (lower.contains("health")) {
-                return "Healthcare resources found.";
-            }
-
-            return "Community resources available.";
-
-        } catch (IOException ex) {
-
+        } catch (IOException e) {
             return "Unable to load resource directory.";
         }
+    }
+
+    private String format(JsonNode s) {
+        return String.format("• %s\n  %s\n  Phone: %s | %s",
+                s.path("organizationName").asText(),
+                s.path("servicesDescription").asText(),
+                s.path("phone").asText("N/A"),
+                s.path("website").asText(s.path("fullAddress").asText("")));
     }
 }

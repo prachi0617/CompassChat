@@ -112,7 +112,7 @@ public class ChannelService extends BaseService&lt;Channel, UUID&gt; {
     public void removeMember(UUID channelId, UUID userToRemove, UUID requesterId, Role role) {
 <span class="fc" id="L113">        ChannelMember m = members.findByChannelIdAndUserId(channelId, userToRemove)</span>
 <span class="fc" id="L114">                .orElseThrow(() -&gt; new ResourceNotFoundException(</span>
-<span class="fc" id="L115">                        &quot;ChannelMember&quot;, channelId + &quot;/&quot; + userToRemove));</span>
+                        &quot;ChannelMember&quot;, channelId + &quot;/&quot; + userToRemove));
 
         // Self-leave is always allowed; otherwise need staff or channel admin.
 <span class="fc" id="L118">        boolean isSelf = userToRemove.equals(requesterId);</span>
@@ -196,7 +196,7 @@ public class ChannelService extends BaseService&lt;Channel, UUID&gt; {
 <span class="fc" id="L196">                .map(m -&gt; {</span>
 <span class="fc" id="L197">                    LocalDateTime since = m.getLastReadAt();</span>
 <span class="pc bpc" id="L198" title="1 of 2 branches missed.">                    if (since == null) return messages.countByChannelIdAndCreatedAtAfterAndDeletedFalse(</span>
-<span class="nc" id="L199">                            channelId, LocalDateTime.MIN);</span>
+                            channelId, LocalDateTime.MIN);
 <span class="fc" id="L200">                    return messages.countByChannelIdAndCreatedAtAfterAndDeletedFalse(channelId, since);</span>
                 })
 <span class="fc" id="L202">                .orElse(0L);</span>

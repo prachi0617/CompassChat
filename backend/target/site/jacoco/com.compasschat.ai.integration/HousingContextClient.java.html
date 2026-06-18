@@ -15,8 +15,8 @@ import java.util.List;
 
 <span class="fc" id="L16">    private static final ObjectMapper MAPPER = new ObjectMapper();</span>
 <span class="fc" id="L17">    private static final List&lt;String&gt; HOUSING_TYPES = List.of(</span>
-<span class="fc" id="L18">            &quot;HOUSING&quot;, &quot;SHELTER&quot;, &quot;EMERGENCY SHELTER&quot;, &quot;TRANSITIONAL HOUSING&quot;, &quot;RENTAL ASSISTANCE&quot;</span>
-<span class="fc" id="L19">    );</span>
+            &quot;HOUSING&quot;, &quot;SHELTER&quot;, &quot;EMERGENCY SHELTER&quot;, &quot;TRANSITIONAL HOUSING&quot;, &quot;RENTAL ASSISTANCE&quot;
+    );
 
     public String getContext(String query) {
         try {
@@ -32,7 +32,7 @@ import java.util.List;
 <span class="fc" id="L32">                    matches.add(formatService(service));</span>
 <span class="fc bfc" id="L33" title="All 2 branches covered.">                    if (matches.size() == 3) break;</span>
                 }
-            }
+<span class="fc" id="L35">            }</span>
 
 <span class="pc bpc" id="L37" title="1 of 2 branches missed.">            if (matches.isEmpty()) return &quot;No housing resources found in the directory.&quot;;</span>
 

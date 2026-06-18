@@ -10,6 +10,7 @@ import com.compasschat.ai.integration.YouthPathwayClient;
 import com.compasschat.ai.service.ResourceSearchService;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -86,6 +87,18 @@ public class AIContextBuilder {
         }
 
         return context;
+    }
+
+    /** Builds a system prompt that includes prior conversation turns for multi-turn context. */
+    public String buildSystemPromptWithHistory(AIContext context, List<String> history) {
+        String base = buildSystemPrompt(context);
+        if (history == null || history.isEmpty()) return base;
+        StringBuilder sb = new StringBuilder(base)
+                .append("\n\nConversation history (oldest first, even indices = user, odd indices = AI):\n");
+        for (int i = 0; i < history.size(); i++) {
+            sb.append(i % 2 == 0 ? "User: " : "AI: ").append(history.get(i)).append("\n");
+        }
+        return sb.toString();
     }
 
     /** Builds a system prompt string from context fragments for the AI provider. */

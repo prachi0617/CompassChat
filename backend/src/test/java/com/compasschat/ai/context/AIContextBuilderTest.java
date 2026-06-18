@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -233,5 +234,38 @@ class AIContextBuilderTest {
         assertTrue(prompt.contains("Relevant context"));
         assertTrue(prompt.contains("Call 988"));
         assertTrue(prompt.contains("IMPORTANT"));
+    }
+
+    // --- buildSystemPromptWithHistory() ---
+
+    @Test
+    void shouldAppendHistory_whenHistoryIsNonEmpty() {
+        AIContext context = new AIContext();
+
+        String prompt = builder.buildSystemPromptWithHistory(context, List.of("hello", "Hi there!"));
+
+        assertTrue(prompt.contains("Conversation history"));
+        assertTrue(prompt.contains("User: hello"));
+        assertTrue(prompt.contains("AI: Hi there!"));
+    }
+
+    @Test
+    void shouldReturnBasePrompt_whenHistoryIsNull() {
+        AIContext context = new AIContext();
+
+        String prompt = builder.buildSystemPromptWithHistory(context, null);
+        String base = builder.buildSystemPrompt(context);
+
+        assertEquals(base, prompt);
+    }
+
+    @Test
+    void shouldReturnBasePrompt_whenHistoryIsEmpty() {
+        AIContext context = new AIContext();
+
+        String prompt = builder.buildSystemPromptWithHistory(context, List.of());
+        String base = builder.buildSystemPrompt(context);
+
+        assertEquals(base, prompt);
     }
 }

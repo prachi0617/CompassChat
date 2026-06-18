@@ -15,9 +15,9 @@ import java.util.List;
 
 <span class="fc" id="L16">    private static final ObjectMapper MAPPER = new ObjectMapper();</span>
 <span class="fc" id="L17">    private static final List&lt;String&gt; YOUTH_TYPES = List.of(</span>
-<span class="fc" id="L18">            &quot;YOUTH&quot;, &quot;EDUCATION&quot;, &quot;TRAINING&quot;, &quot;EMPLOYMENT&quot;, &quot;JOB&quot;, &quot;CAREER&quot;,</span>
-<span class="fc" id="L19">            &quot;AFTER SCHOOL&quot;, &quot;AFTERSCHOOL&quot;, &quot;COLLEGE&quot;, &quot;VOCATIONAL&quot;</span>
-<span class="fc" id="L20">    );</span>
+            &quot;YOUTH&quot;, &quot;EDUCATION&quot;, &quot;TRAINING&quot;, &quot;EMPLOYMENT&quot;, &quot;JOB&quot;, &quot;CAREER&quot;,
+            &quot;AFTER SCHOOL&quot;, &quot;AFTERSCHOOL&quot;, &quot;COLLEGE&quot;, &quot;VOCATIONAL&quot;
+    );
 
     public String getContext(String query) {
         try {
@@ -33,7 +33,7 @@ import java.util.List;
 <span class="fc" id="L33">                    matches.add(formatService(service));</span>
 <span class="fc bfc" id="L34" title="All 2 branches covered.">                    if (matches.size() == 3) break;</span>
                 }
-            }
+<span class="fc" id="L36">            }</span>
 
 <span class="pc bpc" id="L38" title="1 of 2 branches missed.">            if (matches.isEmpty()) return &quot;No youth pathway resources found in the directory.&quot;;</span>
 

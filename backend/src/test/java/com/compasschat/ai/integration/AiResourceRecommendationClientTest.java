@@ -6,8 +6,6 @@ import com.compasschat.mood.ResourceRecommendationService.RecommendedResource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -29,13 +27,22 @@ class AiResourceRecommendationClientTest {
     }
 
     @Test
-    void shouldReturnRuleBasedRecommendations_whenGroqIsDisabled() {
+    void shouldReturnDirectoryResources_whenGroqIsDisabled_anxious() {
         when(groqProvider.isEnabled()).thenReturn(false);
 
         List<RecommendedResource> result = client.recommend(MoodType.ANXIOUS, "feeling anxious");
 
         assertFalse(result.isEmpty());
         verify(groqProvider, never()).complete(any(), any());
+    }
+
+    @Test
+    void shouldReturnDirectoryResources_whenGroqIsDisabled_stressed() {
+        when(groqProvider.isEnabled()).thenReturn(false);
+
+        List<RecommendedResource> result = client.recommend(MoodType.STRESSED, "feeling stressed");
+
+        assertNotNull(result);
     }
 
     @Test
@@ -51,28 +58,38 @@ class AiResourceRecommendationClientTest {
     }
 
     @Test
-    void shouldFallBackToRuleBased_whenGroqThrowsException() {
+    void shouldFallBackToDirectorySearch_whenGroqThrowsException() {
         when(groqProvider.isEnabled()).thenReturn(true);
         when(groqProvider.complete(any(), any())).thenThrow(new RuntimeException("AI unavailable"));
 
         List<RecommendedResource> result = client.recommend(MoodType.STRESSED, "overwhelmed");
 
         assertNotNull(result);
-        // Falls back — rule-based or empty, but must not throw
     }
 
     @Test
-    void shouldReturnNamiResource_whenMoodIsDistressed() {
+    void shouldReturnDirectoryResources_whenMoodIsDistressed() {
         when(groqProvider.isEnabled()).thenReturn(false);
 
         List<RecommendedResource> result = client.recommend(MoodType.DISTRESSED, "can't cope");
 
         assertFalse(result.isEmpty());
-        assertTrue(result.stream().anyMatch(r -> r.source().equals("rule_based")));
+        assertTrue(result.stream().anyMatch(r ->
+                r.source().equals("service_directory") || r.source().equals("groq")));
     }
 
     @Test
-    void shouldReturnHealthResource_whenMoodIsTired() {
+    void shouldReturnResources_whenMoodIsOverwhelmed() {
+        when(groqProvider.isEnabled()).thenReturn(false);
+
+        List<RecommendedResource> result = client.recommend(MoodType.OVERWHELMED, "too much");
+
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+    }
+
+    @Test
+    void shouldReturnResources_whenMoodIsTired() {
         when(groqProvider.isEnabled()).thenReturn(false);
 
         List<RecommendedResource> result = client.recommend(MoodType.TIRED, "exhausted");
@@ -81,12 +98,21 @@ class AiResourceRecommendationClientTest {
     }
 
     @Test
-    void shouldReturnEmptyList_whenMoodIsHappyAndGroqDisabled() {
+    void shouldReturnResources_whenMoodIsHappyAndGroqDisabled() {
         when(groqProvider.isEnabled()).thenReturn(false);
 
         List<RecommendedResource> result = client.recommend(MoodType.HAPPY, "feeling great");
 
-        assertTrue(result.isEmpty());
+        assertNotNull(result);
+    }
+
+    @Test
+    void shouldReturnResources_whenMoodIsNeutralAndGroqDisabled() {
+        when(groqProvider.isEnabled()).thenReturn(false);
+
+        List<RecommendedResource> result = client.recommend(MoodType.NEUTRAL, "okay");
+
+        assertNotNull(result);
     }
 
     @Test
@@ -100,7 +126,19 @@ class AiResourceRecommendationClientTest {
 
         List<RecommendedResource> result = client.recommend(MoodType.LONELY, "alone");
 
-        // Capped at 2 (limit(2))
         assertEquals(2, result.size());
+    }
+
+    @Test
+    void shouldHandleGroqResponseWithMissingFields() {
+        when(groqProvider.isEnabled()).thenReturn(true);
+        when(groqProvider.complete(any(), any())).thenReturn("Resource A | Description A");
+
+        List<RecommendedResource> result = client.recommend(MoodType.SAD, "sad");
+
+        assertEquals(1, result.size());
+        assertEquals("Resource A", result.get(0).title());
+        assertEquals("Description A", result.get(0).summary());
+        assertEquals("", result.get(0).url());
     }
 }

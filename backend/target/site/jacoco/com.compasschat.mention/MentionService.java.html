@@ -51,15 +51,15 @@ public class MentionService extends BaseService&lt;Mention, UUID&gt; {
 
 <span class="fc" id="L52">                eventPublisher.publishEvent(new UserMentionedEvent(</span>
 <span class="fc" id="L53">                        mention.getId(), mentionedUser.getId(),</span>
-<span class="fc" id="L54">                        messageId, channelId, senderUserId));</span>
+                        messageId, channelId, senderUserId));
 
                 // Real-time push: frontend subscribes to /user/queue/mentions
 <span class="fc" id="L57">                broker.convertAndSendToUser(</span>
 <span class="fc" id="L58">                        mentionedUser.getUsername(),</span>
-<span class="fc" id="L59">                        &quot;/queue/mentions&quot;,</span>
+                        &quot;/queue/mentions&quot;,
 <span class="fc" id="L60">                        MentionResponse.from(mention));</span>
 <span class="fc" id="L61">            });</span>
-        }
+<span class="fc" id="L62">        }</span>
 <span class="fc" id="L63">    }</span>
 
     @Transactional(readOnly = true)
@@ -84,7 +84,7 @@ public class MentionService extends BaseService&lt;Mention, UUID&gt; {
 <span class="fc" id="L84">        Mention mention = findById(mentionId);</span>
 <span class="fc bfc" id="L85" title="All 2 branches covered.">        if (!mention.getMentionedUserId().equals(requesterId)) {</span>
 <span class="fc" id="L86">            throw new org.springframework.security.access.AccessDeniedException(</span>
-<span class="fc" id="L87">                    &quot;Cannot mark another user's mention as read&quot;);</span>
+                    &quot;Cannot mark another user's mention as read&quot;);
         }
 <span class="fc" id="L89">        mention.markRead();</span>
 <span class="fc" id="L90">        return MentionResponse.from(mentions.save(mention));</span>

@@ -8,7 +8,7 @@ function welcomeMessage() {
         id: 'ai-welcome',
         from: 'ai',
         type: 'text',
-        text: "Hi, I'm your Community Compass guide. Tell me what's on your mind — housing, support, or just where to start — and I'll point you the right way.",
+        text: "Hi, I'm here if you need help finding resources",
         createdAt: new Date().toISOString(),
     }
 }
@@ -17,20 +17,29 @@ function findSubProject(slug) {
     return subProjectData.subProjects.find((p) => p.slug === slug)
 }
 
-function extractAiText(response) {
-    return (
-        response?.data?.message ||
-        response?.data?.reply ||
-        response?.data?.response ||
-        response?.data?.content ||
-        response?.data?.text ||
-        response?.message ||
-        response?.reply ||
-        response?.response ||
-        response?.content ||
-        response?.text ||
-        'I received your message.'
-    )
+// Item 2: returns all three fields from the backend ChatResponse wrapper
+function extractAiPayload(response) {
+    return {
+        text: response?.data?.response || response?.data?.message || 'I received your message.',
+        intent: response?.data?.intent || null,
+        liveAgentSuggested: response?.data?.liveAgentSuggested === true,
+    }
+}
+
+// Item 2: maps backend IntentType enum values to frontend intent/subProject shape
+const BACKEND_TO_SUBPROJECT = {
+    HOUSING: 'homematch',
+    YOUTH: 'futurepath',
+    CIVIC: 'firststep',
+    RESOURCES: 'kindconnect',
+}
+
+function mapBackendIntent(intent) {
+    if (!intent) return null
+    if (intent === 'ESCALATE') return { intent: 'URGENT' }
+    if (intent === 'MOOD') return { intent: 'MOOD' }
+    if (BACKEND_TO_SUBPROJECT[intent]) return { intent: 'RESOURCE', subProject: BACKEND_TO_SUBPROJECT[intent] }
+    return { intent: 'GENERAL' }
 }
 
 function makeAiTextMessage(text) {
@@ -43,12 +52,30 @@ function makeAiTextMessage(text) {
     }
 }
 
+// Item 5: persist unread count to localStorage so it survives page reloads
+function persistUnread(count) {
+    localStorage.setItem('cc_ai_unread', String(count))
+}
+
+// Item 7: build last-N text messages as history for the backend
+function buildHistory(messages) {
+    return messages
+        .filter((m) => m.type === 'text' && m.text)
+        .slice(-6)
+        .map((m) => m.text)
+}
+
 export const useAIStore = create((set, get) => ({
     messages: [welcomeMessage()],
-    unreadCount: 1,
+    // Item 5: initialize from localStorage; default to 1 for the welcome message
+    unreadCount: Number(localStorage.getItem('cc_ai_unread') ?? 1),
     isThinking: false,
 
-    markRead: () => set({ unreadCount: 0 }),
+    // Item 5: clear persisted count when user opens the AI panel
+    markRead: () => {
+        persistUnread(0)
+        set({ unreadCount: 0 })
+    },
 
     addUserMessage: async (text) => {
         if (!text || !text.trim()) return
@@ -69,33 +96,65 @@ export const useAIStore = create((set, get) => ({
         }))
 
         try {
-            const backendResponse = await api.aiChat(userText)
+            // Item 7: include recent message history for multi-turn context
+            const history = buildHistory(get().messages)
+            const backendResponse = await api.aiChat(userText, history)
 
-            console.log('AI backend response:', backendResponse)
+            // Item 2: extract all three fields instead of just the text string
+            const { text: aiText, intent: backendIntent, liveAgentSuggested } = extractAiPayload(backendResponse)
 
-            const aiText = extractAiText(backendResponse)
+            const newMessages = [makeAiTextMessage(aiText)]
 
-            const aiMsg = makeAiTextMessage(aiText)
+            // Item 2: backend signals escalation → append EscalateCTA
+            if (liveAgentSuggested) {
+                newMessages.push({
+                    id: `ai-${Date.now()}-esc`,
+                    from: 'ai',
+                    type: 'escalate-cta',
+                    label: 'Talk to a human',
+                    contextMessage: `Escalated from AI Assistant: "${userText}"`,
+                    createdAt: new Date().toISOString(),
+                })
+            }
 
-            set((state) => ({
-                messages: [...state.messages, aiMsg],
-                isThinking: false,
-                unreadCount: state.unreadCount + 1,
-            }))
+            // Item 2: backend intent drives card rendering on the happy path
+            const mapped = mapBackendIntent(backendIntent)
+            if (mapped?.intent === 'RESOURCE') {
+                const project = findSubProject(mapped.subProject)
+                if (project) {
+                    newMessages.push({
+                        id: `ai-${Date.now()}-res`,
+                        from: 'ai',
+                        type: 'resource-card',
+                        title: project.name,
+                        description: project.tagline,
+                        link: `/${project.slug}`,
+                        createdAt: new Date().toISOString(),
+                    })
+                }
+            }
+
+            // Item 3b: MOOD intent → POST to /api/moods to log + get real resource cards
+            if (mapped?.intent === 'MOOD') {
+                const frontendMood = classifyIntent(userText)
+                get()._appendMoodResources(frontendMood.moodType || 'NEUTRAL', userText)
+            }
+
+            set((state) => {
+                const newCount = state.unreadCount + 1
+                persistUnread(newCount)
+                return { messages: [...state.messages, ...newMessages], isThinking: false, unreadCount: newCount }
+            })
         } catch (error) {
-            console.error('AI backend error:', error)
-
             if (error.status === 401 || error.status === 403) {
                 const errorMsg = makeAiTextMessage(
                     'Please login first. The AI Assistant needs your login token.'
                 )
-
-                set((state) => ({
-                    messages: [...state.messages, errorMsg],
-                    isThinking: false,
-                    unreadCount: state.unreadCount + 1,
-                }))
-
+                set((state) => {
+                    const newCount = state.unreadCount + 1
+                    persistUnread(newCount)
+                    return { messages: [...state.messages, errorMsg], isThinking: false, unreadCount: newCount }
+                })
                 return
             }
 
@@ -112,7 +171,6 @@ export const useAIStore = create((set, get) => ({
                 type: 'text',
                 text: "That sounds important, and you don't have to navigate it alone. I'm connecting you with our team right now.",
             })
-
             reply.push({
                 type: 'escalate-cta',
                 label: 'Talk to a human',
@@ -122,7 +180,6 @@ export const useAIStore = create((set, get) => ({
             if (result.distressed) {
                 reply.push({ type: 'crisis-block' })
             }
-
             reply.push({
                 type: 'text',
                 text: `Thanks for telling me — it sounds like things feel ${result.moodType
@@ -139,17 +196,17 @@ export const useAIStore = create((set, get) => ({
                 const resources = moodRes?.data?.resources || moodRes?.resources
 
                 if (resources?.length) {
+                    // Item 3a: backend sends `summary` and `url`, not `description` and `link`
                     resources.forEach((r) =>
                         reply.push({
                             type: 'resource-card',
                             title: r.title || r.name,
-                            description: r.description,
-                            link: r.link,
+                            description: r.summary || r.description,
+                            link: r.url || r.link,
                         })
                     )
                 } else {
                     const kc = findSubProject('kindconnect')
-
                     reply.push({
                         type: 'resource-card',
                         title: kc.name,
@@ -159,7 +216,6 @@ export const useAIStore = create((set, get) => ({
                 }
             } catch {
                 const kc = findSubProject('kindconnect')
-
                 reply.push({
                     type: 'resource-card',
                     title: kc.name,
@@ -169,12 +225,10 @@ export const useAIStore = create((set, get) => ({
             }
         } else if (result.intent === 'RESOURCE') {
             const project = findSubProject(result.subProject)
-
             reply.push({
                 type: 'text',
                 text: `It sounds like ${project.name} could help with that.`,
             })
-
             reply.push({
                 type: 'resource-card',
                 title: project.name,
@@ -186,7 +240,6 @@ export const useAIStore = create((set, get) => ({
                 type: 'text',
                 text: "I want to make sure you get the right help. Could you tell me a little more — or I can connect you with someone on our team.",
             })
-
             reply.push({
                 type: 'smart-suggestion',
                 title: 'Not sure where to start?',
@@ -201,10 +254,37 @@ export const useAIStore = create((set, get) => ({
             ...r,
         }))
 
-        set((state) => ({
-            messages: [...state.messages, ...aiMessages],
-            isThinking: false,
-            unreadCount: state.unreadCount + 1,
-        }))
+        set((state) => {
+            const newCount = state.unreadCount + 1
+            persistUnread(newCount)
+            return { messages: [...state.messages, ...aiMessages], isThinking: false, unreadCount: newCount }
+        })
+    },
+
+    // Item 3b: called from the happy path when backend returns MOOD intent;
+    // POSTs to /api/moods to log the mood and get real resource cards from the service directory
+    _appendMoodResources: async (moodType, originalText) => {
+        try {
+            const res = await api.postMood({ moodType, note: originalText })
+            const resources = res?.data?.resources || []
+            if (!resources.length) return
+
+            const cards = resources.map((r, i) => ({
+                id: `ai-${Date.now()}-mood-${i}`,
+                from: 'ai',
+                type: 'resource-card',
+                title: r.title || r.name,
+                description: r.summary || r.description,
+                link: r.url || r.link,
+                createdAt: new Date().toISOString(),
+            }))
+
+            set((state) => ({
+                messages: [...state.messages, ...cards],
+                unreadCount: state.unreadCount + 1,
+            }))
+        } catch {
+            // silent — text response was already displayed
+        }
     },
 }))

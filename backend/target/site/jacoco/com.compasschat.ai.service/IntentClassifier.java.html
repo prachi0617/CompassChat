@@ -9,41 +9,41 @@ import org.springframework.stereotype.Component;
 
 <span class="fc" id="L10">        String input = message.toLowerCase();</span>
 
-<span class="fc" id="L12">        if (containsAny(input,</span>
-<span class="fc" id="L13">                &quot;food&quot;,</span>
-<span class="fc" id="L14">                &quot;housing&quot;,</span>
-<span class="fc" id="L15">                &quot;rent&quot;,</span>
-<span class="fc" id="L16">                &quot;transportation&quot;,</span>
-<span class="fc" id="L17">                &quot;healthcare&quot;,</span>
-<span class="fc bfc" id="L18" title="All 2 branches covered.">                &quot;resource&quot;)) {</span>
+<span class="fc bfc" id="L12" title="All 2 branches covered.">        if (containsAny(input,</span>
+                &quot;food&quot;,
+                &quot;housing&quot;,
+                &quot;rent&quot;,
+                &quot;transportation&quot;,
+                &quot;healthcare&quot;,
+                &quot;resource&quot;)) {
 
 <span class="fc" id="L20">            return AiIntent.RESOURCE_SEARCH;</span>
         }
 
-<span class="fc" id="L23">        if (containsAny(input,</span>
-<span class="fc" id="L24">                &quot;remind&quot;,</span>
-<span class="fc" id="L25">                &quot;appointment&quot;,</span>
-<span class="fc" id="L26">                &quot;meeting&quot;,</span>
-<span class="fc bfc" id="L27" title="All 2 branches covered.">                &quot;medicine&quot;)) {</span>
+<span class="fc bfc" id="L23" title="All 2 branches covered.">        if (containsAny(input,</span>
+                &quot;remind&quot;,
+                &quot;appointment&quot;,
+                &quot;meeting&quot;,
+                &quot;medicine&quot;)) {
 
 <span class="fc" id="L29">            return AiIntent.REMINDER;</span>
         }
 
-<span class="fc" id="L32">        if (containsAny(input,</span>
-<span class="fc" id="L33">                &quot;sad&quot;,</span>
-<span class="fc" id="L34">                &quot;lonely&quot;,</span>
-<span class="fc" id="L35">                &quot;depressed&quot;,</span>
-<span class="fc" id="L36">                &quot;anxious&quot;,</span>
-<span class="fc bfc" id="L37" title="All 2 branches covered.">                &quot;stressed&quot;)) {</span>
+<span class="fc bfc" id="L32" title="All 2 branches covered.">        if (containsAny(input,</span>
+                &quot;sad&quot;,
+                &quot;lonely&quot;,
+                &quot;depressed&quot;,
+                &quot;anxious&quot;,
+                &quot;stressed&quot;)) {
 
 <span class="fc" id="L39">            return AiIntent.MOOD;</span>
         }
 
-<span class="fc" id="L42">        if (containsAny(input,</span>
-<span class="fc" id="L43">                &quot;agent&quot;,</span>
-<span class="fc" id="L44">                &quot;caseworker&quot;,</span>
-<span class="fc" id="L45">                &quot;person&quot;,</span>
-<span class="fc bfc" id="L46" title="All 2 branches covered.">                &quot;human&quot;)) {</span>
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        if (containsAny(input,</span>
+                &quot;agent&quot;,
+                &quot;caseworker&quot;,
+                &quot;person&quot;,
+                &quot;human&quot;)) {
 
 <span class="fc" id="L48">            return AiIntent.LIVE_AGENT;</span>
         }

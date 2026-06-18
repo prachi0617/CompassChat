@@ -29,16 +29,16 @@ public class ChannelMember extends AuditableEntity {
     @Column
     private LocalDateTime lastReadAt;
 
-    @Column(nullable = false)
-<span class="pc" id="L33">    private boolean muted = false;</span>
+<span class="pc" id="L32">    @Column(nullable = false)</span>
+    private boolean muted = false;
 
-    @Enumerated(EnumType.STRING)
+<span class="pc" id="L35">    @Enumerated(EnumType.STRING)</span>
     @Column(nullable = false)
-<span class="pc" id="L37">    private MemberRole memberRole = MemberRole.MEMBER;</span>
+    private MemberRole memberRole = MemberRole.MEMBER;
 
-    @Enumerated(EnumType.STRING)
+<span class="pc" id="L39">    @Enumerated(EnumType.STRING)</span>
     @Column(nullable = false)
-<span class="pc" id="L41">    private NotificationPreference notificationPreference = NotificationPreference.ALL;</span>
+    private NotificationPreference notificationPreference = NotificationPreference.ALL;
 
 <span class="nc" id="L43">    protected ChannelMember() {} // JPA</span>
 

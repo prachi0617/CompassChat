@@ -32,8 +32,8 @@ public class Message extends AuditableEntity {
     @Column
     private LocalDateTime editedAt;
 
-    @Column(nullable = false)
-<span class="pc" id="L36">    private boolean deleted = false;</span>
+<span class="pc" id="L35">    @Column(nullable = false)</span>
+    private boolean deleted = false;
 
 <span class="nc" id="L38">    protected Message() {} // JPA</span>
 
