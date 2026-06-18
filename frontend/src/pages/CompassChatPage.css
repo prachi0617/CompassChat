@@ -1,0 +1,287 @@
+.compass-chat-page {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    background: #1f242c;
+    color: #f8fafc;
+    font-family: Inter, system-ui, sans-serif;
+}
+
+.compass-chat-sidebar {
+    background: #4b0f46;
+    color: white;
+    padding: 18px 14px;
+}
+
+.back-dashboard-btn {
+    display: block;
+    background: rgba(255, 255, 255, 0.16);
+    color: white;
+    text-decoration: none;
+    padding: 12px 16px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 26px;
+}
+
+.workspace-block {
+    padding: 0 10px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 22px;
+}
+
+.workspace-block h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.workspace-block p {
+    margin: 6px 0 0;
+    color: #e9d5ff;
+    font-size: 14px;
+}
+
+.sidebar-group {
+    margin-bottom: 28px;
+}
+
+.sidebar-title {
+    margin: 0 0 10px 10px;
+    color: #e9d5ff;
+    font-size: 12px;
+}
+
+.sidebar-link {
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: white;
+    text-align: left;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.sidebar-link:hover,
+.sidebar-link.active {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+.compass-chat-main {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 18px 24px;
+    background: #1f242c;
+}
+
+.channel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #374151;
+}
+
+.channel-header h2 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.channel-header p {
+    margin: 6px 0 0;
+    color: #cbd5e1;
+    font-size: 14px;
+}
+
+.channel-auth {
+    display: flex;
+    gap: 12px;
+}
+
+.channel-auth button {
+    border-radius: 8px;
+    padding: 11px 22px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.channel-login {
+    background: transparent;
+    color: white;
+    border: 1px solid #64748b;
+}
+
+.channel-register {
+    background: #2563eb;
+    color: white;
+    border: 1px solid #2563eb;
+}
+
+.channel-alert {
+    margin-top: 18px;
+    border: 1px solid #475569;
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: #facc15;
+    font-weight: 700;
+}
+
+.today-divider {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 34px 0;
+    border-top: 1px solid #475569;
+}
+
+.today-divider span {
+    transform: translateY(-50%);
+    background: #1f242c;
+    border: 1px solid #64748b;
+    border-radius: 999px;
+    padding: 8px 18px;
+    color: #e2e8f0;
+    font-weight: 700;
+}
+
+.channel-messages {
+    flex: 1;
+}
+
+.message-item {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 28px;
+}
+
+.message-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    background: #2563eb;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.message-top {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.message-top strong {
+    font-size: 16px;
+}
+
+.message-top span {
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.message-body p {
+    margin: 0;
+    color: #e5e7eb;
+    font-size: 16px;
+}
+
+.message-mention {
+    background: #b45309;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+}
+
+.message-reactions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.message-reactions button {
+    border: none;
+    border-radius: 999px;
+    background: #475569;
+    color: #e2e8f0;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.channel-composer {
+    border: 1px solid #64748b;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #222a33;
+}
+
+.composer-toolbar-dark {
+    display: flex;
+    gap: 16px;
+    padding: 10px 14px;
+    border-bottom: 1px solid #374151;
+}
+
+.composer-toolbar-dark button {
+    border: none;
+    background: transparent;
+    color: #cbd5e1;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.composer-bottom {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+}
+
+.composer-bottom input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: white;
+    font-size: 16px;
+}
+
+.composer-bottom input::placeholder {
+    color: #94a3b8;
+}
+
+.composer-bottom button {
+    border: none;
+    background: #22c55e;
+    color: white;
+    border-radius: 7px;
+    padding: 10px 18px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+@media (max-width: 800px) {
+    .compass-chat-page {
+        grid-template-columns: 1fr;
+    }
+
+    .compass-chat-sidebar {
+        display: none;
+    }
+}

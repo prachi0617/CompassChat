@@ -10,15 +10,60 @@ import { Compass } from 'lucide-react'
 
 function ThinkingIndicator() {
     return (
-        <div className="flex gap-2.5 px-4 py-2">
-            <div className="w-[30px] h-[30px] rounded-full bg-mint-500 text-white flex items-center justify-center shrink-0">
+        <div style={{ display: 'flex', gap: 10, padding: '8px 16px' }}>
+            <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#3DBE8A', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <Compass size={15} />
             </div>
-            <div className="bg-ink/5 rounded-2xl rounded-tl-sm px-3.5 py-2.5 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-ink-50 animate-bounce [animation-delay:-0.3s]" />
-                <span className="w-1.5 h-1.5 rounded-full bg-ink-50 animate-bounce [animation-delay:-0.15s]" />
-                <span className="w-1.5 h-1.5 rounded-full bg-ink-50 animate-bounce" />
+            <div style={{ background: '#F1F5F9', borderRadius: 16, borderTopLeftRadius: 4, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 4 }}>
+                <Dot delay="0s" />
+                <Dot delay="0.15s" />
+                <Dot delay="0.3s" />
             </div>
+        </div>
+    )
+}
+
+function Dot({ delay }) {
+    return (
+        <span
+            style={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                background: '#94A3B8',
+                display: 'inline-block',
+                animation: 'cc-bounce 1.2s infinite',
+                animationDelay: delay,
+            }}
+        />
+    )
+}
+
+function QuickActions({ onAction }) {
+    const actions = [
+        { label: 'Summarize chat', prompt: 'Summarize the latest messages in this channel.' },
+        { label: 'Suggest resources', prompt: 'Suggest some resources that might help me right now.' },
+    ]
+    return (
+        <div style={{ display: 'flex', gap: 8, padding: '10px 16px 4px', flexWrap: 'wrap' }}>
+            {actions.map((a) => (
+                <button
+                    key={a.label}
+                    onClick={() => onAction(a.prompt)}
+                    style={{
+                        border: '1px solid #E2E8F0',
+                        background: '#FFFFFF',
+                        color: '#334155',
+                        fontSize: 12.5,
+                        fontWeight: 500,
+                        padding: '6px 12px',
+                        borderRadius: 999,
+                        cursor: 'pointer',
+                    }}
+                >
+                    {a.label}
+                </button>
+            ))}
         </div>
     )
 }
@@ -28,8 +73,14 @@ function AiMessageRow({ message, onEscalate }) {
 
     if (isUser) {
         return (
-            <div className="flex justify-end px-4 py-1.5">
-                <p className="max-w-[80%] bg-mint-500 text-white rounded-2xl rounded-tr-sm px-3.5 py-2 text-body whitespace-pre-wrap break-words">
+            <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '6px 16px' }}>
+                <p
+                    style={{
+                        maxWidth: '80%', margin: 0, background: '#3DBE8A', color: '#fff',
+                        borderRadius: 16, borderTopRightRadius: 4, padding: '8px 14px',
+                        fontSize: 14, whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+                    }}
+                >
                     {message.text}
                 </p>
             </div>
@@ -37,18 +88,24 @@ function AiMessageRow({ message, onEscalate }) {
     }
 
     return (
-        <div className="flex gap-2.5 px-4 py-1.5">
-            <div className="w-[30px] h-[30px] rounded-full bg-mint-500 text-white flex items-center justify-center shrink-0">
+        <div style={{ display: 'flex', gap: 10, padding: '6px 16px' }}>
+            <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#3DBE8A', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <Compass size={15} />
             </div>
-            <div className="flex-1 min-w-0">
+            <div style={{ flex: 1, minWidth: 0 }}>
                 {message.type === 'text' && (
-                    <p className="bg-ink/5 rounded-2xl rounded-tl-sm px-3.5 py-2 text-body text-ink max-w-[88%] whitespace-pre-wrap break-words">
+                    <p
+                        style={{
+                            margin: 0, background: '#F1F5F9', color: '#0F172A',
+                            borderRadius: 16, borderTopLeftRadius: 4, padding: '8px 14px',
+                            fontSize: 14, maxWidth: '88%', whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+                        }}
+                    >
                         {message.text}
                     </p>
                 )}
                 {message.type === 'smart-suggestion' && (
-                    <SmartSuggestion title={message.title} body={message.body} />
+                    <SmartSuggestion title={message.title} body={message.body} actions={message.actions} />
                 )}
                 {message.type === 'resource-card' && (
                     <ResourceCard title={message.title} description={message.description} link={message.link} />
@@ -84,8 +141,10 @@ export default function AIConversation() {
     }
 
     return (
-        <div className="flex flex-col h-full">
-            <div className="flex-1 overflow-y-auto py-2">
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <style>{`@keyframes cc-bounce { 0%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-4px); } }`}</style>
+            <QuickActions onAction={addUserMessage} />
+            <div style={{ flex: 1, overflowY: 'auto', padding: '6px 0' }}>
                 {messages.map((m) => (
                     <AiMessageRow key={m.id} message={m} onEscalate={handleEscalate} />
                 ))}

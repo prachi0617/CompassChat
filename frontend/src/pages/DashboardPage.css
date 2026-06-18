@@ -17,28 +17,7 @@
     border-bottom: 1px solid #E2E8F0;
 }
 
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-family: 'Sora', 'Inter', system-ui, sans-serif;
-    font-weight: 600;
-    font-size: 17px;
-    color: #0F172A;
-    white-space: nowrap;
-}
 
-.brand-logo {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    background: #F0FBF7;
-    color: #1F8C61;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
 
 .main-nav {
     display: flex;
@@ -141,6 +120,8 @@
     color: #475569;
     margin: 0;
 }
+
+
 
 /* Project cards */
 
@@ -354,4 +335,28 @@
 
 .chat-input-row button:hover {
     background: #1F8C61;
+
+    /* Chat trigger button */
+    .chat-trigger {
+        position: fixed;
+        right: 24px;
+        bottom: 24px;
+        z-index: 50;
+        width: 56px;
+        height: 56px;
+        border-radius: 999px;
+        background: #3dbe8a;
+        color: white;
+        box-shadow: 0 10px 25px rgba(31, 140, 97, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+    }
+
+    /* Hide unread number */
+    .chat-trigger span,
+    .animate-badge-pulse {
+        display: none !important;
+    }
 }
