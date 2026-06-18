@@ -84,6 +84,14 @@ function channelKey(id) {
     return id ?? 'main'
 }
 
+const MOOD_PHRASES = {
+    VERY_LOW: "I hear you — things sound really hard right now. You don't have to face this alone.",
+    LOW: "I'm sorry you're going through this. You don't have to face it alone.",
+    NEUTRAL: "Thanks for sharing. I want to make sure you have the right support.",
+    GOOD: "It's great to hear things are going okay. Here are some resources that might still help.",
+    GREAT: "Glad things are going well! Here are some resources if you ever need them.",
+}
+
 export const useAIStore = create((set, get) => ({
     messagesByChannel: {
         null: [welcomeMessage()],
@@ -287,7 +295,7 @@ export const useAIStore = create((set, get) => ({
             }
             reply.push({
                 type: 'text',
-                text: `Thanks for telling me — it sounds like things feel ${result.moodType.toLowerCase().replace('_', ' ')} right now. I found some support that might help.`,
+                text: MOOD_PHRASES[result.moodType] ?? "Thanks for sharing. I found some support that might help.",
             })
 
             try {

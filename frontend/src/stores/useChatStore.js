@@ -171,7 +171,7 @@ export const useChatStore = create((set, get) => ({
         if (contextMessage) {
             const systemMsg = {
                 id: `sys-${Date.now()}`,
-                body: `📋 Context from AI Assistant: ${contextMessage}`,
+                body: contextMessage,
                 sender: { displayName: 'Community Compass AI' },
                 createdAt: new Date().toISOString(),
                 isMock: true,
