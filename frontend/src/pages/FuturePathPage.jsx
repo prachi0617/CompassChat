@@ -1,54 +1,48 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { Compass } from 'lucide-react'
-import ContactCardModal from '../components/community-compass/ContactCardModal'
+import { ClipboardList, Route, Users } from 'lucide-react'
+import SubProjectLanding from '../components/community-compass/SubProjectLanding'
+
+const features = [
+    {
+        icon: <ClipboardList size={22} />,
+        title: 'AI-Assisted Intake',
+        body: 'A fast, guided onboarding process that understands your specific situation and connects you to the right support right away.',
+    },
+    {
+        icon: <Route size={22} />,
+        title: 'Structured Guidance Plans',
+        body: 'Step-by-step plans built around your goals — housing, employment, education, and independent living milestones.',
+    },
+    {
+        icon: <Users size={22} />,
+        title: 'Youth Transition Support',
+        body: 'Specialized resources and case pathways designed for young adults aging out of foster care and navigating independence.',
+    },
+]
 
 export default function FuturePathPage() {
-    const navigate = useNavigate()
-    const [showContact, setShowContact] = useState(true)
-
-    const contact = {
-        name: 'Shocka Holmes',
-        initials: 'SH',
-        role: 'Career Navigation Lead',
-        title: 'Project Builder',
-        project: 'FuturePath',
-        email: 'Shockah12@gmail.com',
-    }
-
-    function handleClose() {
-        setShowContact(false)
-        navigate('/')
-    }
-
     return (
-        <div className="min-h-screen bg-stone-50 px-6 py-10 text-ink">
-            <div className="mx-auto max-w-4xl">
-                <Link
-                    to="/"
-                    className="mb-6 inline-flex items-center text-2xl font-bold text-mint-700 no-underline hover:text-mint-800"
-                    aria-label="Back to Community Compass"
-                >
-                    ←
-                </Link>
+        <div>
+            <SubProjectLanding
+                name="FuturePath"
+                developer="Shocka Holmes"
+                accent="pink"
+                tagline="AI-assisted intake and structured guidance for young adults transitioning out of foster care."
+            />
 
-                <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-                    <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-mint-50 text-mint-700">
-                        <Compass size={30} />
-                    </div>
-
-                    <h1 className="text-2xl font-bold text-ink">
-                        FuturePath
-                    </h1>
-                </section>
+            <div className="max-w-3xl mx-auto px-6 pb-16">
+                <h2 className="font-display font-semibold text-xl text-ink mb-5">What FuturePath offers</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {features.map((f) => (
+                        <div key={f.title} className="rounded-2xl border border-ink/8 bg-white p-5">
+                            <div className="w-10 h-10 rounded-xl bg-pink-50 text-pink-700 flex items-center justify-center mb-3">
+                                {f.icon}
+                            </div>
+                            <p className="font-semibold text-ink text-sm mb-1">{f.title}</p>
+                            <p className="text-sm text-ink-50 leading-relaxed">{f.body}</p>
+                        </div>
+                    ))}
+                </div>
             </div>
-
-            {showContact && (
-                <ContactCardModal
-                    contact={contact}
-                    onClose={handleClose}
-                />
-            )}
         </div>
     )
 }

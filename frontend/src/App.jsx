@@ -6,7 +6,6 @@ import HomeMatchPage from './pages/HomeMatchPage'
 import FuturePathPage from './pages/FuturePathPage'
 import KindConnectPage from './pages/KindConnectPage'
 import FirstStepPage from './pages/FirstStepPage'
-import CompassChatPage from './pages/CompassChatPage'
 import Toast from './components/ui/Toast'
 import { useAuthStore } from './stores/useAuthStore'
 import { subscribeToErrors } from './lib/websocket'
@@ -39,7 +38,6 @@ export default function App() {
                     <Route path="/futurepath" element={<FuturePathPage />} />
                     <Route path="/kindconnect" element={<KindConnectPage />} />
                     <Route path="/firststep" element={<FirstStepPage />} />
-                    <Route path="/compass-chat" element={<CompassChatPage />} />
                 </Route>
             </Routes>
 

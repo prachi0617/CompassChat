@@ -1,4 +1,4 @@
-import subProjectData from '../../../lib/resources.json' with { type: 'json' }
+import subProjectData from '../../../lib/resources.json'
 
 const URGENT_KEYWORDS = [
     'help me',
