@@ -73,6 +73,38 @@ function loadUnread(channelKey) {
     return Number(localStorage.getItem(`cc_ai_unread_${channelKey}`) ?? (channelKey === 'main' ? 1 : 0))
 }
 
+const LISTING_INTENTS = new Set(['RESOURCES', 'HOUSING'])
+
+function parseServiceListings(text) {
+    // Normalize: split on any newline (single or double) before a bullet
+    const normalized = text.replace(/\n(?=•)/g, '\n\n')
+    const blocks = normalized.split(/\n\n(?=•)/)
+    return blocks
+        .map((block) => {
+            const lines = block.split('\n')
+            // Find the bullet line — skip any non-bullet header lines in the block
+            const bulletIdx = lines.findIndex((l) => l.trim().startsWith('•'))
+            if (bulletIdx === -1) return null
+            const name = lines[bulletIdx].replace(/^•\s*/, '').trim()
+            if (!name) return null
+            const remaining = lines.slice(bulletIdx + 1)
+            const phoneLineIdx = remaining.findIndex((l) => l.trim().startsWith('Phone:'))
+            const descLines = remaining
+                .slice(0, phoneLineIdx === -1 ? undefined : phoneLineIdx)
+                .map((l) => l.trim())
+                .filter(Boolean)
+            const description = descLines.join(' ')
+            let phone = '', website = ''
+            if (phoneLineIdx !== -1) {
+                const parts = remaining[phoneLineIdx].replace(/^\s*Phone:\s*/, '').split(' | ')
+                phone = parts[0]?.trim() ?? ''
+                website = parts[1]?.trim() ?? ''
+            }
+            return { name, description, phone, website }
+        })
+        .filter((s) => s !== null && s.name)
+}
+
 function buildHistory(messages) {
     return messages
         .filter((m) => m.type === 'text' && m.text)
@@ -174,7 +206,29 @@ export const useAIStore = create((set, get) => ({
 
             const { text: aiText, intent: backendIntent, liveAgentSuggested } = extractAiPayload(backendResponse)
 
-            const newMessages = [makeAiTextMessage(aiText)]
+            const newMessages = []
+            let renderedListings = false
+            if (LISTING_INTENTS.has(backendIntent) && aiText.includes('•')) {
+                const listings = parseServiceListings(aiText)
+                if (listings.length > 0) {
+                    const introLine = aiText.split('\n')[0].replace(/^•.*/, '').trim()
+                    const intro = introLine || 'Here are some resources that may help:'
+                    newMessages.push(makeAiTextMessage(intro))
+                    listings.forEach((s) =>
+                        newMessages.push({
+                            id: `ai-${Date.now()}-${s.name}`,
+                            from: 'ai',
+                            type: 'service-listing',
+                            ...s,
+                            createdAt: new Date().toISOString(),
+                        })
+                    )
+                    renderedListings = true
+                }
+            }
+            if (!renderedListings) {
+                newMessages.push(makeAiTextMessage(aiText))
+            }
 
             // Item F: prepend crisis block when frontend detects distressed mood
             const frontendClassify = classifyIntent(userText)
@@ -198,9 +252,9 @@ export const useAIStore = create((set, get) => ({
                 })
             }
 
-            // Item C3: handoff-cta instead of plain resource-card
+            // Item C3: handoff-cta — skip if we already showed real service listing cards
             const mapped = mapBackendIntent(backendIntent)
-            if (mapped?.intent === 'RESOURCE') {
+            if (!renderedListings && mapped?.intent === 'RESOURCE') {
                 const project = findSubProject(mapped.subProject)
                 if (project) {
                     newMessages.push({

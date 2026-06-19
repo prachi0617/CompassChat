@@ -9,6 +9,7 @@ import CrisisBlock from './CrisisBlock'
 import EscalateCTA from './EscalateCTA'
 import HandoffCTA from './HandoffCTA'
 import { Compass } from 'lucide-react'
+import ServiceListingCard from './ServiceListingCard'
 
 function ThinkingIndicator() {
     return (
@@ -114,6 +115,14 @@ function AiMessageRow({ message, onEscalate, onLiveAgent }) {
                         onLiveAgent={() => onLiveAgent(message.projectSlug, message.contextMessage)}
                     />
                 )}
+                {message.type === 'service-listing' && (
+                    <ServiceListingCard
+                        name={message.name}
+                        description={message.description}
+                        phone={message.phone}
+                        website={message.website}
+                    />
+                )}
             </div>
         </div>
     )
@@ -137,7 +146,10 @@ export default function AIConversation() {
     }, [hasMarkedRead, markRead])
 
     useEffect(() => {
-        bottomRef.current?.scrollIntoView({ block: 'end' })
+        const id = setTimeout(() => {
+            bottomRef.current?.scrollIntoView({ block: 'end' })
+        }, 0)
+        return () => clearTimeout(id)
     }, [messages, isThinking])
 
     const handleEscalate = async (contextMessage) => {
