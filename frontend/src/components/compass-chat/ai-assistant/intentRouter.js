@@ -9,6 +9,8 @@ const URGENT_KEYWORDS = [
     'talk to a human',
     'need someone',
     'crisis',
+    'caseworker',
+    'case worker',
 ]
 
 // Keywords mapped to MoodType-style buckets. Distressed moods trigger the
@@ -32,6 +34,17 @@ function normalize(text) {
 
 function matchesAny(haystack, keywords) {
     return keywords.some((kw) => haystack.includes(kw))
+}
+
+// Word-boundary match: prevents "care" from matching inside "healthcare"
+function matchesWord(haystack, keyword) {
+    if (keyword.includes(' ')) return haystack.includes(keyword)
+    const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    return new RegExp(`\\b${escaped}\\b`).test(haystack)
+}
+
+function matchesAnyWord(haystack, keywords) {
+    return keywords.some((kw) => matchesWord(haystack, kw))
 }
 
 const NEGATION_WORDS = ['not ', "don't ", "doesn't ", "didn't ", "isn't ", "aren't ", "can't ", "cannot ", 'no ', 'never ', "i'm not "]
@@ -69,7 +82,7 @@ export function classifyIntent(rawText) {
     }
 
     for (const project of subProjectData.subProjects) {
-        if (matchesAny(text, project.keywords)) {
+        if (matchesAnyWord(text, project.keywords)) {
             return { intent: 'RESOURCE', subProject: project.slug }
         }
     }

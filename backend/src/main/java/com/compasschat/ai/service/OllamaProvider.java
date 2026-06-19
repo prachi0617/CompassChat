@@ -2,6 +2,7 @@ package com.compasschat.ai.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
@@ -19,7 +20,14 @@ public class OllamaProvider implements AiProvider {
             @Value("${ollama.model:gemma2:2b}") String model) {
         this.model = model;
         this.enabled = apiUrl != null && !apiUrl.isBlank();
-        this.restClient = this.enabled ? RestClient.builder().baseUrl(apiUrl).build() : null;
+        if (this.enabled) {
+            SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+            factory.setConnectTimeout(5000);
+            factory.setReadTimeout(60000);
+            this.restClient = RestClient.builder().baseUrl(apiUrl).requestFactory(factory).build();
+        } else {
+            this.restClient = null;
+        }
     }
 
     public boolean isEnabled() {

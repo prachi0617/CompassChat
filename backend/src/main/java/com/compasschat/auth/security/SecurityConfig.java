@@ -37,6 +37,8 @@ public class SecurityConfig {
                 .requestMatchers("/ws/**").permitAll()
                 // H2's little database viewer, demo only:
                 .requestMatchers("/h2-console/**").permitAll()
+                // AI endpoints are open so unauthenticated / guest users can use the assistant:
+                .requestMatchers("/api/ai/**").permitAll()
                 // EVERY other door requires a valid wristband:
                 .anyRequest().authenticated()
             )

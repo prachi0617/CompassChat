@@ -49,7 +49,7 @@ const BACKEND_TO_SUBPROJECT = {
 
 function mapBackendIntent(intent) {
     if (!intent) return null
-    if (intent === 'ESCALATE') return { intent: 'URGENT' }
+    if (intent === 'ESCALATE' || intent === 'CASEWORKER') return { intent: 'URGENT' }
     if (intent === 'MOOD') return { intent: 'MOOD' }
     if (BACKEND_TO_SUBPROJECT[intent]) return { intent: 'RESOURCE', subProject: BACKEND_TO_SUBPROJECT[intent] }
     return { intent: 'GENERAL' }
@@ -164,7 +164,10 @@ export const useAIStore = create((set, get) => ({
             // Prepend sub-project context so the backend knows which channel the user is in
             const activeChannel = AI_SUBPROJECT_CHANNELS.find((c) => c.id === activeId)
             const contextualHistory = activeChannel
-                ? [`Context: User is in the ${activeChannel.slug} help channel (${activeChannel.name}).`, ...history]
+                ? [
+                    `Context: The user is asking in the #${activeChannel.name} channel. This channel is specifically for ${activeChannel.slug} resources. Answer questions about ${activeChannel.slug} directly — do not redirect to other sub-projects.`,
+                    ...history,
+                  ]
                 : history
 
             const backendResponse = await api.aiChat(userText, contextualHistory)
@@ -270,7 +273,10 @@ export const useAIStore = create((set, get) => ({
                 return
             }
 
-            const result = classifyIntent(userText)
+            const activeChannel = AI_SUBPROJECT_CHANNELS.find((c) => c.id === activeId)
+            const result = activeChannel
+                ? { intent: 'RESOURCE', subProject: activeChannel.slug }
+                : classifyIntent(userText)
             await get()._respond(result, userText)
         }
     },
@@ -335,11 +341,6 @@ export const useAIStore = create((set, get) => ({
             reply.push({
                 type: 'text',
                 text: "I want to make sure you get the right help. Could you tell me a little more — or I can connect you with someone on our team.",
-            })
-            reply.push({
-                type: 'smart-suggestion',
-                title: 'Not sure where to start?',
-                body: "Try telling me how you're feeling, or what kind of support you need: housing, youth services, wellness, or news.",
             })
         }
 
