@@ -1,144 +1,81 @@
-import {
-    Home,
-    Compass,
-    HeartHandshake,
-    Newspaper,
-    Send,
-} from 'lucide-react'
-
-import './DashboardPage.css'
-import { useState } from 'React'
+import { Home, Compass, HeartHandshake, Newspaper, MessageCircle } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 const projects = [
     {
         slug: 'homematch',
         name: 'HomeMatch',
+        developer: 'Niciah Rymer-Hillian',
         tagline: 'Personalized housing navigation and an AI Housing Assistant.',
-        icon: <Home size={36} />,
-        color: 'mint',
+        icon: <Home size={32} />,
+        accent: 'bg-blue-50 text-blue-600 border-blue-100',
     },
     {
         slug: 'futurepath',
         name: 'FuturePath',
+        developer: 'Shocka Holmes',
         tagline: 'Guidance for young adults transitioning out of foster care.',
-        icon: <Compass size={36} />,
-        color: 'pink',
+        icon: <Compass size={32} />,
+        accent: 'bg-pink-50 text-pink-700 border-pink-100',
     },
     {
         slug: 'kindconnect',
         name: 'Kind Connect',
+        developer: 'Prachi Patel',
         tagline: 'Well-being resources, check-ins, and a volunteer network.',
-        icon: <HeartHandshake size={36} />,
-        color: 'yellow',
+        icon: <HeartHandshake size={32} />,
+        accent: 'bg-yellow-50 text-yellow-700 border-yellow-100',
     },
     {
         slug: 'firststep',
         name: 'First Step',
+        developer: 'Anitra Johnson',
         tagline: 'Community resources, policy updates, and news for everyone.',
-        icon: <Newspaper size={36} />,
-        color: 'mint',
+        icon: <Newspaper size={32} />,
+        accent: 'bg-orange-50 text-orange-600 border-orange-100',
     },
 ]
 
 export default function DashboardPage() {
     return (
-        <div className="dashboard-page">
-            <header className="dashboard-header">
-                <nav className="main-nav">
-                    <a href="/homematch">HomeMatch</a>
-                    <a href="/futurepath">FuturePath</a>
-                    <a href="/kindconnect">Kind Connect</a>
-                    <a href="/firststep">First Step</a>
-                </nav>
-            </header>
+        <div className="min-h-screen bg-mint-100 px-6 py-14">
+            <div className="max-w-5xl mx-auto">
+                {/* Hero */}
+                <div className="mb-12 text-center">
+                    <h1 className="font-display text-5xl font-bold text-ink mb-4">
+                        Community Compass
+                    </h1>
+                    <p className="text-ink-70 text-xl max-w-2xl mx-auto leading-relaxed">
+                        A platform connecting people to housing, youth services, wellness, and civic resources — all in one place.
+                    </p>
 
-            <main className="dashboard-main">
-                {/* LEFT SIDE: BIG AI ASSISTANT */}
-                <section className="left-section">
-                    <div className="hero">
-                        <h1>CompassChat</h1>
-
-                        <p>
-                            AI Assistant for Community Compass.
-                        </p>
+                    {/* Yellow guide box */}
+                    <div className="mt-8 inline-flex items-center gap-3 bg-yellow-50 border border-yellow-100 text-yellow-900 text-base font-medium px-6 py-3.5 rounded-2xl shadow-sm">
+                        <MessageCircle size={18} className="text-yellow-700 shrink-0" />
+                        Chat with our AI Assistant or a team member — click the button on the right
                     </div>
+                </div>
 
-                    <aside className="ai-panel">
-                        <h2>Community - Chat</h2>
-
-                        <div className="chat-list">
-
-
-
-                        </div>
-
-                        <div className="chat-input-row">
-                            <span>Ask the AI Assistant...</span>
-
-                            <button>
-                                <Send size={24} />
-                            </button>
-                        </div>
-                    </aside>
-                </section>
-
-                {/* RIGHT SIDE: 4 SMALL CARDS */}
-                <section className="project-grid">
-                    {projects.map((project) => (
-                        <a
-                            key={project.slug}
-                            href={`/${project.slug}`}
-                            className="project-card"
+                {/* Sub-project cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    {projects.map((p) => (
+                        <Link
+                            key={p.slug}
+                            to={`/${p.slug}`}
+                            className="group flex gap-5 p-6 rounded-2xl border border-white/60 bg-white hover:shadow-lg transition-shadow no-underline"
                         >
-                            <div className={`project-icon ${project.color}`}>
-                                {project.icon}
+                            <div className={`w-14 h-14 rounded-xl border flex items-center justify-center shrink-0 ${p.accent}`}>
+                                {p.icon}
                             </div>
-
-                            <div>
-                                <h2>{project.name}</h2>
-                                <p>{project.tagline}</p>
+                            <div className="min-w-0">
+                                <p className="font-semibold text-lg text-ink group-hover:text-mint-700 transition-colors">{p.name}</p>
+                                <p className="text-base text-ink-50 mt-1 leading-snug">{p.tagline}</p>
+                                <p className="text-sm text-ink-50 mt-2">by {p.developer}</p>
                             </div>
-                        </a>
+                        </Link>
                     ))}
-                </section>
-            </main>
-        </div>
-    )
-}
-
-function AssistantMessage({ children }) {
-    return (
-        <div className="message-row">
-            <div className="avatar-dot" />
-            <div className="message-bubble normal">{children}</div>
-        </div>
-    )
-}
-
-function AssistantCard({ title, body }) {
-    return (
-        <div className="message-row">
-            <div className="avatar-dot" />
-            <div className="message-bubble crisis">
-                <strong>{title}</strong>
-                <span>{body}</span>
+                </div>
             </div>
         </div>
     )
-}
-
-function ResourceCard({ title, body }) {
-    return (
-        <div className="message-row">
-            <div className="avatar-dot" />
-            <div className="message-bubble resource">
-                <strong>{title}</strong>
-                <span>{body}</span>
-            </div>
-        </div>
-    )
-}
-
-function UserMessage({ children }) {
-    return <div className="user-message">{children}</div>
 }

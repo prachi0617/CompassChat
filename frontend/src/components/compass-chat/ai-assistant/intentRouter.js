@@ -1,4 +1,4 @@
-import subProjectData from '../../../lib/resources.json' with { type: 'json' }
+import subProjectData from '../../../lib/resources.json'
 
 const URGENT_KEYWORDS = [
     'help me',
@@ -34,6 +34,15 @@ function matchesAny(haystack, keywords) {
     return keywords.some((kw) => haystack.includes(kw))
 }
 
+const NEGATION_WORDS = ['not ', "don't ", "doesn't ", "didn't ", "isn't ", "aren't ", "can't ", "cannot ", 'no ', 'never ', "i'm not "]
+
+function isNegated(text, keyword) {
+    const idx = text.indexOf(keyword)
+    if (idx === -1) return false
+    const preceding = text.slice(Math.max(0, idx - 30), idx)
+    return NEGATION_WORDS.some((neg) => preceding.includes(neg))
+}
+
 /**
  * Classifies a free-text message into one of: URGENT, MOOD, RESOURCE, GENERAL.
  * Pure function — no side effects, no network calls. Order of checks matters:
@@ -51,9 +60,10 @@ export function classifyIntent(rawText) {
     }
 
     for (const [moodType, keywords] of Object.entries(MOOD_KEYWORDS)) {
-        if (matchesAny(text, keywords)) {
-            const distressed =
-                DISTRESSED_MOODS.has(moodType) || keywords.some((kw) => DISTRESSED_KEYWORDS.has(kw) && text.includes(kw))
+        for (const kw of keywords) {
+            if (!text.includes(kw)) continue
+            if ((moodType === 'GOOD' || moodType === 'GREAT') && isNegated(text, kw)) continue
+            const distressed = DISTRESSED_MOODS.has(moodType) || DISTRESSED_KEYWORDS.has(kw)
             return { intent: 'MOOD', moodType, note: rawText, distressed }
         }
     }

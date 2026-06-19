@@ -15,7 +15,19 @@
                 "shelter",
                 "homeless",
                 "voucher",
-                "move"
+                "move",
+                "home",
+                "house",
+                "place to live",
+                "place to stay",
+                "nowhere to go",
+                "need a home",
+                "need housing",
+                "find housing",
+                "affordable",
+                "section 8",
+                "hud",
+                "rental"
             ],
             "accent": "mint"
         },
@@ -31,7 +43,19 @@
                 "independence",
                 "aging out",
                 "guardian",
-                "teen"
+                "teen",
+                "young adult",
+                "young",
+                "adult",
+                "on my own",
+                "independent",
+                "emancipated",
+                "care",
+                "group home",
+                "aging",
+                "18",
+                "21",
+                "system"
             ],
             "accent": "pink"
         },
@@ -48,7 +72,18 @@
                 "counseling",
                 "checkin",
                 "wellbeing",
-                "mood"
+                "mood",
+                "food",
+                "hungry",
+                "eat",
+                "meal",
+                "pantry",
+                "groceries",
+                "food bank",
+                "nutrition",
+                "community",
+                "connect",
+                "support"
             ],
             "accent": "yellow"
         },
@@ -64,7 +99,15 @@
                 "civic",
                 "announcement",
                 "legislation",
-                "benefits"
+                "benefits",
+                "resource",
+                "information",
+                "help",
+                "services",
+                "local",
+                "community resource",
+                "assistance",
+                "program"
             ],
             "accent": "mint"
         }

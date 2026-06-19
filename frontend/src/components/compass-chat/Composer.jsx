@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Bold, Italic, Link as LinkIcon, SendHorizontal } from 'lucide-react'
+import { Bold, Italic, Link as LinkIcon, SendHorizontal, Trash2 } from 'lucide-react'
 
-export default function Composer({ onSend, placeholder = 'Message...' }) {
+export default function Composer({ onSend, placeholder = 'Message...', onClear }) {
     const [value, setValue] = useState('')
 
     const submit = (e) => {
@@ -31,8 +31,13 @@ export default function Composer({ onSend, placeholder = 'Message...' }) {
                 <ToolbarButton title="Link (visual only)">
                     <LinkIcon size={13} />
                 </ToolbarButton>
+                {onClear && (
+                    <ToolbarButton title="Clear conversation" onClick={onClear}>
+                        <Trash2 size={13} />
+                    </ToolbarButton>
+                )}
             </div>
-            <div className="flex items-end gap-2 rounded-xl border border-ink/10 bg-ink/[0.02] focus-within:border-mint-500 focus-within:ring-2 focus-within:ring-mint-500/20 transition px-3 py-2">
+            <div className="flex items-end gap-2 rounded-xl border border-ink/10 focus-within:border-mint-500 transition px-3 py-2 outline-none">
                 <textarea
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
@@ -54,12 +59,13 @@ export default function Composer({ onSend, placeholder = 'Message...' }) {
     )
 }
 
-function ToolbarButton({ children, title }) {
+function ToolbarButton({ children, title, onClick }) {
     return (
         <button
             type="button"
             title={title}
             tabIndex={-1}
+            onClick={onClick}
             className="p-1.5 rounded text-ink-50 hover:bg-ink/5 hover:text-ink-70 transition"
         >
             {children}

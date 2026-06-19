@@ -15,6 +15,14 @@ export default function MessageBubble({ message, isOwn }) {
     const [reactions, setReactions] = useState({ done: false, liked: false })
     const senderName = message.sender?.displayName || 'Someone'
 
+    if (message.isSystem) {
+        return (
+            <div className="text-center px-4 py-1.5">
+                <span className="text-meta text-ink-50 italic">{message.body}</span>
+            </div>
+        )
+    }
+
     return (
         <div className={`flex gap-2.5 px-4 py-2 ${isOwn ? 'flex-row-reverse' : ''}`}>
             <Avatar name={senderName} size={30} />
@@ -29,7 +37,7 @@ export default function MessageBubble({ message, isOwn }) {
                 >
                     {message.body}
                 </p>
-                <div className={`flex items-center gap-1.5 mt-1 ${isOwn ? 'flex-row-reverse' : ''}`}>
+                <div className={`flex flex-wrap items-center gap-1.5 mt-1 ${isOwn ? 'flex-row-reverse' : ''}`}>
                     <Pill
                         tone={reactions.done ? 'mint' : 'neutral'}
                         icon={<Check size={11} />}

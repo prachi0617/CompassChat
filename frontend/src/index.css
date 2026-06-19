@@ -58,6 +58,11 @@ h4 {
     outline-offset: 2px;
 }
 
+textarea:focus-visible,
+input:focus-visible {
+    outline: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
 
     *,
