@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { classifyIntent } from '../components/compass-chat/ai-assistant/intentRouter'
 import { api } from '../lib/api'
 import subProjectData from '../lib/resources.json'
-import { AI_SUBPROJECT_CHANNELS } from './useChatStore'
+import { AI_SUBPROJECT_CHANNELS, useChatStore } from './useChatStore'
 
 function welcomeMessage() {
     return {
@@ -73,8 +73,6 @@ function loadUnread(channelKey) {
     return Number(localStorage.getItem(`cc_ai_unread_${channelKey}`) ?? (channelKey === 'main' ? 1 : 0))
 }
 
-const LISTING_INTENTS = new Set(['RESOURCES', 'HOUSING'])
-
 function parseServiceListings(text) {
     // Normalize: split on any newline (single or double) before a bullet
     const normalized = text.replace(/\n(?=•)/g, '\n\n')
@@ -132,6 +130,8 @@ export const useAIStore = create((set, get) => ({
         null: loadUnread('main'),
     },
     pendingListingsByChannel: {},
+    awaitingMoreResultsReply: false,
+    awaitingNavigatorReply: false,
     isThinking: false,
     activeAiChannelId: null,
 
@@ -183,10 +183,37 @@ export const useAIStore = create((set, get) => ({
             createdAt: new Date().toISOString(),
         }
 
-        // Intercept Yes/No when the user is paging through pending service listings
         const lower = userText.toLowerCase()
         const pending = get().pendingListingsByChannel[activeId] ?? []
-        if (pending.length > 0 && (lower === 'yes' || lower === 'no')) {
+
+        // Intercept Yes/No when user was asked about speaking to a navigator
+        if (get().awaitingNavigatorReply && (lower === 'yes' || lower === 'no')) {
+            const replyMessages = []
+            if (lower === 'yes') {
+                replyMessages.push(makeAiTextMessage("I'm connecting you with a navigator now. They'll be able to help you directly."))
+                set((state) => ({
+                    messagesByChannel: {
+                        ...state.messagesByChannel,
+                        [activeId]: [...(state.messagesByChannel[activeId] ?? []), userMsg, ...replyMessages],
+                    },
+                    awaitingNavigatorReply: false,
+                }))
+                useChatStore.getState().switchToAdminDm('User requested to speak with a navigator after reviewing resources.')
+            } else {
+                replyMessages.push(makeAiTextMessage("Okay! Let me know if there's anything else I can help with."))
+                set((state) => ({
+                    messagesByChannel: {
+                        ...state.messagesByChannel,
+                        [activeId]: [...(state.messagesByChannel[activeId] ?? []), userMsg, ...replyMessages],
+                    },
+                    awaitingNavigatorReply: false,
+                }))
+            }
+            return
+        }
+
+        // Intercept Yes/No when the user is paging through pending service listings
+        if (get().awaitingMoreResultsReply && (lower === 'yes' || lower === 'no')) {
             const replyMessages = []
             if (lower === 'yes') {
                 const batch = pending.slice(0, 3)
@@ -200,10 +227,11 @@ export const useAIStore = create((set, get) => ({
                         createdAt: new Date().toISOString(),
                     })
                 )
-                if (remaining.length > 0) {
+                const hasMore = remaining.length > 0
+                if (hasMore) {
                     replyMessages.push(makeAiTextMessage('Would you like to see more results? (Yes / No)'))
                 } else {
-                    replyMessages.push(makeAiTextMessage('Those are all the results I have. Let me know if I can help with anything else.'))
+                    replyMessages.push(makeAiTextMessage('Those are all the results I found. Would you like to speak to a navigator? (Yes / No)'))
                 }
                 set((state) => ({
                     messagesByChannel: {
@@ -211,6 +239,8 @@ export const useAIStore = create((set, get) => ({
                         [activeId]: [...(state.messagesByChannel[activeId] ?? []), userMsg, ...replyMessages],
                     },
                     pendingListingsByChannel: { ...state.pendingListingsByChannel, [activeId]: remaining },
+                    awaitingMoreResultsReply: hasMore,
+                    awaitingNavigatorReply: !hasMore,
                 }))
             } else {
                 replyMessages.push(makeAiTextMessage('Okay! Feel free to ask if you need anything else.'))
@@ -220,6 +250,7 @@ export const useAIStore = create((set, get) => ({
                         [activeId]: [...(state.messagesByChannel[activeId] ?? []), userMsg, ...replyMessages],
                     },
                     pendingListingsByChannel: { ...state.pendingListingsByChannel, [activeId]: [] },
+                    awaitingMoreResultsReply: false,
                 }))
             }
             return
@@ -231,6 +262,8 @@ export const useAIStore = create((set, get) => ({
                 [activeId]: [...(state.messagesByChannel[activeId] ?? []), userMsg],
             },
             isThinking: true,
+            awaitingMoreResultsReply: false,
+            awaitingNavigatorReply: false,
         }))
 
         try {
@@ -251,7 +284,7 @@ export const useAIStore = create((set, get) => ({
 
             const newMessages = []
             let renderedListings = false
-            if (LISTING_INTENTS.has(backendIntent) && aiText.includes('•')) {
+            if (aiText.includes('•')) {
                 const listings = parseServiceListings(aiText)
                 if (listings.length > 0) {
                     const introLine = aiText.split('\n')[0].replace(/^•.*/, '').trim()
@@ -268,14 +301,14 @@ export const useAIStore = create((set, get) => ({
                             createdAt: new Date().toISOString(),
                         })
                     )
-                    if (remaining.length > 0) {
-                        newMessages.push(makeAiTextMessage('Would you like to see more results? (Yes / No)'))
-                    }
+                    newMessages.push(makeAiTextMessage('Would you like to see more results? (Yes / No)'))
                     set((state) => ({
                         pendingListingsByChannel: {
                             ...state.pendingListingsByChannel,
                             [activeId]: remaining,
                         },
+                        awaitingMoreResultsReply: true,
+                        awaitingNavigatorReply: false,
                     }))
                     renderedListings = true
                 }
@@ -323,13 +356,8 @@ export const useAIStore = create((set, get) => ({
                 }
             }
 
-            if (mapped?.intent === 'MOOD') {
-                const frontendMood = classifyIntent(userText)
-                get()._appendMoodResources(frontendMood.moodType || 'NEUTRAL', userText)
-            }
-
             // Secondary fallback: if backend gave no recognized resource intent, use frontend classifier
-            if (!mapped || mapped.intent === 'GENERAL') {
+            if (!renderedListings && (!mapped || mapped.intent === 'GENERAL')) {
                 const secondary = activeChannel
                     ? { intent: 'RESOURCE', subProject: activeChannel.slug }
                     : classifyIntent(userText)
