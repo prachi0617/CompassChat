@@ -131,6 +131,7 @@ export const useAIStore = create((set, get) => ({
     unreadByChannel: {
         null: loadUnread('main'),
     },
+    pendingListingsByChannel: {},
     isThinking: false,
     activeAiChannelId: null,
 
@@ -182,6 +183,48 @@ export const useAIStore = create((set, get) => ({
             createdAt: new Date().toISOString(),
         }
 
+        // Intercept Yes/No when the user is paging through pending service listings
+        const lower = userText.toLowerCase()
+        const pending = get().pendingListingsByChannel[activeId] ?? []
+        if (pending.length > 0 && (lower === 'yes' || lower === 'no')) {
+            const replyMessages = []
+            if (lower === 'yes') {
+                const batch = pending.slice(0, 3)
+                const remaining = pending.slice(3)
+                batch.forEach((s) =>
+                    replyMessages.push({
+                        id: `ai-${Date.now()}-${s.name}`,
+                        from: 'ai',
+                        type: 'service-listing',
+                        ...s,
+                        createdAt: new Date().toISOString(),
+                    })
+                )
+                if (remaining.length > 0) {
+                    replyMessages.push(makeAiTextMessage('Would you like to see more results? (Yes / No)'))
+                } else {
+                    replyMessages.push(makeAiTextMessage('Those are all the results I have. Let me know if I can help with anything else.'))
+                }
+                set((state) => ({
+                    messagesByChannel: {
+                        ...state.messagesByChannel,
+                        [activeId]: [...(state.messagesByChannel[activeId] ?? []), userMsg, ...replyMessages],
+                    },
+                    pendingListingsByChannel: { ...state.pendingListingsByChannel, [activeId]: remaining },
+                }))
+            } else {
+                replyMessages.push(makeAiTextMessage('Okay! Feel free to ask if you need anything else.'))
+                set((state) => ({
+                    messagesByChannel: {
+                        ...state.messagesByChannel,
+                        [activeId]: [...(state.messagesByChannel[activeId] ?? []), userMsg, ...replyMessages],
+                    },
+                    pendingListingsByChannel: { ...state.pendingListingsByChannel, [activeId]: [] },
+                }))
+            }
+            return
+        }
+
         set((state) => ({
             messagesByChannel: {
                 ...state.messagesByChannel,
@@ -214,7 +257,9 @@ export const useAIStore = create((set, get) => ({
                     const introLine = aiText.split('\n')[0].replace(/^•.*/, '').trim()
                     const intro = introLine || 'Here are some resources that may help:'
                     newMessages.push(makeAiTextMessage(intro))
-                    listings.forEach((s) =>
+                    const firstBatch = listings.slice(0, 3)
+                    const remaining = listings.slice(3)
+                    firstBatch.forEach((s) =>
                         newMessages.push({
                             id: `ai-${Date.now()}-${s.name}`,
                             from: 'ai',
@@ -223,6 +268,15 @@ export const useAIStore = create((set, get) => ({
                             createdAt: new Date().toISOString(),
                         })
                     )
+                    if (remaining.length > 0) {
+                        newMessages.push(makeAiTextMessage('Would you like to see more results? (Yes / No)'))
+                    }
+                    set((state) => ({
+                        pendingListingsByChannel: {
+                            ...state.pendingListingsByChannel,
+                            [activeId]: remaining,
+                        },
+                    }))
                     renderedListings = true
                 }
             }

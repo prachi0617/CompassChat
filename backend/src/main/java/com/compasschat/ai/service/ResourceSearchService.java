@@ -45,25 +45,25 @@ public class ResourceSearchService {
                 String desc = s.path("servicesDescription").asText("").toLowerCase();
                 for (String word : words) {
                     if (word.length() > 3 && !STOP_WORDS.contains(word)) {
-                        if (type.contains(word) && typeMatches.size() < 3) {
+                        if (type.contains(word) && typeMatches.size() < 5) {
                             typeMatches.add(format(s));
                             seen.add(orgName);
                             break;
-                        } else if (desc.contains(word) && descMatches.size() < 3) {
+                        } else if (desc.contains(word) && descMatches.size() < 4) {
                             descMatches.add(format(s));
                             seen.add(orgName);
                             break;
                         }
                     }
                 }
-                if (typeMatches.size() == 3) break;
+                if (typeMatches.size() == 5) break;
             }
 
             List<String> results = new ArrayList<>(typeMatches);
             for (String d : descMatches) {
-                if (results.size() >= 3) break;
                 results.add(d);
             }
+            if (results.size() > 9) results = results.subList(0, 9);
 
             return results.isEmpty()
                     ? "Community resources available — contact Delaware 211 for personalized help."

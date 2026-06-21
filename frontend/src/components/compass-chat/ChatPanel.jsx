@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import Sidebar from './Sidebar'
 import DemoBanner from './DemoBanner'
@@ -29,6 +29,29 @@ export default function ChatPanel({ isOpen, onClose }) {
     const isAiActive = activeConversationId === null || isAiChannel(activeConversationId)
 
     const [hasOpened, setHasOpened] = useState(isOpen)
+    const [panelWidth, setPanelWidth] = useState(420)
+    const isDragging = useRef(false)
+
+    const onMouseMove = useCallback((e) => {
+        if (!isDragging.current) return
+        const newWidth = window.innerWidth - e.clientX
+        setPanelWidth(Math.max(340, Math.min(860, newWidth)))
+    }, [])
+
+    const onMouseUp = useCallback(() => {
+        isDragging.current = false
+        document.body.style.userSelect = ''
+        window.removeEventListener('mousemove', onMouseMove)
+        window.removeEventListener('mouseup', onMouseUp)
+    }, [onMouseMove])
+
+    const onResizeStart = useCallback((e) => {
+        e.preventDefault()
+        isDragging.current = true
+        document.body.style.userSelect = 'none'
+        window.addEventListener('mousemove', onMouseMove)
+        window.addEventListener('mouseup', onMouseUp)
+    }, [onMouseMove, onMouseUp])
 
     useEffect(() => {
         if (isOpen) setHasOpened(true)
@@ -81,13 +104,24 @@ export default function ChatPanel({ isOpen, onClose }) {
                 onClick={(e) => e.stopPropagation()}
                 className="fixed top-0 right-0 h-full bg-white shadow-2xl flex flex-col"
                 style={{
-                    width: 'min(100vw, var(--panel-width))',
+                    width: Math.min(panelWidth, window.innerWidth),
                     zIndex: 9999,
                     transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
-                    transition: 'transform 250ms cubic-bezier(0.16, 1, 0.3, 1)',
+                    transition: isDragging.current ? 'none' : 'transform 250ms cubic-bezier(0.16, 1, 0.3, 1)',
                     pointerEvents: isOpen ? 'auto' : 'none',
+                    position: 'fixed',
                 }}
             >
+                <div
+                    onMouseDown={onResizeStart}
+                    style={{
+                        position: 'absolute', left: 0, top: 0, width: 6, height: '100%',
+                        cursor: 'col-resize', zIndex: 1,
+                        background: 'transparent',
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(0,0,0,0.08)' }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
+                />
                 <div className="h-14 shrink-0 border-b border-ink/8 px-4 flex items-center justify-between">
                     <p className="font-display font-semibold text-ink truncate">{activeName}</p>
                     <button
