@@ -9,10 +9,9 @@ export default function Sidebar({
     onSelectConversation,
     isAiActive,
     onSelectAi,
-    aiUnreadCount,
 }) {
     return (
-        <div className="w-44 sm:w-48 border-r border-pink-100 bg-pink-50 flex flex-col h-full shrink-0 py-3 overflow-y-auto">
+        <div className="w-56 sm:w-60 border-r border-pink-100 bg-pink-50 flex flex-col h-full shrink-0 py-3 overflow-y-auto">
             <div className="px-3 pb-2">
                 <p className="text-meta font-semibold text-ink-50 uppercase tracking-wide">Community Compass</p>
             </div>
@@ -27,11 +26,6 @@ export default function Sidebar({
                 >
                     <Star size={15} className="text-yellow-500 shrink-0" fill="currentColor" />
                     <span className="truncate flex-1">AI Assistant</span>
-                    {aiUnreadCount > 0 && (
-                        <span className="min-w-[16px] h-4 px-1 rounded-full bg-yellow-500 text-ink text-[10px] font-semibold flex items-center justify-center">
-                            {aiUnreadCount}
-                        </span>
-                    )}
                 </button>
             </div>
 

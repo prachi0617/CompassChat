@@ -24,6 +24,10 @@ async function request(path, { method = 'GET', body, auth = true } = {}) {
     const data = isJson ? await res.json() : await res.text()
 
     if (!res.ok) {
+        if (res.status === 401) {
+            localStorage.removeItem('cc_demo_token')
+        }
+
         const message =
             (isJson && (data?.error || data?.message)) ||
             `Request failed (${res.status})`
@@ -45,7 +49,8 @@ export const api = {
             auth: false,
         }),
 
-    myChannels: () => request('/channels/mine'),
+    myChannels: () => request('/channels'),
+    listUsers: () => request('/users'),
 
     channelMessages: (channelId, page = 0, size = 50) =>
         request(`/channels/${channelId}/messages?page=${page}&size=${size}`),

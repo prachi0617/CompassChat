@@ -9,7 +9,6 @@ import com.compasschat.ai.service.AiAgentService;
 import com.compasschat.auth.security.JwtService;
 import com.compasschat.common.base.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -33,22 +32,24 @@ public class AiAgentController {
     @PostMapping("/chat")
     public ApiResponse<ChatResponse> chat(@RequestBody ChatRequest request,
                                           HttpServletRequest http) {
-        UUID userId = jwtService.getUserId(extractToken(http));
+        UUID userId = extractOptionalUserId(http);
         return ApiResponse.ok(aiAgentService.processMessage(request.message(), userId, request.history()));
     }
 
     @PostMapping("/escalate")
     public ApiResponse<EscalateResponse> escalate(@RequestBody EscalateRequest request,
                                                    HttpServletRequest http) {
-        UUID userId = jwtService.getUserId(extractToken(http));
+        UUID userId = extractOptionalUserId(http);
         return ApiResponse.ok(escalationService.escalate(userId, request.contextMessage()));
     }
 
-    private String extractToken(HttpServletRequest http) {
-        String header = http.getHeader("Authorization");
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new AccessDeniedException("Missing token");
+    private UUID extractOptionalUserId(HttpServletRequest http) {
+        try {
+            String header = http.getHeader("Authorization");
+            if (header == null || !header.startsWith("Bearer ")) return null;
+            return jwtService.getUserId(header.substring(7));
+        } catch (Exception e) {
+            return null;
         }
-        return header.substring(7);
     }
 }

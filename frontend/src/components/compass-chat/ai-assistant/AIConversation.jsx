@@ -9,6 +9,7 @@ import CrisisBlock from './CrisisBlock'
 import EscalateCTA from './EscalateCTA'
 import HandoffCTA from './HandoffCTA'
 import { Compass } from 'lucide-react'
+import ServiceListingCard from './ServiceListingCard'
 
 function ThinkingIndicator() {
     return (
@@ -114,6 +115,14 @@ function AiMessageRow({ message, onEscalate, onLiveAgent }) {
                         onLiveAgent={() => onLiveAgent(message.projectSlug, message.contextMessage)}
                     />
                 )}
+                {message.type === 'service-listing' && (
+                    <ServiceListingCard
+                        name={message.name}
+                        description={message.description}
+                        phone={message.phone}
+                        website={message.website}
+                    />
+                )}
             </div>
         </div>
     )
@@ -127,7 +136,10 @@ export default function AIConversation() {
     const switchToSubProjectChannel = useChatStore((s) => s.switchToSubProjectChannel)
     const switchToAdminDm = useChatStore((s) => s.switchToAdminDm)
     const bottomRef = useRef(null)
+    const lastUserMsgRef = useRef(null)
     const [hasMarkedRead, setHasMarkedRead] = useState(false)
+
+    const lastUserMsgId = [...messages].reverse().find((m) => m.from === 'user')?.id
 
     useEffect(() => {
         if (!hasMarkedRead) {
@@ -137,8 +149,20 @@ export default function AIConversation() {
     }, [hasMarkedRead, markRead])
 
     useEffect(() => {
-        bottomRef.current?.scrollIntoView({ block: 'end' })
-    }, [messages, isThinking])
+        // rAF so tall service-listing cards finish layout before we measure/scroll
+        const raf = requestAnimationFrame(() => {
+            if (lastUserMsgId) {
+                // Pin the latest user question to the top and KEEP it pinned for the
+                // whole turn (user-message render AND the later AI-batch render),
+                // so the response reads from the start instead of jumping to the end.
+                lastUserMsgRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' })
+            } else {
+                // No question asked yet (welcome message) → follow the bottom.
+                bottomRef.current?.scrollIntoView({ block: 'end' })
+            }
+        })
+        return () => cancelAnimationFrame(raf)
+    }, [messages, isThinking, lastUserMsgId])
 
     const handleEscalate = async (contextMessage) => {
         try { await api.aiEscalate(contextMessage) } catch { /* proceed to DM regardless */ }
@@ -156,12 +180,13 @@ export default function AIConversation() {
             <QuickActions onAction={addUserMessage} />
             <div style={{ flex: 1, overflowY: 'auto', padding: '6px 0' }}>
                 {messages.map((m) => (
-                    <AiMessageRow
-                        key={m.id}
-                        message={m}
-                        onEscalate={handleEscalate}
-                        onLiveAgent={handleLiveAgent}
-                    />
+                    <div key={m.id} ref={m.id === lastUserMsgId ? lastUserMsgRef : undefined}>
+                        <AiMessageRow
+                            message={m}
+                            onEscalate={handleEscalate}
+                            onLiveAgent={handleLiveAgent}
+                        />
+                    </div>
                 ))}
                 {isThinking && <ThinkingIndicator />}
                 <div ref={bottomRef} />

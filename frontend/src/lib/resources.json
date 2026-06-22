@@ -6,6 +6,8 @@
             "developer": "Niciah Rymer-Hillian",
             "tagline": "Personalized housing navigation with eligibility-based matching, interactive maps, and an AI Housing Assistant.",
             "keywords": [
+                "homematch",
+                "home match",
                 "housing",
                 "rent",
                 "apartment",
@@ -15,7 +17,7 @@
                 "shelter",
                 "homeless",
                 "voucher",
-                "move",
+                "moving",
                 "home",
                 "house",
                 "place to live",
@@ -37,7 +39,11 @@
             "developer": "Shocka Holmes",
             "tagline": "AI-assisted intake and structured guidance for young adults transitioning out of foster care.",
             "keywords": [
+                "futurepath",
+                "future path",
                 "foster",
+                "foster care",
+                "in care",
                 "youth",
                 "transition",
                 "independence",
@@ -45,17 +51,10 @@
                 "guardian",
                 "teen",
                 "young adult",
-                "young",
-                "adult",
-                "on my own",
-                "independent",
                 "emancipated",
-                "care",
                 "group home",
-                "aging",
-                "18",
-                "21",
-                "system"
+                "18 and out",
+                "aged out"
             ],
             "accent": "pink"
         },
@@ -65,6 +64,8 @@
             "developer": "Prachi Patel",
             "tagline": "Community support and well-being resource discovery, wellness check-ins, and a volunteer network.",
             "keywords": [
+                "kindconnect",
+                "kind connect",
                 "volunteer",
                 "wellness",
                 "mental health",
@@ -80,10 +81,7 @@
                 "pantry",
                 "groceries",
                 "food bank",
-                "nutrition",
-                "community",
-                "connect",
-                "support"
+                "nutrition"
             ],
             "accent": "yellow"
         },
@@ -93,6 +91,8 @@
             "developer": "Anitra Johnson",
             "tagline": "Community resources, policy updates, and news for everyone.",
             "keywords": [
+                "firststep",
+                "first step",
                 "news",
                 "policy",
                 "update",
@@ -100,13 +100,8 @@
                 "announcement",
                 "legislation",
                 "benefits",
-                "resource",
-                "information",
-                "help",
-                "services",
                 "local",
                 "community resource",
-                "assistance",
                 "program"
             ],
             "accent": "mint"
