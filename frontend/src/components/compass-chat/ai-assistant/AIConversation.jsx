@@ -71,14 +71,23 @@ function AiMessageRow({ message, onEscalate, onLiveAgent }) {
 
     if (isUser) {
         return (
-            <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '6px 16px' }}>
-                <p style={{
-                    maxWidth: '80%', margin: 0, background: '#3DBE8A', color: '#fff',
-                    borderRadius: 16, borderTopRightRadius: 4, padding: '8px 14px',
-                    fontSize: 14, whiteSpace: 'pre-wrap', wordBreak: 'break-word',
-                }}>
-                    {message.text}
-                </p>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, padding: '6px 16px' }}>
+                {message.text && (
+                    <p style={{
+                        maxWidth: '80%', margin: 0, background: '#3DBE8A', color: '#fff',
+                        borderRadius: 16, borderTopRightRadius: 4, padding: '8px 14px',
+                        fontSize: 14, whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+                    }}>
+                        {message.text}
+                    </p>
+                )}
+                {message.attachment?.url && (
+                    <img
+                        src={message.attachment.url}
+                        alt={message.attachment.name || 'shared image'}
+                        style={{ maxWidth: '70%', maxHeight: 220, borderRadius: 14, objectFit: 'cover' }}
+                    />
+                )}
             </div>
         )
     }
@@ -191,7 +200,15 @@ export default function AIConversation() {
                 {isThinking && <ThinkingIndicator />}
                 <div ref={bottomRef} />
             </div>
-            <Composer onSend={addUserMessage} placeholder="Ask the AI Assistant..." onClear={clearMessages} />
+            <Composer
+                allowImage
+                onSend={(p) => {
+                    const payload = typeof p === 'string' ? { text: p, attachment: null } : (p ?? {})
+                    addUserMessage(payload.text ?? '', payload.attachment ?? null)
+                }}
+                placeholder="Ask Sage..."
+                onClear={clearMessages}
+            />
         </div>
     )
 }

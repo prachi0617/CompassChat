@@ -15,7 +15,7 @@ const features = [
     {
         icon: <Bot size={22} />,
         title: 'AI Housing Assistant',
-        body: 'Ask questions about vouchers, applications, tenant rights, or next steps — the AI Assistant answers instantly.',
+        body: 'Ask questions about vouchers, applications, tenant rights, or next steps — Sage answers instantly.',
     },
 ]
 

@@ -13,7 +13,7 @@ export default function Sidebar({
     return (
         <div className="w-56 sm:w-60 border-r border-pink-100 bg-pink-50 flex flex-col h-full shrink-0 py-3 overflow-y-auto">
             <div className="px-3 pb-2">
-                <p className="text-meta font-semibold text-ink-50 uppercase tracking-wide">Community Compass</p>
+                <p className="text-meta font-semibold text-ink-50 uppercase tracking-wide">Compass Chat</p>
             </div>
 
             {/* AI Assistant — main */}
@@ -25,7 +25,7 @@ export default function Sidebar({
                     }`}
                 >
                     <Star size={15} className="text-yellow-500 shrink-0" fill="currentColor" />
-                    <span className="truncate flex-1">AI Assistant</span>
+                    <span className="truncate flex-1">Sage</span>
                 </button>
             </div>
 
