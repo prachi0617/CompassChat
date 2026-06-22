@@ -1,10 +1,10 @@
 # CompassChat
 
-**A store-and-forward messaging platform for the Community Compass ecosystem**
+**A messaging and AI-assistant platform for the Community Compass ecosystem**
 
-CompassChat is a Java-based, Slack-inspired communication platform built as the primary internal messaging backbone for [Community Compass](#about-community-compass) — an AI-powered community guidance platform that connects residents to housing, resources, and support services.
+CompassChat is a full-stack, Slack-inspired communication platform built as the internal messaging backbone for [Community Compass](#about-community-compass) — an AI-powered community guidance platform that connects residents to housing, resources, and support services. It pairs real-time channels and direct messages with an AI Assistant that surfaces resources and can hand off to a human navigator.
 
-This project is a ZipCode Wilmington student capstone. It demonstrates full-stack Java development, real-time messaging architecture, role-based access control, and integration across a multi-project ecosystem.
+This project is a ZipCode Wilmington student capstone. It demonstrates full-stack Java development, real-time messaging over WebSocket/STOMP, role-based access control, an AI resource assistant with provider fallback, and integration across a multi-project ecosystem.
 
 ---
 
@@ -18,6 +18,7 @@ This project is a ZipCode Wilmington student capstone. It demonstrates full-stac
 - [API Reference](#api-reference)
 - [Channel Structure](#channel-structure)
 - [Related Sub-Projects](#related-sub-projects)
+- [Roadmap / Future Versions](#roadmap--future-versions)
 - [Team](#team)
 - [License](#license)
 
@@ -34,65 +35,60 @@ Community Compass is an AI-powered community guidance platform designed to help 
 | **Community Support & Well-Being** | Resource discovery, wellness check-ins, volunteer networks, and AI-guided recommendations |
 | **Youth Transition Pathways** | AI-assisted intake and structured guidance plans for young adults navigating independence |
 
-CompassChat is the **communication layer** that ties these four sub-projects together, enabling case workers, coordinators, and support staff to collaborate across the platform in real time.
+CompassChat is the **communication layer** that ties these four sub-projects together, enabling residents and support staff to collaborate and access resources in real time.
 
 ---
 
 ## Project Overview
 
-CompassChat is a **store-and-forward messaging system** — messages are persisted to the server and delivered to recipients whenever they are online. This design supports:
+CompassChat persists messages to the server and delivers them to recipients in real time over WebSocket. This design supports:
 
-- Asynchronous communication between case workers and clients
-- Persistent channel history that survives client disconnects
-- Audit-ready message records for case documentation
+- Real-time communication across channels and direct messages
+- Persistent channel and DM history that survives client disconnects
+- An AI Assistant that classifies intent, returns matching resources, and escalates to a human navigator when needed
 - Cross-team coordination across the four Community Compass sub-projects
 
 ### Who Uses CompassChat?
 
 | Role | Use Case |
 |---|---|
-| **Case Workers** | Communicate directly with clients; coordinate with peers; receive sub-project channel updates |
-| **Clients / Residents** | Receive guidance, follow up on housing referrals, ask questions in a secure space |
-| **Coordinators / Admins** | Manage channel membership, monitor communication, oversee cross-team workflows |
-| **Sub-Project Teams** | Dedicated channels for housing, civic, well-being, and youth services coordination |
+| **Residents / Clients** | Ask the AI Assistant for help, receive resource recommendations, follow up with a navigator |
+| **Case Workers / Navigators** | Communicate directly with residents; coordinate with peers |
+| **Coordinators / Admins** | Manage channel membership and oversee communication |
+| **Sub-Project Teams** | Channels aligned to housing, civic, well-being, and youth services |
 
 ---
 
 ## Features
 
 ### Messaging
-- Real-time store-and-forward messaging (WebSocket / long-poll fallback)
-- Direct Messages (DMs) between any two users
-- Public and private channels
-- Threaded replies on any message
-- Message edit and delete (with audit trail)
-- File and image attachment support
-- Read receipts and unread message counts
+- Real-time messaging over WebSocket (STOMP + SockJS)
+- Direct Messages (DMs) between users
+- Public, private, direct, and system channel types
+- Message edit and delete (soft-delete) with an audit-log history endpoint
+- Typing indicators and presence broadcasts (online / away / offline)
+- Channel read tracking and unread counts
 
-### Channels
-- Create and archive channels
-- Role-based channel membership (admin, member, read-only)
-- Pinned messages within channels
-- Channel descriptions and purpose fields
-- System channels linked to each Community Compass sub-project
+### AI Assistant
+- In-app AI Assistant for resource discovery, grounded in the Community Compass service directory
+- Quick-action prompts: food, housing, youth resources, and "how you are feeling"
+- Resource results rendered as cards, paginated ("Would you like to see more?")
+- Mood check-ins with resource recommendations
+- Crisis detection block (988 Suicide & Crisis Lifeline, 741741 Crisis Text Line)
+- Escalation / handoff to a human navigator or sub-project channel
+- Provider fallback chain: **Groq** (Llama 3) → **Ollama** (local) → **rule-based** responses
 
-### Users & Roles
-- Role-based access control: `ADMIN`, `CASE_WORKER`, `COORDINATOR`, `CLIENT`, `VOLUNTEER`
-- User profiles with contact info and assigned sub-project(s)
-- Case worker–client assignment management
-- Presence indicators (online / away / offline)
+### Channels & Users
+- Create, update, and archive channels
+- Channel membership management (add / remove members, per-member role and notification preference)
+- Role-based access control (see roles below)
+- User profiles with presence status and an assigned sub-project field
 
-### Notifications
-- In-app notification feed
-- `@mention` support with targeted notifications
-- Channel-level notification preferences (all messages / mentions only / muted)
-- Email digest for offline users (configurable)
+### Mentions
+- `@mention` tracking with unread counts
+- Real-time mention delivery over WebSocket (`/user/queue/mentions`)
 
-### Administration
-- Admin dashboard: user management, channel oversight, message audit log
-- Bulk channel membership management
-- Export channel history (CSV / JSON) for case records
-- Rate limiting and spam prevention
+> See [Roadmap / Future Versions](#roadmap--future-versions) for features planned but not yet implemented (threaded replies, file attachments, read receipts, email digests, pinned messages, export, rate limiting, and more).
 
 ---
 
@@ -100,25 +96,31 @@ CompassChat is a **store-and-forward messaging system** — messages are persist
 
 ```
 ┌─────────────────────────────────────────────────┐
-│                  CompassChat                    │
-│                                                 │
-│   ┌─────────────┐       ┌────────────────────┐  │
-│   │  React 18   │◄─────►│  Spring Boot API   │  │
-│   │  Frontend   │  REST │  (Java 21)         │  │
-│   │  (Vite +    │  /WS  │                    │  │
-│   │  Tailwind)  │       │  - Auth (JWT)      │  │
-│   └─────────────┘       │  - Channels        │  │
-│                         │  - Messages        │  │
-│                         │  - Users / Roles   │  │
-│                         │  - Notifications   │  │
-│                         └────────┬───────────┘  │
-│                                  │              │
-│                         ┌────────▼───────────┐  │
-│                         │   PostgreSQL DB    │  │
-│                         │   (Messages,       │  │
-│                         │   Channels,        │  │
-│                         │   Users, Roles)    │  │
-│                         └────────────────────┘  │
+│                  CompassChat                     │
+│                                                  │
+│   ┌─────────────┐       ┌────────────────────┐   │
+│   │  React 19   │◄─────►│  Spring Boot API   │   │
+│   │  Frontend   │  REST │  (Java 17)         │   │
+│   │  (Vite +    │  /WS  │                    │   │
+│   │  Tailwind)  │       │  - Auth (JWT)      │   │
+│   │  :5173      │       │  - Channels / DMs  │   │
+│   └─────────────┘       │  - Messages        │   │
+│                         │  - Users / Roles   │   │
+│                         │  - Mentions / Mood │   │
+│                         │  - AI Assistant    │   │
+│                         │  :8081             │   │
+│                         └────────┬───────────┘   │
+│                                  │               │
+│                         ┌────────▼───────────┐   │
+│                         │  H2 (in-memory,    │   │
+│                         │  PostgreSQL mode)  │   │
+│                         └────────┬───────────┘   │
+│                                  │               │
+│                         ┌────────▼───────────┐   │
+│                         │  AI Providers:     │   │
+│                         │  Groq → Ollama →   │   │
+│                         │  rule-based        │   │
+│                         └────────────────────┘   │
 └─────────────────────────────────────────────────┘
          │              │              │              │
          ▼              ▼              ▼              ▼
@@ -130,23 +132,30 @@ CompassChat is a **store-and-forward messaging system** — messages are persist
 
 | Layer | Technology |
 |---|---|
-| **Language** | Java 21 |
-| **Framework** | Spring Boot 3.x |
+| **Language** | Java 17 |
+| **Framework** | Spring Boot 3.3.5 |
 | **Persistence** | Spring Data JPA / Hibernate |
-| **Database** | PostgreSQL |
-| **Real-Time** | Spring WebSocket (STOMP) |
-| **Auth** | Spring Security + JWT |
-| **Build Tool** | Maven or Gradle |
-| **Frontend** | React 18, Vite, Tailwind CSS |
-| **Testing** | JUnit 5, Mockito, Spring Boot Test |
-| **Containerization** | Docker / Docker Compose |
+| **Database** | H2 in-memory (PostgreSQL compatibility mode); `create-drop` on startup |
+| **Real-Time** | Spring WebSocket (STOMP over SockJS) |
+| **Auth** | Spring Security + JWT (JJWT 0.11.5) |
+| **AI** | Spring AI (OpenAI-compatible client) → Groq `llama3-8b-8192`; Ollama fallback; rule-based fallback |
+| **Build Tool** | Maven |
+| **Frontend** | React 19, Vite, Tailwind CSS, Zustand, React Router |
+| **Real-Time (FE)** | @stomp/stompjs, sockjs-client |
+| **Testing** | JUnit 5, Spring Boot Test, Spring Security Test |
+
+> **Note:** The current build uses an H2 in-memory database that re-seeds on every restart (`create-drop`). PostgreSQL and containerized deployment are planned — see [Roadmap](#roadmap--future-versions).
+
+### Roles
+
+`MEMBER`, `MODERATOR`, `ADMIN`, `CASE_WORKER`, `COORDINATOR`, `CLIENT`, `VOLUNTEER`
 
 ### Key Domain Models
 
 ```
 User
  ├── id, username, email, passwordHash
- ├── role: ADMIN | CASE_WORKER | COORDINATOR | CLIENT | VOLUNTEER
+ ├── role: MEMBER | MODERATOR | ADMIN | CASE_WORKER | COORDINATOR | CLIENT | VOLUNTEER
  ├── assignedSubProject (optional)
  └── presence: ONLINE | AWAY | OFFLINE
 
@@ -154,20 +163,31 @@ Channel
  ├── id, name, description, purpose
  ├── type: PUBLIC | PRIVATE | DIRECT | SYSTEM
  ├── linkedSubProject (optional)
- └── members: List<ChannelMembership>
+ └── archived
 
-Message
- ├── id, body, createdAt, editedAt
- ├── sender: User
- ├── channel: Channel
- ├── parentMessage: Message (for threads)
- └── attachments: List<Attachment>
-
-ChannelMembership
- ├── user: User
- ├── channel: Channel
+ChannelMember
+ ├── channelId, userId, lastReadAt, muted
  ├── memberRole: ADMIN | MEMBER | READ_ONLY
  └── notificationPreference: ALL | MENTIONS | MUTED
+
+Message
+ ├── id, content, createdAt, editedAt, deleted
+ ├── senderId
+ └── channelId
+
+DirectMessage
+ ├── id, content, createdAt, editedAt, deleted
+ ├── senderId
+ └── recipientId
+
+MessageAuditLog
+ ├── messageId, action, performedBy
+ └── previousContent, newContent
+
+Mention   ── messageId, channelId, senderUserId, mentionedUserId, read
+Mood      ── userId, moodType, note
+Notification (minimal) ── title, message, read
+EscalationLog ── userId, contextMessage
 ```
 
 ---
@@ -176,11 +196,10 @@ ChannelMembership
 
 ### Prerequisites
 
-- Java 21+
-- Maven 3.9+ or Gradle 8+
-- PostgreSQL 15+
-- Node.js 20+ (for frontend development)
-- Docker (optional, for containerized setup)
+- Java 17+
+- Maven 3.9+
+- Node.js 20+ (for the frontend)
+- (Optional) A Groq API key for live AI responses; without one, the assistant uses local/rule-based fallbacks
 
 ### Clone the Repository
 
@@ -189,48 +208,42 @@ git clone https://github.com/zipcode-wilmington/<your-repo-name>.git
 cd <your-repo-name>
 ```
 
-### Database Setup
-
-```sql
-CREATE DATABASE compasschat;
-CREATE USER compasschat_user WITH ENCRYPTED PASSWORD 'changeme';
-GRANT ALL PRIVILEGES ON DATABASE compasschat TO compasschat_user;
-```
-
-### Backend Configuration
-
-Copy the example environment file and update values:
-
-```bash
-cp src/main/resources/application.example.properties src/main/resources/application.properties
-```
-
-Key configuration properties:
-
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/compasschat
-spring.datasource.username=compasschat_user
-spring.datasource.password=changeme
-spring.jpa.hibernate.ddl-auto=update
-
-jwt.secret=your-secret-key-here
-jwt.expiration-ms=86400000
-
-# Cross-origin for frontend dev server
-cors.allowed-origins=http://localhost:5173
-```
-
 ### Run the Backend
 
-```bash
-# Maven
-./mvnw spring-boot:run
+The backend uses an H2 in-memory database — no external database setup is required. Demo data is seeded automatically on startup.
 
-# Gradle
-./gradlew bootRun
+```bash
+cd backend
+./mvnw spring-boot:run
 ```
 
-The API will be available at `http://localhost:8080`.
+The API runs at `http://localhost:8081`.
+
+Optional environment variables:
+
+```bash
+# Enable live AI responses via Groq (otherwise rule-based / Ollama fallback is used)
+export GROQ_API_KEY=your-groq-key
+
+# Optional: point at a local Ollama instance
+export OLLAMA_URL=http://localhost:11434
+```
+
+Relevant configuration (`backend/src/main/resources/application.properties`):
+
+```properties
+server.port=8081
+
+spring.datasource.url=jdbc:h2:mem:compasschat;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+spring.jpa.hibernate.ddl-auto=create-drop
+spring.h2.console.enabled=true
+
+jwt.expiration-ms=86400000
+
+# AI (Groq, OpenAI-compatible)
+spring.ai.openai.base-url=https://api.groq.com/openai
+spring.ai.openai.chat.options.model=llama3-8b-8192
+```
 
 ### Run the Frontend
 
@@ -240,37 +253,32 @@ npm install
 npm run dev
 ```
 
-The UI will be available at `http://localhost:5173`.
+The UI runs at `http://localhost:5173` and proxies `/api` and `/ws` to the backend on port 8081.
 
-### Docker Compose (Full Stack)
-
-```bash
-docker compose up --build
-```
-
-This starts PostgreSQL, the Spring Boot API, and the React frontend together.
+The app **auto-logs in as a demo resident** (`demo-resident` / `demo123`) on boot. If the backend is unreachable, the chat falls back to an offline mock mode so the UI is still demonstrable.
 
 ---
 
 ## API Reference
 
-Base URL: `http://localhost:8080/api/v1`
+Base URL: `http://localhost:8081/api`
 
-All endpoints (except auth) require a `Bearer <token>` Authorization header.
+All endpoints except `/auth/**` and `/ai/**` require an `Authorization: Bearer <token>` header.
 
 ### Authentication
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `POST` | `/auth/register` | Register a new user |
+| `POST` | `/auth/register` | Register a new user, returns JWT |
 | `POST` | `/auth/login` | Login, returns JWT |
-| `POST` | `/auth/logout` | Invalidate session token |
+
+> JWT is stateless — there is no logout endpoint; clients discard the token.
 
 ### Users
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/users` | List all users (admin) |
+| `GET` | `/users` | List users |
 | `GET` | `/users/{id}` | Get user profile |
 | `PUT` | `/users/{id}` | Update user profile |
 | `GET` | `/users/me` | Get current user |
@@ -281,76 +289,96 @@ All endpoints (except auth) require a `Bearer <token>` Authorization header.
 | Method | Endpoint | Description |
 |---|---|---|
 | `GET` | `/channels` | List accessible channels |
-| `POST` | `/channels` | Create a new channel |
+| `GET` | `/channels/mine` | List the current user's channel memberships |
+| `POST` | `/channels` | Create a channel |
 | `GET` | `/channels/{id}` | Get channel details |
 | `PUT` | `/channels/{id}` | Update channel info |
-| `DELETE` | `/channels/{id}` | Archive a channel |
-| `POST` | `/channels/{id}/members` | Add member to channel |
-| `DELETE` | `/channels/{id}/members/{userId}` | Remove member |
+| `POST` | `/channels/{id}/archive` | Archive a channel |
+| `POST` | `/channels/{id}/read` | Mark channel as read |
+| `GET` | `/channels/{id}/unread` | Get unread count |
+| `GET` | `/channels/{id}/members` | List channel members |
+| `POST` | `/channels/{id}/members` | Add a member |
+| `DELETE` | `/channels/{id}/members/{userId}` | Remove a member |
 
 ### Messages
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/channels/{id}/messages` | Get channel message history |
-| `POST` | `/channels/{id}/messages` | Post a message |
+| `GET` | `/channels/{channelId}/messages` | Get channel message history (paginated) |
+| `POST` | `/channels/{channelId}/messages` | Post a message |
 | `PUT` | `/messages/{id}` | Edit a message |
-| `DELETE` | `/messages/{id}` | Delete a message |
-| `POST` | `/messages/{id}/replies` | Reply in thread |
-| `GET` | `/messages/{id}/replies` | Get thread replies |
+| `DELETE` | `/messages/{id}` | Soft-delete a message |
+| `GET` | `/messages/{id}/history` | Get a message's edit/audit history |
 
 ### Direct Messages
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/dm` | List DM conversations |
-| `POST` | `/dm/{userId}` | Start or continue a DM |
+| `POST` | `/dm/{recipientId}` | Send a direct message |
+| `GET` | `/dm/{otherUserId}` | Get a DM conversation (paginated) |
+| `DELETE` | `/dm/{id}` | Soft-delete a direct message |
+
+### Mentions
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/mentions/me` | List the current user's mentions |
+| `GET` | `/mentions/me/unread` | List unread mentions |
+| `GET` | `/mentions/me/unread/count` | Unread mention count (badge) |
+| `POST` | `/mentions/{id}/read` | Mark a mention as read |
+
+### Mood
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/moods` | Log a mood entry; returns recommended resources |
+| `GET` | `/moods/me` | Get the current user's mood history |
+| `GET` | `/moods/{id}` | Get a single mood entry |
+
+### AI Assistant
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/ai/chat` | Chat with the AI Assistant (message + history); unauthenticated access allowed |
+| `POST` | `/ai/escalate` | Log an escalation to a human navigator |
 
 ### WebSocket
 
-Connect at `ws://localhost:8080/ws` using STOMP.
+Connect at `ws://localhost:8081/ws` using STOMP over SockJS (Bearer token in the connect headers).
 
 | Destination | Direction | Description |
 |---|---|---|
-| `/app/channel/{id}/send` | Client → Server | Send a message |
-| `/topic/channel/{id}` | Server → Client | Receive channel messages |
-| `/user/queue/notifications` | Server → Client | Personal notifications |
-| `/user/queue/dm` | Server → Client | Incoming DMs |
+| `/app/channels/{id}/messages` | Client → Server | Send a message to a channel |
+| `/app/channels/{id}/typing` | Client → Server | Send a typing indicator |
+| `/topic/channels/{id}` | Server → Client | Receive channel messages |
+| `/topic/channels/{id}/typing` | Server → Client | Receive typing indicators |
+| `/topic/presence` | Server → Client | Presence status updates |
+| `/user/queue/mentions` | Server → Client | Personal `@mention` notifications |
+| `/user/queue/errors` | Server → Client | Session error messages |
 
 ---
 
 ## Channel Structure
 
-CompassChat ships with a set of pre-seeded **system channels** aligned to the Community Compass sub-projects, plus standard coordination channels.
+CompassChat seeds demo channels on startup (the H2 database is recreated each run). Channels align to the Community Compass sub-projects alongside general coordination channels.
 
-### System Channels
-
-| Channel | Purpose |
-|---|---|
-| `#civic-team` | Internal coordination for the Civic Guidance & Community Updates sub-project |
-| `#housing-team` | Case worker coordination for housing navigation and voucher support |
-| `#wellbeing-team` | Community support coordinators and volunteer network communication |
-| `#youth-services-team` | Youth transition counselors and pathway coordinators |
-
-### Standard Channels
+### Seeded Channels
 
 | Channel | Purpose |
 |---|---|
-| `#general` | Organization-wide announcements and general discussion |
-| `#case-workers` | Case worker peer support and shared practice |
-| `#admin-ops` | Administrative and operational coordination |
-| `#volunteers` | Volunteer scheduling and coordination |
-| `#tech-support` | Platform support and issue reporting |
+| `#general` | Organization-wide discussion |
+| `#futurepath-news` | Youth / FuturePath program updates and resources |
+| `#homematch-help` | Housing referrals and HomeMatch support |
+| `#firststep-news` | Community resources, policy updates, news |
+| `#kindconnect-wellbeing` | Wellness check-ins and support |
 
-### Client Channels
+### System / Team Channels
 
-Client-facing channels are created dynamically as **private channels** when a case is opened. Naming convention:
+Additional team channels (`#civic-team`, `#housing-team`, `#wellbeing-team`, `#youth-services-team`) and operational channels (`#case-workers`, `#admin-ops`, `#volunteers`, `#tech-support`) are seeded as `SYSTEM`-type channels for staff coordination.
 
-```
-#case-{caseId}-{clientLastName}
-```
+### Direct Messages
 
-Only the assigned case worker(s) and the client are members. Coordinators with appropriate roles may observe but do not participate by default.
+DMs are `DIRECT`-type channels between two users (e.g. a resident and a navigator). The frontend demo presents an "Admin Team" DM and a mock "Case Worker" DM.
 
 ---
 
@@ -359,38 +387,49 @@ Only the assigned case worker(s) and the client are members. Coordinators with a
 CompassChat is the communication backbone for the Community Compass platform. The four sub-projects below are companion capstone repositories within the same ecosystem.
 
 ### Civic Guidance & Community Updates
-> Verified community resources, local assistance programs, seasonal opportunities, and policy updates — with "Why It Matters" civic briefings that help residents understand the impact of news and legislation.
+> Verified community resources, local assistance programs, seasonal opportunities, and policy updates — with "Why It Matters" civic briefings.
 
-- **Repo:** [community-compass-civic](#)
-- **Stack:** React 18, Spring Boot, PostgreSQL
-- **CompassChat Integration:** Staff coordinate in `#civic-team`; policy update alerts can be posted to `#general`
-
----
+- **Stack:** React, Spring Boot, PostgreSQL
+- **CompassChat Integration:** Staff coordinate in `#firststep-news` / `#civic-team`
 
 ### Personalized Housing Navigation
-> Eligibility-based housing matching, interactive Leaflet maps, and an AI Housing Assistant grounded in real listings, eligibility requirements, and user preferences.
+> Eligibility-based housing matching, interactive maps, and an AI Housing Assistant grounded in real listings and eligibility requirements.
 
-- **Repo:** [community-compass-housing](#)
-- **Stack:** React 18, FastAPI, PostgreSQL / Supabase, Leaflet, OpenAI / Claude
-- **CompassChat Integration:** Case workers coordinate in `#housing-team`; client housing threads use private case channels
-
----
+- **Stack:** React, FastAPI, PostgreSQL / Supabase, Leaflet, OpenAI / Claude
+- **CompassChat Integration:** Housing help via the `#homematch-help` channel and AI Assistant
 
 ### Community Support & Well-Being
-> Resource discovery, mood and wellness check-ins, appointment and reminder management, volunteer network connectivity, and AI-guided recommendations.
+> Resource discovery, mood and wellness check-ins, reminders, volunteer connectivity, and AI-guided recommendations.
 
-- **Repo:** [community-compass-wellbeing](#)
-- **Stack:** React 18, Spring Boot, PostgreSQL / Supabase, Claude / Ollama
-- **CompassChat Integration:** Coordinators and volunteers communicate in `#wellbeing-team`; support requests can trigger DM notifications to assigned workers
+- **Stack:** React, Spring Boot, PostgreSQL / Supabase, Claude / Ollama
+- **CompassChat Integration:** Wellness support via `#kindconnect-wellbeing` and the mood check-in feature
+
+### Youth Transition Pathways
+> AI-assisted intake and structured guidance plans for young adults navigating housing, employment, education, and financial stability.
+
+- **Stack:** React, Spring Boot, FastAPI, PostgreSQL, OpenAI / Claude
+- **CompassChat Integration:** Youth resources via `#futurepath-news` and the AI Assistant
 
 ---
 
-### Youth Transition Pathways
-> AI-assisted intake and structured guidance plans for young adults navigating housing, employment, education, transportation, and financial stability simultaneously.
+## Roadmap / Future Versions
 
-- **Repo:** [community-compass-youth](#)
-- **Stack:** React 18, Spring Boot, FastAPI, PostgreSQL, OpenAI / Claude
-- **CompassChat Integration:** Youth counselors coordinate in `#youth-services-team`; transition plan milestones can generate automated check-in messages
+The following features are described in the product vision but are **not yet implemented**. They are planned for future versions:
+
+| Feature | Status |
+|---|---|
+| Threaded replies on messages | Planned |
+| File and image attachments | Planned |
+| Per-message read receipts | Planned (channel-level read tracking exists today) |
+| Pinned messages | Planned |
+| In-app notification feed | Planned (mentions are tracked; full notification system is a stub) |
+| Email digest for offline users | Planned |
+| Export channel history (CSV / JSON) | Planned |
+| Rate limiting / spam prevention | Planned |
+| Admin dashboard (user/channel/audit management) | Stub endpoints only |
+| Case worker ↔ client assignment management | Partial (`assignedSubProject` field exists; no management endpoints) |
+| PostgreSQL database + Docker Compose deployment | Planned (currently H2 in-memory) |
+| Channel notification preferences UI (all / mentions / muted) | Backend field exists; UI planned |
 
 ---
 
