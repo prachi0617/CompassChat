@@ -27,7 +27,6 @@ export default function Layout() {
     const selectConversation = useChatStore((s) => s.selectConversation)
     const isAiChannel = useChatStore((s) => s.isAiChannel)
     const setActiveAiChannel = useAIStore((s) => s.setActiveAiChannel)
-    const aiUnreadCount = useAIStore((s) => Object.values(s.unreadByChannel).reduce((sum, n) => sum + n, 0))
 
     useEffect(() => {
         const chatParam = searchParams.get('chat')
@@ -60,7 +59,6 @@ export default function Layout() {
             <ChatTrigger
                 isOpen={chatOpen}
                 onClick={() => setChatOpen((o) => !o)}
-                unreadCount={aiUnreadCount}
             />
 
             <ChatPanel
