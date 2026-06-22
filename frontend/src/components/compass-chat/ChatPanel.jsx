@@ -101,7 +101,7 @@ export default function ChatPanel({ isOpen, onClose }) {
 
     const activeName = isAiActive
         ? activeConversationId === null
-            ? 'AI Assistant'
+            ? 'Sage'
             : activeConversationId.replace('ai-', '#')
         : [...channels, ...dms].find((c) => c.id === activeConversationId)?.name || 'Conversation'
 

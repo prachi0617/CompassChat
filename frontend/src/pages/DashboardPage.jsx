@@ -52,7 +52,7 @@ export default function DashboardPage() {
                     {/* Yellow guide box */}
                     <div className="mt-8 inline-flex items-center gap-3 bg-yellow-50 border border-yellow-100 text-yellow-900 text-base font-medium px-6 py-3.5 rounded-2xl shadow-sm">
                         <MessageCircle size={18} className="text-yellow-700 shrink-0" />
-                        Chat with our AI Assistant or a team member — click the button on the right
+                        Chat with Sage, our AI assistant, or a team member — click the button on the right
                     </div>
                 </div>
 

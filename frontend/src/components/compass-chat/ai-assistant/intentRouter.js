@@ -17,16 +17,38 @@ const URGENT_KEYWORDS = [
 // crisis safety-net block before anything else.
 const MOOD_KEYWORDS = {
     VERY_LOW: ['suicidal', 'hopeless', 'want to die', "can't go on", 'worthless'],
-    LOW: ['sad', 'depressed', 'down', 'lonely', 'tired', 'exhausted', 'overwhelmed', 'anxious', 'stressed', 'scared', 'worried'],
+    LOW: [
+        'sad', 'depressed', 'down', 'lonely', 'tired', 'exhausted', 'overwhelmed',
+        'anxious', 'anxiety', 'stressed', 'stress', 'scared', 'worried', 'nervous',
+        'afraid', 'fear', 'insecure', 'discouraged', 'unmotivated', 'defeated',
+        'numb', 'empty', "can't cope", 'struggling', 'struggle', 'burned out',
+        'burnt out', 'panicked', 'panic', 'helpless', 'low', 'upset', 'frustrated',
+        'angry', 'hurt', 'crying', 'cry',
+    ],
     NEUTRAL: ['okay', 'meh', 'unsure', 'confused'],
     GOOD: ['happy', 'calm', 'good', 'fine', 'relieved'],
     GREAT: ['great', 'excited', 'grateful', 'hopeful'],
 }
 
+// Positive/confidence words that, when negated ("not confident", "don't feel
+// confident"), express a LOW mood instead of a positive one.
+const POSITIVE_FLIP_KEYWORDS = ['confident', 'strong', 'motivated', 'hopeful', 'okay', 'good', 'fine']
+
 const DISTRESSED_MOODS = new Set(['VERY_LOW'])
 // "overwhelmed" specifically should still surface crisis resources per the
 // plan's demo script, even though it's bucketed as LOW rather than VERY_LOW.
 const DISTRESSED_KEYWORDS = new Set(['overwhelmed', 'hopeless', "can't go on", 'suicidal', 'want to die']);
+
+// Frontend mood buckets → valid backend MoodType enum values (for api.postMood).
+// Backend enum: HAPPY, HOPEFUL, CALM, GRATEFUL, NEUTRAL, TIRED, SAD, LONELY,
+// ANXIOUS, ANGRY, STRESSED, OVERWHELMED, DISTRESSED.
+export const MOOD_BUCKET_TO_BACKEND = {
+    VERY_LOW: 'DISTRESSED',
+    LOW: 'SAD',
+    NEUTRAL: 'NEUTRAL',
+    GOOD: 'CALM',
+    GREAT: 'HAPPY',
+}
 
 function normalize(text) {
     return text.toLowerCase().trim()
@@ -70,6 +92,14 @@ export function classifyIntent(rawText) {
 
     if (matchesAny(text, URGENT_KEYWORDS)) {
         return { intent: 'URGENT' }
+    }
+
+    // Negated positive/confidence words ("not confident", "don't feel good")
+    // express a LOW mood — check this before the positive buckets below.
+    for (const kw of POSITIVE_FLIP_KEYWORDS) {
+        if (text.includes(kw) && isNegated(text, kw)) {
+            return { intent: 'MOOD', moodType: 'LOW', note: rawText, distressed: false }
+        }
     }
 
     for (const [moodType, keywords] of Object.entries(MOOD_KEYWORDS)) {
