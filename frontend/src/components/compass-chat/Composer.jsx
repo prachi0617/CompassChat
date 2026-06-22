@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Bold, Italic, Link as LinkIcon, SendHorizontal, Trash2 } from 'lucide-react'
 
-export default function Composer({ onSend, placeholder = 'Message...', onClear }) {
+export default function Composer({ onSend, placeholder = 'Message...', onClear, onEmptyEnter }) {
     const [value, setValue] = useState('')
 
     const submit = (e) => {
@@ -15,6 +15,11 @@ export default function Composer({ onSend, placeholder = 'Message...', onClear }
     const handleKeyDown = (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault()
+            // In the Admin Team DM, an empty Enter fires the next scripted line.
+            if (!value.trim() && onEmptyEnter) {
+                onEmptyEnter()
+                return
+            }
             submit(e)
         }
     }

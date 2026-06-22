@@ -4,6 +4,14 @@ import { api } from '../lib/api'
 import subProjectData from '../lib/resources.json'
 import { AI_SUBPROJECT_CHANNELS, useChatStore } from './useChatStore'
 
+// Monotonic counter guarantees unique message ids even when several
+// messages are created within the same millisecond.
+let aiMessageSeq = 0
+function nextAiId(suffix = '') {
+    aiMessageSeq += 1
+    return `ai-${Date.now()}-${aiMessageSeq}${suffix ? `-${suffix}` : ''}`
+}
+
 function welcomeMessage() {
     return {
         id: 'ai-welcome',
@@ -57,7 +65,7 @@ function mapBackendIntent(intent) {
 
 function makeAiTextMessage(text) {
     return {
-        id: `ai-${Date.now()}`,
+        id: nextAiId(),
         from: 'ai',
         type: 'text',
         text,
@@ -220,7 +228,7 @@ export const useAIStore = create((set, get) => ({
                 const remaining = pending.slice(3)
                 batch.forEach((s) =>
                     replyMessages.push({
-                        id: `ai-${Date.now()}-${s.name}`,
+                        id: nextAiId(s.name),
                         from: 'ai',
                         type: 'service-listing',
                         ...s,
@@ -294,7 +302,7 @@ export const useAIStore = create((set, get) => ({
                     const remaining = listings.slice(3)
                     firstBatch.forEach((s) =>
                         newMessages.push({
-                            id: `ai-${Date.now()}-${s.name}`,
+                            id: nextAiId(s.name),
                             from: 'ai',
                             type: 'service-listing',
                             ...s,
@@ -321,7 +329,7 @@ export const useAIStore = create((set, get) => ({
             const frontendClassify = classifyIntent(userText)
             if (frontendClassify.distressed) {
                 newMessages.unshift({
-                    id: `ai-${Date.now()}-crisis`,
+                    id: nextAiId('crisis'),
                     from: 'ai',
                     type: 'crisis-block',
                     createdAt: new Date().toISOString(),
@@ -330,7 +338,7 @@ export const useAIStore = create((set, get) => ({
 
             if (liveAgentSuggested) {
                 newMessages.push({
-                    id: `ai-${Date.now()}-esc`,
+                    id: nextAiId('esc'),
                     from: 'ai',
                     type: 'escalate-cta',
                     label: 'Talk to a human',
@@ -345,7 +353,7 @@ export const useAIStore = create((set, get) => ({
                 const project = findSubProject(mapped.subProject)
                 if (project) {
                     newMessages.push({
-                        id: `ai-${Date.now()}-handoff`,
+                        id: nextAiId('handoff'),
                         from: 'ai',
                         type: 'handoff-cta',
                         projectName: project.name,
@@ -365,7 +373,7 @@ export const useAIStore = create((set, get) => ({
                     const project = findSubProject(secondary.subProject)
                     if (project) {
                         newMessages.push({
-                            id: `ai-${Date.now()}-handoff-fallback`,
+                            id: nextAiId('handoff-fallback'),
                             from: 'ai',
                             type: 'handoff-cta',
                             projectName: project.name,
@@ -481,7 +489,7 @@ export const useAIStore = create((set, get) => ({
         }
 
         const aiMessages = reply.map((r, i) => ({
-            id: `ai-${Date.now()}-${i}`,
+            id: nextAiId(String(i)),
             from: 'ai',
             createdAt: new Date().toISOString(),
             ...r,
@@ -510,7 +518,7 @@ export const useAIStore = create((set, get) => ({
             if (!resources.length) return
 
             const cards = resources.map((r, i) => ({
-                id: `ai-${Date.now()}-mood-${i}`,
+                id: nextAiId(`mood-${i}`),
                 from: 'ai',
                 type: 'resource-card',
                 title: r.title || r.name,

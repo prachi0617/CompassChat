@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { api } from '../lib/api'
+import { getStoredToken } from '../lib/auth'
 import {
     subscribeToChannel,
     unsubscribeFromChannel,
@@ -16,19 +17,34 @@ export const AI_SUBPROJECT_CHANNELS = [
 
 const AI_CHANNEL_IDS = new Set(AI_SUBPROJECT_CHANNELS.map((c) => c.id))
 
-const MOCK_CHANNELS = [
-    { id: 'mock-general', name: 'general', type: 'CHANNEL', memberCount: 12 },
-    { id: 'mock-case-workers', name: 'case-workers', type: 'CHANNEL', memberCount: 5 },
-    { id: 'mock-housing-team', name: 'housing-team', type: 'CHANNEL', memberCount: 7 },
-    { id: 'mock-homematch-help', name: 'homematch-help', type: 'CHANNEL', memberCount: 3 },
-    { id: 'mock-futurepath-help', name: 'futurepath-help', type: 'CHANNEL', memberCount: 2 },
-    { id: 'mock-kindconnect-help', name: 'kindconnect-help', type: 'CHANNEL', memberCount: 4 },
-    { id: 'mock-firststep-help', name: 'firststep-help', type: 'CHANNEL', memberCount: 2 },
+// Fixed display-only topic labels shown under "Channels". These do not
+// map to backend channels — clicking them opens an empty thread.
+const TOPIC_CHANNELS = [
+    { id: 'topic-notices', name: 'Notices', type: 'CHANNEL', memberCount: 12 },
+    { id: 'topic-housing-search', name: 'Housing Search', type: 'CHANNEL', memberCount: 8 },
+    { id: 'topic-moods-gifs', name: 'Moods/Gifs', type: 'CHANNEL', memberCount: 15 },
+    { id: 'topic-community', name: 'Community', type: 'CHANNEL', memberCount: 20 },
 ]
 
-const MOCK_DMS = [
-    { id: 'mock-dm-admin', name: 'Admin Team', type: 'DM' },
-    { id: 'mock-dm-caseworker', name: 'Case Worker — Jordan', type: 'DM' },
+// The seeded backend DIRECT channel that the demo script posts into.
+const ADMIN_DM_BACKEND_NAME = 'dm-resident-zip'
+
+// Case Worker DM is always a pure mock thread.
+const MOCK_DM_CASEWORKER = { id: 'mock-dm-caseworker', name: 'Case Worker — Jordan', type: 'DM' }
+// Fallback Admin Team DM id when no live backend channel is available.
+const MOCK_DM_ADMIN = { id: 'mock-dm-admin', name: 'Admin Team', type: 'DM' }
+
+// Scripted Demo Resident ↔ Zip Carter conversation for the Admin Team DM.
+// Fired one line per Enter press (on an empty message box) during the demo.
+// Demo Resident lines use 'Guest User' so MessageThread right-aligns them
+// (its currentUserName defaults to 'Guest User'); Zip lines align left.
+const ADMIN_TEAM_SCRIPT = [
+    { displayName: 'Guest User', body: 'Hi - I need a place to stay.' },
+    { displayName: 'Zip Carter', body: 'Hi! I just saw your message - If you are between 18 and 25 you may qualify for services through FuturePath.' },
+    { displayName: 'Guest User', body: 'Actually, I have a housing voucher.' },
+    { displayName: 'Zip Carter', body: 'Good news, HomeMatch offers housing search for people using a housing voucher. If you would like to learn more about either one of these or other resources, let me know and I can connect you.' },
+    { displayName: 'Guest User', body: "Ok, I saw that on your website. Let me read about it and I'll get back to you." },
+    { displayName: 'Zip Carter', body: 'Sounds great - take your time and reach out whenever you\'re ready.' },
 ]
 
 function buildMockMessages() {
@@ -36,11 +52,9 @@ function buildMockMessages() {
     const lines = [
         ['Jordan Reyes', 'Morning! Reminder that the housing voucher clinic is at 10am today.'],
         ['Guest User', 'Thanks for the heads up — I will be there.'],
-        ['Sam Okafor', 'Does anyone have the updated intake form?'],
-        ['Jordan Reyes', "Yep, I'll drop it in here in a sec."],
+        ['Jordan Reyes', "Yep, I'll drop the intake form in here in a sec."],
         ['Jordan Reyes', 'intake-form-v3.pdf'],
         ['Guest User', 'Got it, thank you!'],
-        ['Sam Okafor', "I'll review with the client this afternoon."],
         ['Priya Nair', 'Quick one — is the wellness check-in still on for Friday?'],
         ['Jordan Reyes', 'Yes, confirmed for Friday at 2pm.'],
         ['Guest User', 'Perfect, see everyone there 👋'],
@@ -54,24 +68,67 @@ function buildMockMessages() {
     }))
 }
 
+// username → display name overrides for demo personas
+const DISPLAY_NAMES = {
+    'demo-resident': 'Demo Resident',
+    'zip': 'Zip Carter',
+    'holson-prymer': 'Holson Prymer',
+    'erik-stevens': 'Erik Stevens',
+    'compass-bot': 'CompassBot',
+}
+
+function normalizeMessage(msg, userMap) {
+    const senderId = msg.senderId
+    const username = userMap[senderId] || senderId
+    const displayName = DISPLAY_NAMES[username] || username
+    return {
+        id: msg.id || msg.messageId,
+        body: msg.body || msg.content,
+        sender: { displayName },
+        createdAt: msg.createdAt || msg.sentAt,
+    }
+}
+
 export const useChatStore = create((set, get) => ({
     channels: [],
     dms: [],
+    userMap: {}, // userId → username
     messagesByConversation: {},
     activeConversationId: null,
     mode: 'mock', // 'mock' | 'live'
     loading: false,
+    adminScriptCursor: 0, // index of the next Admin Team scripted line to fire
 
     loadConversations: async () => {
         set({ loading: true })
-        if (isSocketConnected()) {
+        // Channels/users come from plain REST and only need a valid token —
+        // they do NOT depend on the WebSocket handshake (the socket is only
+        // used later for live message push).
+        if (getStoredToken()) {
             try {
-                const channels = await api.myChannels()
+                const [channelsRes, usersRes] = await Promise.all([
+                    api.myChannels(),
+                    api.listUsers(),
+                ])
+                const allChannels = channelsRes?.data ?? []
+                const userList = usersRes?.data ?? []
+                const userMap = Object.fromEntries(userList.map((u) => [u.id, u.username]))
+
+                // Admin Team DM points at the live backend DIRECT channel so
+                // the demo script's messages appear in real time.
+                const backendAdminDm = allChannels.find((c) => c.name === ADMIN_DM_BACKEND_NAME)
+                const adminDm = backendAdminDm
+                    ? { id: backendAdminDm.id, name: 'Admin Team', type: 'DM' }
+                    : MOCK_DM_ADMIN
+
                 set({
-                    channels: channels.filter((c) => c.type !== 'DIRECT'),
-                    dms: channels.filter((c) => c.type === 'DIRECT'),
+                    channels: TOPIC_CHANNELS,
+                    dms: [adminDm, MOCK_DM_CASEWORKER],
+                    userMap,
                     mode: 'live',
                     loading: false,
+                    // Case Worker is always a mock thread.
+                    messagesByConversation: { [MOCK_DM_CASEWORKER.id]: buildMockMessages() },
                 })
                 return
             } catch (err) {
@@ -79,13 +136,13 @@ export const useChatStore = create((set, get) => ({
             }
         }
 
-        // Mock fallback (M2 demo state, or backend unreachable)
+        // Mock fallback (offline, or backend unreachable)
         set({
-            channels: MOCK_CHANNELS,
-            dms: MOCK_DMS,
+            channels: TOPIC_CHANNELS,
+            dms: [MOCK_DM_ADMIN, MOCK_DM_CASEWORKER],
             mode: 'mock',
             loading: false,
-            messagesByConversation: { [MOCK_CHANNELS[0].id]: buildMockMessages() },
+            messagesByConversation: { [MOCK_DM_CASEWORKER.id]: buildMockMessages() },
         })
     },
 
@@ -101,18 +158,25 @@ export const useChatStore = create((set, get) => ({
         if (conversationId === null) return // AI Assistant — no fetch needed
         if (AI_CHANNEL_IDS.has(conversationId)) return // AI sub-project channel — handled by useAIStore
 
-        if (get().mode === 'live') {
+        // Display-only topic labels and mock threads never hit the backend.
+        const isLocalConversation =
+            conversationId.startsWith('topic-') || conversationId.startsWith('mock-')
+
+        if (get().mode === 'live' && !isLocalConversation) {
             try {
                 const page = await api.channelMessages(conversationId, 0, 50)
-                const messages = [...(page.content || page)].reverse()
+                const raw = page?.data?.content || page?.content || page?.data || page || []
+                const userMap = get().userMap
+                const messages = [...raw].reverse().map((m) => normalizeMessage(m, userMap))
                 set((state) => ({
                     messagesByConversation: { ...state.messagesByConversation, [conversationId]: messages },
                 }))
                 subscribeToChannel(conversationId, (incoming) => {
+                    const norm = normalizeMessage(incoming, get().userMap)
                     set((state) => ({
                         messagesByConversation: {
                             ...state.messagesByConversation,
-                            [conversationId]: [...(state.messagesByConversation[conversationId] || []), incoming],
+                            [conversationId]: [...(state.messagesByConversation[conversationId] || []), norm],
                         },
                     }))
                 })
@@ -127,7 +191,7 @@ export const useChatStore = create((set, get) => ({
             set((state) => ({
                 messagesByConversation: {
                     ...state.messagesByConversation,
-                    [conversationId]: conversationId === MOCK_CHANNELS[0].id ? buildMockMessages() : [],
+                    [conversationId]: conversationId === 'mock-dm-caseworker' ? buildMockMessages() : [],
                 },
             }))
         }
@@ -194,11 +258,47 @@ export const useChatStore = create((set, get) => ({
     },
 
     switchToAdminDm: (contextMessage) => {
-        const adminDm = get().dms.find((d) => /admin/i.test(d.name)) || MOCK_DMS[0]
+        const adminDm = get().dms[0] || MOCK_DM_ADMIN
         set({ activeConversationId: adminDm.id })
         if (contextMessage) {
             get().sendMessage(adminDm.id, contextMessage)
         }
         return adminDm
+    },
+
+    // The Admin Team DM id (first DM, set in loadConversations; falls back to mock).
+    getAdminDmId: () => get().dms.find((d) => d.name === 'Admin Team')?.id ?? MOCK_DM_ADMIN.id,
+
+    // Fire the next line of the scripted Admin Team conversation. Each call
+    // appends one message (alternating Demo Resident / Zip) until exhausted.
+    fireNextAdminScriptLine: () => {
+        const cursor = get().adminScriptCursor
+        if (cursor >= ADMIN_TEAM_SCRIPT.length) return // script exhausted
+
+        const adminDmId = get().getAdminDmId()
+        const line = ADMIN_TEAM_SCRIPT[cursor]
+        const message = {
+            id: `admin-script-${cursor}`,
+            body: line.body,
+            sender: { displayName: line.displayName },
+            createdAt: new Date().toISOString(),
+            isMock: true,
+        }
+        set((state) => ({
+            adminScriptCursor: cursor + 1,
+            messagesByConversation: {
+                ...state.messagesByConversation,
+                [adminDmId]: [...(state.messagesByConversation[adminDmId] || []), message],
+            },
+        }))
+    },
+
+    // Clear the Admin Team thread and reset the script so it can be re-run.
+    resetAdminScript: () => {
+        const adminDmId = get().getAdminDmId()
+        set((state) => ({
+            adminScriptCursor: 0,
+            messagesByConversation: { ...state.messagesByConversation, [adminDmId]: [] },
+        }))
     },
 }))

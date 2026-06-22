@@ -5,8 +5,8 @@ const TOKEN_KEY = 'cc_demo_token'
 // Seeded demo user credentials. The backend is expected to have this
 // account pre-seeded (see PLAN.md M3 backend ask).
 const DEMO_CREDENTIALS = {
-    username: 'demo.user',
-    password: 'CommunityCompass!2026',
+    username: 'demo-resident',
+    password: 'demo123',
 }
 
 /**

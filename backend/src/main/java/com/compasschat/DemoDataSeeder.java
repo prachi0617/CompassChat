@@ -63,7 +63,7 @@ public class DemoDataSeeder {
                     Role.MEMBER, PresenceStatus.ONLINE);
 
             User zip = save(users, encoder,
-                    "zip-carter", "zip@compasschat.local", "demo123",
+                    "zip", "zip@compasschat.local", "demo123",
                     Role.MODERATOR, PresenceStatus.ONLINE);
 
             User holson = save(users, encoder,
@@ -80,7 +80,11 @@ public class DemoDataSeeder {
 
             // ---------- CHANNELS ----------
             Channel general = createChannel(channels, holson.getId(),
-                    "compass-chat", "Main community channel for everyone",
+                    "general", "General discussion for everyone",
+                    ChannelType.PUBLIC);
+
+            Channel futurepathNews = createChannel(channels, holson.getId(),
+                    "futurepath-news", "FuturePath program updates and resources",
                     ChannelType.PUBLIC);
 
             Channel homematch = createChannel(channels, holson.getId(),
@@ -95,30 +99,47 @@ public class DemoDataSeeder {
                     "kindconnect-wellbeing", "Wellness check-ins and support",
                     ChannelType.PUBLIC);
 
+            Channel dmResidentZip = createChannel(channels, resident.getId(),
+                    "dm-resident-zip", "Direct message between Demo Resident and Zip Carter",
+                    ChannelType.DIRECT);
+
             // ---------- MEMBERSHIPS ----------
-            for (Channel ch : new Channel[]{general, homematch, firststep, kindconnect}) {
+            for (Channel ch : new Channel[]{general, futurepathNews, homematch, firststep, kindconnect}) {
                 for (User u : new User[]{resident, zip, holson, erik, bot}) {
                     memberships.save(new ChannelMember(ch.getId(), u.getId()));
                 }
             }
+            // DM: only the two participants
+            memberships.save(new ChannelMember(dmResidentZip.getId(), resident.getId()));
+            memberships.save(new ChannelMember(dmResidentZip.getId(), zip.getId()));
 
             // ---------- MESSAGES ----------
-            // #compass-chat — welcome flow and casual community chat
-            seedMessage(messages, auditLogs, general.getId(), bot.getId(),
-                    "Welcome to CompassChat! This is the main community space. "
-                    + "Reach out to staff anytime — we're here to help.");
-
+            // #general
             seedMessage(messages, auditLogs, general.getId(), holson.getId(),
+                    "Welcome everyone! This is the general channel — feel free to introduce yourself.");
+            seedMessage(messages, auditLogs, general.getId(), erik.getId(),
+                    "Hey all, happy to be here!");
+
+            // #futurepath-news — program updates and casual community chat
+            seedMessage(messages, auditLogs, futurepathNews.getId(), bot.getId(),
+                    "Welcome to FuturePath News! Program updates and resources for "
+                    + "young adults are posted here. Reach out to staff anytime.");
+
+            seedMessage(messages, auditLogs, futurepathNews.getId(), holson.getId(),
                     "Reminder: the resource fair this Saturday at 10am, "
                     + "St. Paul Community Center. Free transportation available — "
                     + "DM me if you need a ride.");
 
-            seedMessage(messages, auditLogs, general.getId(), erik.getId(),
+            seedMessage(messages, auditLogs, futurepathNews.getId(), erik.getId(),
                     "Thanks Holson! I'll be there. Anyone else going?");
 
-            seedMessage(messages, auditLogs, general.getId(), zip.getId(),
+            seedMessage(messages, auditLogs, futurepathNews.getId(), zip.getId(),
                     "I'll be at the fair too. Look for the HomeMatch table — "
                     + "we'll have housing intake forms ready.");
+
+            // DM: resident ↔ zip
+            seedMessage(messages, auditLogs, dmResidentZip.getId(), zip.getId(),
+                    "Hi! I saw you have questions about housing. I'm Zip, your case worker — feel free to message me here anytime.");
 
             // #homematch-help — the housing referral story
             seedMessage(messages, auditLogs, homematch.getId(), bot.getId(),
@@ -154,7 +175,7 @@ public class DemoDataSeeder {
 
             System.out.println(">>> Demo data seeded:");
             System.out.println("    5 users (1 resident, 1 moderator, 1 admin, 1 peer, 1 bot)");
-            System.out.println("    4 channels (compass-chat, homematch-help, firststep-news, kindconnect-wellbeing)");
+            System.out.println("    6 channels (general, futurepath-news, homematch-help, firststep-news, kindconnect-wellbeing, dm-resident-zip)");
             System.out.println("    12 messages across the channels");
             System.out.println("    Auto-signed-in user: demo-resident / demo123");
         };
@@ -173,9 +194,13 @@ public class DemoDataSeeder {
 
     private Channel createChannel(ChannelRepository repo, UUID creator,
                                   String name, String description, ChannelType type) {
-        Channel ch = new Channel(name, description, type);
-        ch.setCreatedBy(creator);
-        return repo.save(ch);
+        // Another seeder (DataSeeder) may have already created a channel with
+        // this name. Reuse it rather than violating the unique-name constraint.
+        return repo.findByName(name).orElseGet(() -> {
+            Channel ch = new Channel(name, description, type);
+            ch.setCreatedBy(creator);
+            return repo.save(ch);
+        });
     }
 
     private void seedMessage(MessageRepository messages,

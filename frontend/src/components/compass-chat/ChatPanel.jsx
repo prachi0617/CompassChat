@@ -7,6 +7,7 @@ import Composer from './Composer'
 import AIConversation from './ai-assistant/AIConversation'
 import { useChatStore } from '../../stores/useChatStore'
 import { useAIStore } from '../../stores/useAIStore'
+import { useAuthStore } from '../../stores/useAuthStore'
 
 export default function ChatPanel({ isOpen, onClose }) {
     const {
@@ -20,11 +21,15 @@ export default function ChatPanel({ isOpen, onClose }) {
         sendMessage,
         clearConversation,
         isAiChannel,
+        getAdminDmId,
+        fireNextAdminScriptLine,
+        resetAdminScript,
     } = useChatStore()
 
     const setActiveAiChannel = useAIStore((s) => s.setActiveAiChannel)
-    const unreadByChannel = useAIStore((s) => s.unreadByChannel)
-    const aiUnreadCount = Object.values(unreadByChannel).reduce((sum, n) => sum + n, 0)
+
+    const socketReady = useAuthStore((s) => s.socketReady)
+    const authStatus = useAuthStore((s) => s.status)
 
     const isAiActive = activeConversationId === null || isAiChannel(activeConversationId)
 
@@ -66,14 +71,20 @@ export default function ChatPanel({ isOpen, onClose }) {
         selectConversation(id)
     }
 
+    // Immediately select AI assistant when panel opens
     useEffect(() => {
-        if (isOpen) {
-            handleSelectConversation(null)
-            if (channels.length === 0 && dms.length === 0) {
-                loadConversations()
-            }
-        }
+        if (isOpen) handleSelectConversation(null)
     }, [isOpen]) // eslint-disable-line react-hooks/exhaustive-deps
+
+    // Load conversations once auth resolves. Channels/users come over REST
+    // (token only) — no need to wait for the WebSocket handshake, which can
+    // be slow or fail in dev and would otherwise leave the sidebar empty.
+    useEffect(() => {
+        const authResolved = authStatus === 'ready' || authStatus === 'offline'
+        if (isOpen && authResolved && channels.length === 0 && dms.length === 0) {
+            loadConversations()
+        }
+    }, [isOpen, authStatus, socketReady]) // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if (!isOpen) return
@@ -143,7 +154,6 @@ export default function ChatPanel({ isOpen, onClose }) {
                         onSelectConversation={handleSelectConversation}
                         isAiActive={isAiActive}
                         onSelectAi={() => handleSelectConversation(null)}
-                        aiUnreadCount={aiUnreadCount}
                     />
 
                     <div className="flex min-w-0 flex-1 flex-col">
@@ -158,7 +168,16 @@ export default function ChatPanel({ isOpen, onClose }) {
                                 <Composer
                                     onSend={(body) => sendMessage(activeConversationId, body)}
                                     placeholder={`Message ${activeName}`}
-                                    onClear={() => clearConversation(activeConversationId)}
+                                    onClear={
+                                        activeConversationId === getAdminDmId()
+                                            ? resetAdminScript
+                                            : () => clearConversation(activeConversationId)
+                                    }
+                                    onEmptyEnter={
+                                        activeConversationId === getAdminDmId()
+                                            ? fireNextAdminScriptLine
+                                            : undefined
+                                    }
                                 />
                             </>
                         )}
