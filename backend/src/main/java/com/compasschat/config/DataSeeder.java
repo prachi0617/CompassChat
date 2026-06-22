@@ -18,11 +18,11 @@ public class DataSeeder implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        seed("general",             "General discussion for all members",       ChannelType.PUBLIC, null);
-        seed("case-workers",        "Case worker coordination",                 ChannelType.PUBLIC, null);
-        seed("admin-ops",           "Administrative operations",                ChannelType.PUBLIC, null);
-        seed("volunteers",          "Volunteer coordination",                   ChannelType.PUBLIC, null);
-        seed("tech-support",        "Technical support requests",               ChannelType.PUBLIC, null);
+        seed("general",             "General discussion for all members",       ChannelType.SYSTEM, null);
+        seed("case-workers",        "Case worker coordination",                 ChannelType.SYSTEM, null);
+        seed("admin-ops",           "Administrative operations",                ChannelType.SYSTEM, null);
+        seed("volunteers",          "Volunteer coordination",                   ChannelType.SYSTEM, null);
+        seed("tech-support",        "Technical support requests",               ChannelType.SYSTEM, null);
         seed("civic-team",          "Civic engagement team",                    ChannelType.SYSTEM, "CIVIC");
         seed("housing-team",        "Housing assistance coordination",          ChannelType.SYSTEM, "HOUSING");
         seed("wellbeing-team",      "Well-being and mental health support",     ChannelType.SYSTEM, "WELLBEING");

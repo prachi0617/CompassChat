@@ -2,7 +2,15 @@ import { create } from 'zustand'
 import { classifyIntent } from '../components/compass-chat/ai-assistant/intentRouter'
 import { api } from '../lib/api'
 import subProjectData from '../lib/resources.json'
-import { AI_SUBPROJECT_CHANNELS } from './useChatStore'
+import { AI_SUBPROJECT_CHANNELS, useChatStore } from './useChatStore'
+
+// Monotonic counter guarantees unique message ids even when several
+// messages are created within the same millisecond.
+let aiMessageSeq = 0
+function nextAiId(suffix = '') {
+    aiMessageSeq += 1
+    return `ai-${Date.now()}-${aiMessageSeq}${suffix ? `-${suffix}` : ''}`
+}
 
 function welcomeMessage() {
     return {
@@ -49,7 +57,7 @@ const BACKEND_TO_SUBPROJECT = {
 
 function mapBackendIntent(intent) {
     if (!intent) return null
-    if (intent === 'ESCALATE') return { intent: 'URGENT' }
+    if (intent === 'ESCALATE' || intent === 'CASEWORKER') return { intent: 'URGENT' }
     if (intent === 'MOOD') return { intent: 'MOOD' }
     if (BACKEND_TO_SUBPROJECT[intent]) return { intent: 'RESOURCE', subProject: BACKEND_TO_SUBPROJECT[intent] }
     return { intent: 'GENERAL' }
@@ -57,7 +65,7 @@ function mapBackendIntent(intent) {
 
 function makeAiTextMessage(text) {
     return {
-        id: `ai-${Date.now()}`,
+        id: nextAiId(),
         from: 'ai',
         type: 'text',
         text,
@@ -71,6 +79,36 @@ function persistUnread(channelKey, count) {
 
 function loadUnread(channelKey) {
     return Number(localStorage.getItem(`cc_ai_unread_${channelKey}`) ?? (channelKey === 'main' ? 1 : 0))
+}
+
+function parseServiceListings(text) {
+    // Normalize: split on any newline (single or double) before a bullet
+    const normalized = text.replace(/\n(?=•)/g, '\n\n')
+    const blocks = normalized.split(/\n\n(?=•)/)
+    return blocks
+        .map((block) => {
+            const lines = block.split('\n')
+            // Find the bullet line — skip any non-bullet header lines in the block
+            const bulletIdx = lines.findIndex((l) => l.trim().startsWith('•'))
+            if (bulletIdx === -1) return null
+            const name = lines[bulletIdx].replace(/^•\s*/, '').trim()
+            if (!name) return null
+            const remaining = lines.slice(bulletIdx + 1)
+            const phoneLineIdx = remaining.findIndex((l) => l.trim().startsWith('Phone:'))
+            const descLines = remaining
+                .slice(0, phoneLineIdx === -1 ? undefined : phoneLineIdx)
+                .map((l) => l.trim())
+                .filter(Boolean)
+            const description = descLines.join(' ')
+            let phone = '', website = ''
+            if (phoneLineIdx !== -1) {
+                const parts = remaining[phoneLineIdx].replace(/^\s*Phone:\s*/, '').split(' | ')
+                phone = parts[0]?.trim() ?? ''
+                website = parts[1]?.trim() ?? ''
+            }
+            return { name, description, phone, website }
+        })
+        .filter((s) => s !== null && s.name)
 }
 
 function buildHistory(messages) {
@@ -99,6 +137,9 @@ export const useAIStore = create((set, get) => ({
     unreadByChannel: {
         null: loadUnread('main'),
     },
+    pendingListingsByChannel: {},
+    awaitingMoreResultsReply: false,
+    awaitingNavigatorReply: false,
     isThinking: false,
     activeAiChannelId: null,
 
@@ -150,12 +191,87 @@ export const useAIStore = create((set, get) => ({
             createdAt: new Date().toISOString(),
         }
 
+        const lower = userText.toLowerCase()
+        const pending = get().pendingListingsByChannel[activeId] ?? []
+
+        // Intercept Yes/No when user was asked about speaking to a navigator
+        if (get().awaitingNavigatorReply && (lower === 'yes' || lower === 'no')) {
+            const replyMessages = []
+            if (lower === 'yes') {
+                replyMessages.push(makeAiTextMessage("I'm connecting you with a navigator now. They'll be able to help you directly."))
+                set((state) => ({
+                    messagesByChannel: {
+                        ...state.messagesByChannel,
+                        [activeId]: [...(state.messagesByChannel[activeId] ?? []), userMsg, ...replyMessages],
+                    },
+                    awaitingNavigatorReply: false,
+                }))
+                useChatStore.getState().switchToAdminDm('User requested to speak with a navigator after reviewing resources.')
+            } else {
+                replyMessages.push(makeAiTextMessage("Okay! Let me know if there's anything else I can help with."))
+                set((state) => ({
+                    messagesByChannel: {
+                        ...state.messagesByChannel,
+                        [activeId]: [...(state.messagesByChannel[activeId] ?? []), userMsg, ...replyMessages],
+                    },
+                    awaitingNavigatorReply: false,
+                }))
+            }
+            return
+        }
+
+        // Intercept Yes/No when the user is paging through pending service listings
+        if (get().awaitingMoreResultsReply && (lower === 'yes' || lower === 'no')) {
+            const replyMessages = []
+            if (lower === 'yes') {
+                const batch = pending.slice(0, 3)
+                const remaining = pending.slice(3)
+                batch.forEach((s) =>
+                    replyMessages.push({
+                        id: nextAiId(s.name),
+                        from: 'ai',
+                        type: 'service-listing',
+                        ...s,
+                        createdAt: new Date().toISOString(),
+                    })
+                )
+                const hasMore = remaining.length > 0
+                if (hasMore) {
+                    replyMessages.push(makeAiTextMessage('Would you like to see more results? (Yes / No)'))
+                } else {
+                    replyMessages.push(makeAiTextMessage('Those are all the results I found. Would you like to speak to a navigator? (Yes / No)'))
+                }
+                set((state) => ({
+                    messagesByChannel: {
+                        ...state.messagesByChannel,
+                        [activeId]: [...(state.messagesByChannel[activeId] ?? []), userMsg, ...replyMessages],
+                    },
+                    pendingListingsByChannel: { ...state.pendingListingsByChannel, [activeId]: remaining },
+                    awaitingMoreResultsReply: hasMore,
+                    awaitingNavigatorReply: !hasMore,
+                }))
+            } else {
+                replyMessages.push(makeAiTextMessage('Okay! Feel free to ask if you need anything else.'))
+                set((state) => ({
+                    messagesByChannel: {
+                        ...state.messagesByChannel,
+                        [activeId]: [...(state.messagesByChannel[activeId] ?? []), userMsg, ...replyMessages],
+                    },
+                    pendingListingsByChannel: { ...state.pendingListingsByChannel, [activeId]: [] },
+                    awaitingMoreResultsReply: false,
+                }))
+            }
+            return
+        }
+
         set((state) => ({
             messagesByChannel: {
                 ...state.messagesByChannel,
                 [activeId]: [...(state.messagesByChannel[activeId] ?? []), userMsg],
             },
             isThinking: true,
+            awaitingMoreResultsReply: false,
+            awaitingNavigatorReply: false,
         }))
 
         try {
@@ -164,20 +280,56 @@ export const useAIStore = create((set, get) => ({
             // Prepend sub-project context so the backend knows which channel the user is in
             const activeChannel = AI_SUBPROJECT_CHANNELS.find((c) => c.id === activeId)
             const contextualHistory = activeChannel
-                ? [`Context: User is in the ${activeChannel.slug} help channel (${activeChannel.name}).`, ...history]
+                ? [
+                    `Context: The user is asking in the #${activeChannel.name} channel. This channel is specifically for ${activeChannel.slug} resources. Answer questions about ${activeChannel.slug} directly — do not redirect to other sub-projects.`,
+                    ...history,
+                  ]
                 : history
 
             const backendResponse = await api.aiChat(userText, contextualHistory)
 
             const { text: aiText, intent: backendIntent, liveAgentSuggested } = extractAiPayload(backendResponse)
 
-            const newMessages = [makeAiTextMessage(aiText)]
+            const newMessages = []
+            let renderedListings = false
+            if (aiText.includes('•')) {
+                const listings = parseServiceListings(aiText)
+                if (listings.length > 0) {
+                    const introLine = aiText.split('\n')[0].replace(/^•.*/, '').trim()
+                    const intro = introLine || 'Here are some resources that may help:'
+                    newMessages.push(makeAiTextMessage(intro))
+                    const firstBatch = listings.slice(0, 3)
+                    const remaining = listings.slice(3)
+                    firstBatch.forEach((s) =>
+                        newMessages.push({
+                            id: nextAiId(s.name),
+                            from: 'ai',
+                            type: 'service-listing',
+                            ...s,
+                            createdAt: new Date().toISOString(),
+                        })
+                    )
+                    newMessages.push(makeAiTextMessage('Would you like to see more results? (Yes / No)'))
+                    set((state) => ({
+                        pendingListingsByChannel: {
+                            ...state.pendingListingsByChannel,
+                            [activeId]: remaining,
+                        },
+                        awaitingMoreResultsReply: true,
+                        awaitingNavigatorReply: false,
+                    }))
+                    renderedListings = true
+                }
+            }
+            if (!renderedListings) {
+                newMessages.push(makeAiTextMessage(aiText))
+            }
 
             // Item F: prepend crisis block when frontend detects distressed mood
             const frontendClassify = classifyIntent(userText)
             if (frontendClassify.distressed) {
                 newMessages.unshift({
-                    id: `ai-${Date.now()}-crisis`,
+                    id: nextAiId('crisis'),
                     from: 'ai',
                     type: 'crisis-block',
                     createdAt: new Date().toISOString(),
@@ -186,7 +338,7 @@ export const useAIStore = create((set, get) => ({
 
             if (liveAgentSuggested) {
                 newMessages.push({
-                    id: `ai-${Date.now()}-esc`,
+                    id: nextAiId('esc'),
                     from: 'ai',
                     type: 'escalate-cta',
                     label: 'Talk to a human',
@@ -195,13 +347,13 @@ export const useAIStore = create((set, get) => ({
                 })
             }
 
-            // Item C3: handoff-cta instead of plain resource-card
+            // Item C3: handoff-cta — skip if we already showed real service listing cards
             const mapped = mapBackendIntent(backendIntent)
-            if (mapped?.intent === 'RESOURCE') {
+            if (!renderedListings && mapped?.intent === 'RESOURCE') {
                 const project = findSubProject(mapped.subProject)
                 if (project) {
                     newMessages.push({
-                        id: `ai-${Date.now()}-handoff`,
+                        id: nextAiId('handoff'),
                         from: 'ai',
                         type: 'handoff-cta',
                         projectName: project.name,
@@ -212,13 +364,8 @@ export const useAIStore = create((set, get) => ({
                 }
             }
 
-            if (mapped?.intent === 'MOOD') {
-                const frontendMood = classifyIntent(userText)
-                get()._appendMoodResources(frontendMood.moodType || 'NEUTRAL', userText)
-            }
-
             // Secondary fallback: if backend gave no recognized resource intent, use frontend classifier
-            if (!mapped || mapped.intent === 'GENERAL') {
+            if (!renderedListings && (!mapped || mapped.intent === 'GENERAL')) {
                 const secondary = activeChannel
                     ? { intent: 'RESOURCE', subProject: activeChannel.slug }
                     : classifyIntent(userText)
@@ -226,7 +373,7 @@ export const useAIStore = create((set, get) => ({
                     const project = findSubProject(secondary.subProject)
                     if (project) {
                         newMessages.push({
-                            id: `ai-${Date.now()}-handoff-fallback`,
+                            id: nextAiId('handoff-fallback'),
                             from: 'ai',
                             type: 'handoff-cta',
                             projectName: project.name,
@@ -270,7 +417,10 @@ export const useAIStore = create((set, get) => ({
                 return
             }
 
-            const result = classifyIntent(userText)
+            const activeChannel = AI_SUBPROJECT_CHANNELS.find((c) => c.id === activeId)
+            const result = activeChannel
+                ? { intent: 'RESOURCE', subProject: activeChannel.slug }
+                : classifyIntent(userText)
             await get()._respond(result, userText)
         }
     },
@@ -336,15 +486,10 @@ export const useAIStore = create((set, get) => ({
                 type: 'text',
                 text: "I want to make sure you get the right help. Could you tell me a little more — or I can connect you with someone on our team.",
             })
-            reply.push({
-                type: 'smart-suggestion',
-                title: 'Not sure where to start?',
-                body: "Try telling me how you're feeling, or what kind of support you need: housing, youth services, wellness, or news.",
-            })
         }
 
         const aiMessages = reply.map((r, i) => ({
-            id: `ai-${Date.now()}-${i}`,
+            id: nextAiId(String(i)),
             from: 'ai',
             createdAt: new Date().toISOString(),
             ...r,
@@ -373,7 +518,7 @@ export const useAIStore = create((set, get) => ({
             if (!resources.length) return
 
             const cards = resources.map((r, i) => ({
-                id: `ai-${Date.now()}-mood-${i}`,
+                id: nextAiId(`mood-${i}`),
                 from: 'ai',
                 type: 'resource-card',
                 title: r.title || r.name,

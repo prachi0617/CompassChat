@@ -30,7 +30,7 @@ public class HousingContextClient {
                 String type = service.path("typeOfService").asText("").toUpperCase();
                 if (HOUSING_TYPES.stream().anyMatch(type::contains)) {
                     matches.add(formatService(service));
-                    if (matches.size() == 3) break;
+                    if (matches.size() == 9) break;
                 }
             }
 

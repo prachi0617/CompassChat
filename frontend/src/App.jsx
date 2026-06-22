@@ -13,6 +13,7 @@ import { subscribeToErrors } from './lib/websocket'
 export default function App() {
     const boot = useAuthStore((s) => s.boot)
     const status = useAuthStore((s) => s.status)
+    const socketReady = useAuthStore((s) => s.socketReady)
     const [toastMessage, setToastMessage] = useState(null)
 
     useEffect(() => {
@@ -20,14 +21,14 @@ export default function App() {
     }, [boot])
 
     useEffect(() => {
-        if (status !== 'ready') return
+        if (!socketReady) return
 
         const sub = subscribeToErrors((err) => {
             setToastMessage(err?.message || 'Something went wrong. Please try again.')
         })
 
         return () => sub?.unsubscribe()
-    }, [status])
+    }, [socketReady])
 
     return (
         <>
