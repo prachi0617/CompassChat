@@ -197,16 +197,19 @@ export const useChatStore = create((set, get) => ({
         }
     },
 
-    sendMessage: (conversationId, body) => {
-        if (get().mode === 'live' && isSocketConnected()) {
+    sendMessage: (conversationId, body, attachment = null) => {
+        // Text-only live messages go over the socket. Images are demo-only
+        // (data URLs aren't sent over STOMP), so any attachment appends locally.
+        if (!attachment && get().mode === 'live' && isSocketConnected()) {
             publishMessage(conversationId, body)
             return
         }
 
-        // Mock mode: append locally
+        // Mock / local append
         const message = {
             id: `local-${Date.now()}`,
             body,
+            attachment: attachment || null,
             sender: { displayName: 'Guest User' },
             createdAt: new Date().toISOString(),
             isMock: true,

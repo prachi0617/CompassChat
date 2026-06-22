@@ -35,6 +35,8 @@ export default function ChatPanel({ isOpen, onClose }) {
 
     const [hasOpened, setHasOpened] = useState(isOpen)
     const [panelWidth, setPanelWidth] = useState(420)
+    const [isHovering, setIsHovering] = useState(false)
+    const [dragging, setDragging] = useState(false)
     const isDragging = useRef(false)
 
     const onMouseMove = useCallback((e) => {
@@ -45,6 +47,7 @@ export default function ChatPanel({ isOpen, onClose }) {
 
     const onMouseUp = useCallback(() => {
         isDragging.current = false
+        setDragging(false)
         document.body.style.userSelect = ''
         window.removeEventListener('mousemove', onMouseMove)
         window.removeEventListener('mouseup', onMouseUp)
@@ -53,6 +56,7 @@ export default function ChatPanel({ isOpen, onClose }) {
     const onResizeStart = useCallback((e) => {
         e.preventDefault()
         isDragging.current = true
+        setDragging(true)
         document.body.style.userSelect = 'none'
         window.addEventListener('mousemove', onMouseMove)
         window.addEventListener('mouseup', onMouseUp)
@@ -125,14 +129,39 @@ export default function ChatPanel({ isOpen, onClose }) {
             >
                 <div
                     onMouseDown={onResizeStart}
+                    onMouseEnter={() => setIsHovering(true)}
+                    onMouseLeave={() => setIsHovering(false)}
+                    role="separator"
+                    aria-orientation="vertical"
+                    aria-label="Resize chat panel"
                     style={{
-                        position: 'absolute', left: 0, top: 0, width: 6, height: '100%',
-                        cursor: 'col-resize', zIndex: 1,
+                        position: 'absolute', left: 0, top: 0, width: 12, height: '100%',
+                        cursor: 'col-resize', zIndex: 20, touchAction: 'none',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
                         background: 'transparent',
                     }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(0,0,0,0.08)' }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
-                />
+                >
+                    {/* Always-visible grip bar — brightens on hover/drag, stays lit through the whole drag */}
+                    <div
+                        style={{
+                            width: 4, height: 44, borderRadius: 9999,
+                            background: (dragging || isHovering) ? '#3DBE8A' : 'rgba(15,23,42,0.18)',
+                            transition: dragging ? 'none' : 'background 120ms ease',
+                            display: 'flex', flexDirection: 'column', alignItems: 'center',
+                            justifyContent: 'center', gap: 3,
+                        }}
+                    >
+                        {[0, 1, 2].map((i) => (
+                            <span
+                                key={i}
+                                style={{
+                                    width: 2, height: 2, borderRadius: 9999,
+                                    background: (dragging || isHovering) ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.55)',
+                                }}
+                            />
+                        ))}
+                    </div>
+                </div>
                 <div className="h-14 shrink-0 border-b border-ink/8 px-4 flex items-center justify-between">
                     <p className="font-display font-semibold text-ink truncate">{activeName}</p>
                     <button
@@ -166,8 +195,27 @@ export default function ChatPanel({ isOpen, onClose }) {
                                     loading={loading && !messages}
                                 />
                                 <Composer
-                                    onSend={(body) => sendMessage(activeConversationId, body)}
-                                    placeholder={`Message ${activeName}`}
+                                    allowImage
+                                    onSend={(payload) => {
+                                        const text = (payload?.text ?? '').trim()
+                                        const attachment = payload?.attachment ?? null
+
+                                        // Moods/Gifs: a typed feeling (no image) routes to the AI mood flow.
+                                        if (activeConversationId === 'topic-moods-gifs' && text && !attachment) {
+                                            setActiveAiChannel(null)
+                                            selectConversation(null)
+                                            useAIStore.getState().addUserMessage(text)
+                                            return
+                                        }
+
+                                        // Everything else (including images in Moods/Gifs) posts to the channel.
+                                        sendMessage(activeConversationId, text, attachment)
+                                    }}
+                                    placeholder={
+                                        activeConversationId === 'topic-moods-gifs'
+                                            ? "Share how you're feeling, or post a GIF…"
+                                            : `Message ${activeName}`
+                                    }
                                     onClear={
                                         activeConversationId === getAdminDmId()
                                             ? resetAdminScript

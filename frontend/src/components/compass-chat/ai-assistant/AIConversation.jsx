@@ -191,7 +191,11 @@ export default function AIConversation() {
                 {isThinking && <ThinkingIndicator />}
                 <div ref={bottomRef} />
             </div>
-            <Composer onSend={addUserMessage} placeholder="Ask the AI Assistant..." onClear={clearMessages} />
+            <Composer
+                onSend={(p) => addUserMessage(typeof p === 'string' ? p : p?.text ?? '')}
+                placeholder="Ask the AI Assistant..."
+                onClear={clearMessages}
+            />
         </div>
     )
 }
