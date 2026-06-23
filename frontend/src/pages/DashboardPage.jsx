@@ -11,7 +11,7 @@ const projects = [
         developer: 'Niciah Rymer-Hillian',
         tagline: 'Personalized housing navigation and an AI Housing Assistant.',
         icon: <Home size={32} />,
-        accent: 'bg-blue-50 text-blue-600 border-blue-100',
+        accent: 'bg-orange-50 text-blue-600 border-orange-100',
     },
     {
         slug: 'futurepath',
