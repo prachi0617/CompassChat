@@ -1,5 +1,8 @@
-import { Home, Compass, HeartHandshake, Newspaper, MessageCircle } from 'lucide-react'
+import { Home, MessageCircle } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import kindConnectLogo from '../assets/KindConnect_logo.jpg'
+import firstStepLogo from '../assets/FirstStep_logo.png'
+import futurePathLogo from '../assets/FuturePath_logo.png'
 
 const projects = [
     {
@@ -15,15 +18,15 @@ const projects = [
         name: 'FuturePath',
         developer: 'Shocka Holmes',
         tagline: 'Guidance for young adults transitioning out of foster care.',
-        icon: <Compass size={32} />,
-        accent: 'bg-pink-50 text-pink-700 border-pink-100',
+        icon: <img src={futurePathLogo} alt="FuturePath logo" className="h-11 w-11 object-contain" />,
+        accent: 'bg-orange-50 text-pink-700 border-orange-100',
     },
     {
         slug: 'kindconnect',
         name: 'Kind Connect',
         developer: 'Prachi Patel',
         tagline: 'Well-being resources, check-ins, and a volunteer network.',
-        icon: <HeartHandshake size={32} />,
+        icon: <img src={kindConnectLogo} alt="Kind Connect logo" className="h-11 w-11 object-contain" />,
         accent: 'bg-yellow-50 text-yellow-700 border-yellow-100',
     },
     {
@@ -31,7 +34,7 @@ const projects = [
         name: 'First Step',
         developer: 'Anitra Johnson',
         tagline: 'Community resources, policy updates, and news for everyone.',
-        icon: <Newspaper size={32} />,
+        icon: <img src={firstStepLogo} alt="First Step logo" className="h-11 w-11 object-contain" />,
         accent: 'bg-orange-50 text-orange-600 border-orange-100',
     },
 ]
