@@ -25,7 +25,7 @@ export default {
                 ink: {
                     DEFAULT: '#111827',
                     70: '#374151',
-                    50: '#9CA3AF',
+                    50: '#6B7280',
                 },
                 blue: {
                     50: '#EFF6FF',
