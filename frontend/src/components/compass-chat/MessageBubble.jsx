@@ -31,12 +31,22 @@ export default function MessageBubble({ message, isOwn }) {
                     <span className="font-medium text-body text-ink">{senderName}</span>
                     <span className="text-meta text-ink-50">{formatTime(message.createdAt)}</span>
                 </div>
-                <p
-                    className={`text-body text-ink mt-0.5 max-w-[85%] whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2 ${isOwn ? 'bg-mint-500 text-white rounded-tr-sm' : 'bg-ink/5 rounded-tl-sm'
-                        }`}
-                >
-                    {message.body}
-                </p>
+                {message.body && (
+                    <p
+                        className={`text-body text-ink mt-0.5 max-w-[85%] whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2 ${isOwn ? 'bg-mint-500 text-white rounded-tr-sm' : 'bg-ink/5 rounded-tl-sm'
+                            }`}
+                    >
+                        {message.body}
+                    </p>
+                )}
+                {message.attachment?.url && (
+                    <img
+                        src={message.attachment.url}
+                        alt={message.attachment.name || 'shared image'}
+                        className="mt-1 max-w-[85%] rounded-2xl border border-ink/10"
+                        style={{ maxHeight: 260, objectFit: 'cover' }}
+                    />
+                )}
                 <div className={`flex flex-wrap items-center gap-1.5 mt-1 ${isOwn ? 'flex-row-reverse' : ''}`}>
                     <Pill
                         tone={reactions.done ? 'mint' : 'neutral'}

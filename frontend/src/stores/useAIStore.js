@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { classifyIntent } from '../components/compass-chat/ai-assistant/intentRouter'
+import { classifyIntent, MOOD_BUCKET_TO_BACKEND } from '../components/compass-chat/ai-assistant/intentRouter'
 import { api } from '../lib/api'
 import subProjectData from '../lib/resources.json'
 import { AI_SUBPROJECT_CHANNELS, useChatStore } from './useChatStore'
@@ -140,6 +140,9 @@ export const useAIStore = create((set, get) => ({
     pendingListingsByChannel: {},
     awaitingMoreResultsReply: false,
     awaitingNavigatorReply: false,
+    // True when the active navigator (Yes/No) prompt came from the mood flow,
+    // so "Yes" shows the Kind Connect card instead of switching to the Admin DM.
+    moodNavigatorContext: false,
     isThinking: false,
     activeAiChannelId: null,
 
@@ -177,10 +180,10 @@ export const useAIStore = create((set, get) => ({
         }))
     },
 
-    addUserMessage: async (text) => {
-        if (!text || !text.trim()) return
+    addUserMessage: async (text, attachment = null) => {
+        const userText = (text || '').trim()
+        if (!userText && !attachment) return
 
-        const userText = text.trim()
         const activeId = get().activeAiChannelId
 
         const userMsg = {
@@ -188,25 +191,66 @@ export const useAIStore = create((set, get) => ({
             from: 'user',
             type: 'text',
             text: userText,
+            attachment: attachment || null,
             createdAt: new Date().toISOString(),
+        }
+
+        // Image with no text → render the image and acknowledge the feeling
+        // (treat as a neutral mood so resources + the live-agent prompt follow).
+        if (!userText && attachment) {
+            set((state) => ({
+                messagesByChannel: {
+                    ...state.messagesByChannel,
+                    [activeId]: [...(state.messagesByChannel[activeId] ?? []), userMsg],
+                },
+                isThinking: true,
+                awaitingMoreResultsReply: false,
+                awaitingNavigatorReply: false,
+            }))
+            await get()._respond({ intent: 'MOOD', moodType: 'NEUTRAL', distressed: false }, 'shared an image')
+            return
         }
 
         const lower = userText.toLowerCase()
         const pending = get().pendingListingsByChannel[activeId] ?? []
 
-        // Intercept Yes/No when user was asked about speaking to a navigator
+        // Intercept Yes/No when user was asked about speaking to a navigator / live agent
         if (get().awaitingNavigatorReply && (lower === 'yes' || lower === 'no')) {
             const replyMessages = []
+            const moodOrigin = get().moodNavigatorContext
             if (lower === 'yes') {
-                replyMessages.push(makeAiTextMessage("I'm connecting you with a navigator now. They'll be able to help you directly."))
-                set((state) => ({
-                    messagesByChannel: {
-                        ...state.messagesByChannel,
-                        [activeId]: [...(state.messagesByChannel[activeId] ?? []), userMsg, ...replyMessages],
-                    },
-                    awaitingNavigatorReply: false,
-                }))
-                useChatStore.getState().switchToAdminDm('User requested to speak with a navigator after reviewing resources.')
+                if (moodOrigin) {
+                    // Mood flow → "live agent" shows the Kind Connect well-being card.
+                    const kc = findSubProject('kindconnect')
+                    replyMessages.push(makeAiTextMessage('Kind Connect can support you with well-being resources and a real person to talk to.'))
+                    replyMessages.push({
+                        id: nextAiId('kindconnect'),
+                        from: 'ai',
+                        type: 'resource-card',
+                        title: kc.name,
+                        description: kc.tagline,
+                        link: `/${kc.slug}`,
+                        createdAt: new Date().toISOString(),
+                    })
+                    set((state) => ({
+                        messagesByChannel: {
+                            ...state.messagesByChannel,
+                            [activeId]: [...(state.messagesByChannel[activeId] ?? []), userMsg, ...replyMessages],
+                        },
+                        awaitingNavigatorReply: false,
+                        moodNavigatorContext: false,
+                    }))
+                } else {
+                    replyMessages.push(makeAiTextMessage("I'm connecting you with a navigator now. They'll be able to help you directly."))
+                    set((state) => ({
+                        messagesByChannel: {
+                            ...state.messagesByChannel,
+                            [activeId]: [...(state.messagesByChannel[activeId] ?? []), userMsg, ...replyMessages],
+                        },
+                        awaitingNavigatorReply: false,
+                    }))
+                    useChatStore.getState().switchToAdminDm('User requested to speak with a navigator after reviewing resources.')
+                }
             } else {
                 replyMessages.push(makeAiTextMessage("Okay! Let me know if there's anything else I can help with."))
                 set((state) => ({
@@ -215,6 +259,7 @@ export const useAIStore = create((set, get) => ({
                         [activeId]: [...(state.messagesByChannel[activeId] ?? []), userMsg, ...replyMessages],
                     },
                     awaitingNavigatorReply: false,
+                    moodNavigatorContext: false,
                 }))
             }
             return
@@ -273,6 +318,15 @@ export const useAIStore = create((set, get) => ({
             awaitingMoreResultsReply: false,
             awaitingNavigatorReply: false,
         }))
+
+        // Mood messages always go through the dedicated mood flow (acknowledgement
+        // + postMood resource cards + crisis block), regardless of whether the
+        // backend AI is reachable — the generic backend reply isn't appropriate here.
+        const moodCheck = classifyIntent(userText)
+        if (moodCheck.intent === 'MOOD') {
+            await get()._respond(moodCheck, userText)
+            return
+        }
 
         try {
             const history = buildHistory(get().messagesByChannel[activeId] ?? [])
@@ -428,6 +482,7 @@ export const useAIStore = create((set, get) => ({
     _respond: async (result, originalText) => {
         const activeId = get().activeAiChannelId
         const reply = []
+        let moodPromptActive = false
 
         if (result.intent === 'URGENT') {
             reply.push({
@@ -449,7 +504,8 @@ export const useAIStore = create((set, get) => ({
             })
 
             try {
-                const moodRes = await api.postMood({ moodType: result.moodType, note: originalText })
+                const backendMoodType = MOOD_BUCKET_TO_BACKEND[result.moodType] ?? 'NEUTRAL'
+                const moodRes = await api.postMood({ moodType: backendMoodType, note: originalText })
                 const resources = moodRes?.data?.resources || moodRes?.resources
 
                 if (resources?.length) {
@@ -469,6 +525,13 @@ export const useAIStore = create((set, get) => ({
                 const kc = findSubProject('kindconnect')
                 reply.push({ type: 'resource-card', title: kc.name, description: kc.tagline, link: `/${kc.slug}` })
             }
+
+            // After the resources, offer a live agent (→ Kind Connect card) or to wrap up.
+            reply.push({
+                type: 'text',
+                text: 'Would you like to speak to a live agent, or see more resources? (Yes / No)',
+            })
+            moodPromptActive = true
         } else if (result.intent === 'RESOURCE') {
             const project = findSubProject(result.subProject)
             reply.push({
@@ -506,6 +569,9 @@ export const useAIStore = create((set, get) => ({
                 },
                 isThinking: false,
                 unreadByChannel: { ...state.unreadByChannel, [activeId]: newCount },
+                // Arm the live-agent (Yes/No) prompt for the mood flow.
+                awaitingNavigatorReply: moodPromptActive,
+                moodNavigatorContext: moodPromptActive,
             }
         })
     },

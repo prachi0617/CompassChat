@@ -25,7 +25,7 @@ export default function DemoBanner() {
             className="w-full flex items-center gap-2 bg-yellow-50 text-ink px-4 py-2 text-meta border-b border-yellow-300/60 hover:bg-yellow-100 transition-colors text-left cursor-pointer"
         >
             <Users size={14} className="text-yellow-700 shrink-0" />
-            <span>Click here if you would like to speak to Prachi, Anitra, Niciah or Shocka.</span>
+            <span>Click here if you would like to speak to a member of our Admin Team.</span>
         </button>
     )
 }
