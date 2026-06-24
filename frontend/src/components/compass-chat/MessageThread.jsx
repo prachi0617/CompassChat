@@ -19,9 +19,8 @@ export default function MessageThread({ conversationId, messages, loading, curre
     const openedConversationRef = useRef(null)
 
     useEffect(() => {
-        // When a conversation is first opened, start at the TOP so the reader
-        // sees the beginning of the thread. Only follow the bottom for new
-        // messages that arrive while the same conversation stays open.
+        // On first open of a conversation, start at the TOP. Only follow the
+        // bottom for new messages that arrive while the same conversation is open.
         if (openedConversationRef.current !== conversationId) {
             openedConversationRef.current = conversationId
             requestAnimationFrame(() => {
