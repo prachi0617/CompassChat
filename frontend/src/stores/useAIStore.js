@@ -220,9 +220,18 @@ export const useAIStore = create((set, get) => ({
             const moodOrigin = get().moodNavigatorContext
             if (lower === 'yes') {
                 if (moodOrigin) {
-                    // Mood flow → "live agent" shows the Kind Connect well-being card.
+                    // Mood flow → "live agent": connecting message + pink "Talk to a person"
+                    // escalate button, plus the Kind Connect card as additional support.
                     const kc = findSubProject('kindconnect')
-                    replyMessages.push(makeAiTextMessage('Kind Connect can support you with well-being resources and a real person to talk to.'))
+                    replyMessages.push(makeAiTextMessage("I'm connecting you with a live agent now. In the meantime, Kind Connect can offer well-being support."))
+                    replyMessages.push({
+                        id: nextAiId('escalate'),
+                        from: 'ai',
+                        type: 'escalate-cta',
+                        label: 'Talk to a person',
+                        contextMessage: 'Escalated from Sage after a well-being check-in.',
+                        createdAt: new Date().toISOString(),
+                    })
                     replyMessages.push({
                         id: nextAiId('kindconnect'),
                         from: 'ai',
