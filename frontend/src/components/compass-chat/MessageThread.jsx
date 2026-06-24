@@ -13,12 +13,24 @@ function SkeletonBubble({ align = 'left' }) {
     )
 }
 
-export default function MessageThread({ messages, loading, currentUserName = 'Guest User' }) {
+export default function MessageThread({ conversationId, messages, loading, currentUserName = 'Guest User' }) {
     const bottomRef = useRef(null)
+    const scrollRef = useRef(null)
+    const openedConversationRef = useRef(null)
 
     useEffect(() => {
+        // When a conversation is first opened, start at the TOP so the reader
+        // sees the beginning of the thread. Only follow the bottom for new
+        // messages that arrive while the same conversation stays open.
+        if (openedConversationRef.current !== conversationId) {
+            openedConversationRef.current = conversationId
+            requestAnimationFrame(() => {
+                if (scrollRef.current) scrollRef.current.scrollTop = 0
+            })
+            return
+        }
         bottomRef.current?.scrollIntoView({ block: 'end' })
-    }, [messages])
+    }, [messages, conversationId])
 
     if (loading) {
         return (
@@ -39,7 +51,7 @@ export default function MessageThread({ messages, loading, currentUserName = 'Gu
     }
 
     return (
-        <div className="flex-1 overflow-y-auto py-2">
+        <div ref={scrollRef} className="flex-1 overflow-y-auto py-2">
             {messages.map((m) => (
                 <MessageBubble key={m.id} message={m} isOwn={m.sender?.displayName === currentUserName} />
             ))}
