@@ -191,6 +191,7 @@ export default function ChatPanel({ isOpen, onClose }) {
                         ) : (
                             <>
                                 <MessageThread
+                                    conversationId={activeConversationId}
                                     messages={messages}
                                     loading={loading && !messages}
                                 />
