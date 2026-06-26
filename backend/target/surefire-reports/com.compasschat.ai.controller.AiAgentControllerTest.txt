@@ -1,4 +1,15 @@
 -------------------------------------------------------------------------------
 Test set: com.compasschat.ai.controller.AiAgentControllerTest
 -------------------------------------------------------------------------------
-Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.245 s -- in com.compasschat.ai.controller.AiAgentControllerTest
+Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 4.936 s <<< FAILURE! -- in com.compasschat.ai.controller.AiAgentControllerTest
+com.compasschat.ai.controller.AiAgentControllerTest.shouldReturnErrorStatus_whenAuthorizationHeaderIsMissing -- Time elapsed: 0.254 s <<< FAILURE!
+java.lang.AssertionError: Range for response status value 200 expected:<SERVER_ERROR> but was:<SUCCESSFUL>
+	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
+	at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
+	at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$is5xxServerError$6(StatusResultMatchers.java:103)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.compasschat.ai.controller.AiAgentControllerTest.shouldReturnErrorStatus_whenAuthorizationHeaderIsMissing(AiAgentControllerTest.java:97)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+

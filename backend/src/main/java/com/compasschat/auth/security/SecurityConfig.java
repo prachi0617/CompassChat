@@ -39,6 +39,8 @@ public class SecurityConfig {
                 .requestMatchers("/h2-console/**").permitAll()
                 // AI endpoints are open so unauthenticated / guest users can use the assistant:
                 .requestMatchers("/api/ai/**").permitAll()
+                // Health check for container orchestration / load balancers:
+                .requestMatchers("/actuator/health").permitAll()
                 // EVERY other door requires a valid wristband:
                 .anyRequest().authenticated()
             )

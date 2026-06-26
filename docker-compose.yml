@@ -1,0 +1,43 @@
+# CompassChat — portable Docker stack (Postgres + Spring Boot + nginx-served frontend).
+# Run:  cp .env.example .env  &&  docker compose up --build
+# Open: http://localhost:8080
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: compasschat
+      POSTGRES_USER: compass
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-compass-dev-pw}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U compass -d compasschat"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    environment:
+      PORT: 8081
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:postgresql://db:5432/compasschat
+      DB_USER: compass
+      DB_PASSWORD: ${DB_PASSWORD:-compass-dev-pw}
+      APP_JWT_SECRET: ${APP_JWT_SECRET:-change-me-in-prod}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "8081"
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

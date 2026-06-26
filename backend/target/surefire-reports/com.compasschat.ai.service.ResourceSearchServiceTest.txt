@@ -1,4 +1,32 @@
 -------------------------------------------------------------------------------
 Test set: com.compasschat.ai.service.ResourceSearchServiceTest
 -------------------------------------------------------------------------------
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.027 s -- in com.compasschat.ai.service.ResourceSearchServiceTest
+Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.046 s <<< FAILURE! -- in com.compasschat.ai.service.ResourceSearchServiceTest
+com.compasschat.ai.service.ResourceSearchServiceTest.shouldReturnCommunityResourcesResult_whenQueryHasNoMatchingKeyword -- Time elapsed: 0.043 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: 
+expected: <Community resources available — contact Delaware 211 for personalized help.> but was: <• Delaware College of Art Design
+  Pre-college program with workshops, courses and events designed to learn about studying art/design in higher education including possible career options.
+  Phone: 302-622-8000 | https://dcad.edu/community-education/pre-college/
+
+• RI International - Recovery Response Center
+  The Recovery Response Center is a 23-hour crisis assessment and engagement program for individuals 18 years of age or older, with significant mental health and/or substance use challenges. The goals of the Recovery Response Center are to prevent hospitalization, when possible, and higher levels of care by rapidly getting to know the persons needs, engaging in a voluntary recovery opportunity, and connecting people to the community services and support.
+  Phone: 302-318-6070 | https://riinternational.com/listing/recovery-response-center-newark/
+
+• Big Brothers Big Sisters of Delaware, Inc.
+  Match children of single parent homes with mentors. Also available is Sports Buddies, where children are paired with an adult with a shared interest in sports or fitness, and an LGBTQ youth initiative, where LGBTQ youth are paired with an LGBTQ individual or ally.
+  Phone: 302-998-3577 | https://bbbsde.org/our-programs
+
+• West End Neighborhood House - Camp W.E.S.T. Fun-Zone
+  West End's Summer Camp program is filled with activities centered around children having fun in the sun. Junior and Senior Camp Counselors ensure that children are engaged in a variety of summer camp activities. West End has partnered with Summer Learning Collab to close the gap around summer learning loss and includes various academic enrichment activities to keep the education wheels turning while on summer break. Summer camp staff members are invigorating, creative, energetic, caring and passionate about working with children. Summer Camp runs from June to August of each year. West End also works closely with various school districts to offer services during school breaks, including: School Closing Camp, Spring Break Camp, Winter Break Camp, and In-Service Day Camp when possible.
+  Phone: 302-658-4171 | https://westendnh.org/programs/youthdevelopment/childcare/>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:177)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1145)
+	at com.compasschat.ai.service.ResourceSearchServiceTest.shouldReturnCommunityResourcesResult_whenQueryHasNoMatchingKeyword(ResourceSearchServiceTest.java:49)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+

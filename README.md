@@ -257,6 +257,29 @@ The UI runs at `http://localhost:5173` and proxies `/api` and `/ws` to the backe
 
 The app **auto-logs in as a demo resident** (`demo-resident` / `demo123`) on boot. If the backend is unreachable, the chat falls back to an offline mock mode so the UI is still demonstrable.
 
+### Run with Docker (full stack)
+
+The whole app — PostgreSQL, the Spring Boot backend, and the nginx-served frontend — runs in containers. This is the portable, deploy-anywhere path; unlike the local H2 setup, **data persists across restarts** in a Postgres volume.
+
+```bash
+cp .env.example .env        # then edit values if you like
+docker compose up --build
+```
+
+Open **`http://localhost:8080`**. The frontend's nginx serves the built UI and reverse-proxies `/api` and `/ws` to the backend, so everything is same-origin.
+
+Environment variables (in `.env`):
+
+| Var | Purpose |
+|---|---|
+| `DB_PASSWORD` | Postgres password (shared by the `db` and `backend` services) |
+| `APP_JWT_SECRET` | JWT signing secret — use a long random string for real deployments |
+| `GROQ_API_KEY` | Optional. Empty = the AI assistant uses its built-in rule-based fallback; set it to enable Groq (Llama 3) responses |
+
+Demo data seeds on first boot and the app auto-logs in as `demo-resident`, so the link "just works". Tear down with `docker compose down` (keeps the database volume) or `docker compose down -v` (also wipes Postgres).
+
+> Local development without Docker (`mvn spring-boot:run` + `npm run dev`) still uses in-memory H2 and is unchanged.
+
 ---
 
 ## API Reference
@@ -428,7 +451,7 @@ The following features are described in the product vision but are **not yet imp
 | Rate limiting / spam prevention | Planned |
 | Admin dashboard (user/channel/audit management) | Stub endpoints only |
 | Case worker ↔ client assignment management | Partial (`assignedSubProject` field exists; no management endpoints) |
-| PostgreSQL database + Docker Compose deployment | Planned (currently H2 in-memory) |
+| PostgreSQL database + Docker Compose deployment | ✅ Done (see [Run with Docker](#run-with-docker-full-stack); `prod` profile uses Postgres, local dev still H2) |
 | Channel notification preferences UI (all / mentions / muted) | Backend field exists; UI planned |
 
 ---

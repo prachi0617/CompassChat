@@ -303,3 +303,167 @@ That's the demo. Three minutes, hits every feature.
 - README.md updated with: how to run, the demo user credentials, and a one-paragraph project summary
 
 Ship it.
+
+---
+---
+
+# Plan: Make CompassChat Deployable (Portable Docker + Postgres for Prod)
+
+> Appended post-demo. Roadmap Phase 1 (deployment). This is a planning document — not yet implemented.
+
+## Context
+
+CompassChat currently runs only on a developer laptop (backend `mvn spring-boot:run` on 8081, frontend `vite` on 5173, H2 in-memory). Roadmap Phase 1 = get it deployable. The goal here is a **portable Docker setup** that runs on any host with Docker — not tied to one cloud.
+
+### Confirmed decisions
+- **Portable Docker (any host):** Dockerfiles + a working `docker-compose.yml` (backend + frontend nginx + Postgres). No cloud-specific blueprint.
+- **Postgres for prod, H2 for local/test:** a Spring `prod` profile uses Postgres from env vars; default profile keeps H2 (local dev + the 51-class test suite unchanged).
+- **Keep seeding + auto-login:** the deployed link "just works" — demo data seeds on first boot, frontend auto-logs in as `demo-resident`.
+
+### Key facts verified
+- Backend: Java 17, Spring Boot 3.3.5, Maven fat jar `target/java-service-0.1.0.jar`, **no Maven wrapper**, `spring-boot-maven-plugin` present.
+- `application.properties`: `server.port=8081`, H2 `create-drop`, `app.jwt.secret` **hardcoded**, `GROQ_API_KEY` already env-driven. The `spring.ai.*` Groq autoconfig-exclude block is delicate — **must be preserved verbatim**.
+- H2 dependency is `runtime` scope (keep). Need to add the PostgreSQL driver.
+- Both seeders are **idempotent** (`DemoDataSeeder` guards on `findByUsername("demo-resident")`; `DataSeeder` guards on `existsByName`) → safe on persistent Postgres across restarts; `ddl-auto=update` won't duplicate data.
+- Frontend talks to backend via **relative `/api` + `/ws`** (`api.js` `BASE_URL='/api'`, `websocket.js` `new SockJS('/ws')`) — no hardcoded host → nginx reverse proxy is the prod model. Vite proxy is dev-only.
+- Security: no CORS bean; `/ws/**`, `/api/auth/**`, `/api/ai/**`, `/h2-console/**` are permitAll. (Same-origin via nginx → no CORS needed in prod.)
+- WebSocket endpoint is registered `withSockJS()` (fixed earlier) — nginx must pass `/ws` with HTTP/1.1 upgrade headers.
+
+---
+
+## 1. Backend: prod profile + Postgres + `$PORT` + externalized secret
+
+**File:** `backend/src/main/resources/application.properties`
+- Change `server.port=8081` → `server.port=${PORT:8081}` (host can inject a port; defaults to 8081).
+- Change `app.jwt.secret=...` → `app.jwt.secret=${APP_JWT_SECRET:CompassChatSuperSecretKeyForDevelopmentOnly1234567890}` (env override in prod; dev fallback unchanged).
+- Leave H2 datasource, the Groq block, and the autoconfigure-exclude **exactly as-is** (default profile = local dev/test).
+
+**File (new):** `backend/src/main/resources/application-prod.properties`
+- Postgres datasource from env:
+  ```
+  spring.datasource.url=${DB_URL}
+  spring.datasource.username=${DB_USER}
+  spring.datasource.password=${DB_PASSWORD}
+  spring.datasource.driver-class-name=org.postgresql.Driver
+  spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+  spring.jpa.hibernate.ddl-auto=update
+  spring.h2.console.enabled=false
+  ```
+  (Activated by `SPRING_PROFILES_ACTIVE=prod`. Data persists; idempotent seeders won't duplicate.)
+
+**File:** `backend/pom.xml`
+- Add the PostgreSQL driver dependency (runtime scope):
+  ```xml
+  <dependency>
+    <groupId>org.postgresql</groupId>
+    <artifactId>postgresql</artifactId>
+    <scope>runtime</scope>
+  </dependency>
+  ```
+- (Optional, recommended) add `spring-boot-starter-actuator` for a `/actuator/health` healthcheck used by compose. If added, permit `/actuator/health` in `SecurityConfig` (add `.requestMatchers("/actuator/health").permitAll()`).
+
+## 2. Backend Dockerfile (multi-stage)
+
+**File (new):** `backend/Dockerfile`
+- Stage 1 `maven:3.9-eclipse-temurin-17`: copy `pom.xml`, `mvn -q dependency:go-offline`, copy `src/`, `mvn -q clean package -DskipTests` → `target/java-service-0.1.0.jar`.
+- Stage 2 `eclipse-temurin:17-jre`: copy the jar → `/app/app.jar`, `EXPOSE 8081`, `ENTRYPOINT ["java","-jar","/app/app.jar"]`. Reads `PORT`, `SPRING_PROFILES_ACTIVE`, `DB_*`, `APP_JWT_SECRET`, `GROQ_API_KEY` at runtime.
+
+**File (new):** `backend/.dockerignore` → `target/`, `.idea/`, `*.iml`, `.git/`.
+
+## 3. Frontend Dockerfile (build → nginx) + reverse proxy
+
+**File (new):** `frontend/Dockerfile`
+- Stage 1 `node:20-alpine`: copy `package*.json`, `npm ci`, copy rest, `npm run build` → `dist/`.
+- Stage 2 `nginx:1.27-alpine`: copy `dist/` → `/usr/share/nginx/html`, copy nginx config; `EXPOSE 8080`.
+
+**File (new):** `frontend/nginx.conf`
+- `listen 8080;`, `root /usr/share/nginx/html; index index.html;`
+- SPA fallback: `location / { try_files $uri /index.html; }`
+- `location /api/ { proxy_pass http://backend:8081; proxy_set_header Host $host; ... }`
+- `location /ws/ { proxy_pass http://backend:8081; proxy_http_version 1.1; proxy_set_header Upgrade $http_upgrade; proxy_set_header Connection "upgrade"; proxy_read_timeout 1h; }` (SockJS/STOMP needs the upgrade headers + long timeout)
+
+**File (new):** `frontend/.dockerignore` → `node_modules/`, `dist/`, `.git/`.
+
+> The `backend` hostname in nginx resolves over the compose network (service name). On another host/orchestrator, point it at the backend's URL.
+
+## 4. docker-compose.yml (the deployable unit)
+
+**File:** `docker-compose.yml` (currently empty)
+```yaml
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: compasschat
+      POSTGRES_USER: compass
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-compass-dev-pw}
+    volumes: [ "pgdata:/var/lib/postgresql/data" ]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U compass -d compasschat"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  backend:
+    build: ./backend
+    environment:
+      PORT: 8081
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:postgresql://db:5432/compasschat
+      DB_USER: compass
+      DB_PASSWORD: ${DB_PASSWORD:-compass-dev-pw}
+      APP_JWT_SECRET: ${APP_JWT_SECRET:-change-me-in-prod}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+    depends_on:
+      db: { condition: service_healthy }
+    expose: [ "8081" ]
+  frontend:
+    build: ./frontend
+    ports: [ "8080:8080" ]
+    depends_on: [ backend ]
+volumes: { pgdata: {} }
+```
+Run: `docker compose up --build` → open `http://localhost:8080`. Postgres persists in the `pgdata` volume; seeders populate on first boot only.
+
+## 5. Env template + docs
+
+**File (new):** `.env.example`
+```
+DB_PASSWORD=compass-dev-pw
+APP_JWT_SECRET=change-me-to-a-long-random-string
+GROQ_API_KEY=         # optional; empty = rule-based AI fallback
+```
+**File:** append `.env` to `.gitignore`.
+**File:** `README.md` — add a "Run with Docker" section (the 3 env vars, `docker compose up --build`, the `http://localhost:8080` URL, note that without `GROQ_API_KEY` the AI uses the rule-based fallback, and that data now persists in Postgres).
+
+---
+
+## Files to Create / Modify
+
+| File | Change |
+|---|---|
+| `backend/src/main/resources/application.properties` | `server.port=${PORT:8081}`; `app.jwt.secret=${APP_JWT_SECRET:...}`. Leave H2 + Groq blocks intact. |
+| `backend/src/main/resources/application-prod.properties` | New — Postgres datasource from `DB_*` env, `ddl-auto=update`, H2 console off. |
+| `backend/pom.xml` | Add `postgresql` (runtime); optionally `spring-boot-starter-actuator`. |
+| `backend/src/main/java/.../auth/security/SecurityConfig.java` | (Only if actuator added) permit `/actuator/health`. |
+| `backend/Dockerfile`, `backend/.dockerignore` | New — multi-stage Maven build → JRE runtime. |
+| `frontend/Dockerfile`, `frontend/.dockerignore`, `frontend/nginx.conf` | New — Vite build → nginx serving static + proxying `/api` and `/ws` (WebSocket upgrade). |
+| `docker-compose.yml` | Fill in db + backend + frontend (was empty). |
+| `.env.example`, `.gitignore`, `README.md` | New env template; ignore `.env`; Docker run docs. |
+
+No application/business-logic changes. Local dev (`mvn spring-boot:run` + `vite`) and the test suite keep using H2 unchanged (default profile).
+
+---
+
+## Verification
+
+1. **Local containerized run:** from repo root, `cp .env.example .env`, then `docker compose up --build`.
+2. Postgres becomes healthy; backend starts with `prod` profile and logs `>>> Seeding CompassChat demo data...` (first run) then connects to Postgres.
+3. Open `http://localhost:8080` → app loads, auto-logs in as demo-resident; sidebar shows channels + DMs.
+4. Network tab: `GET /api/channels` → 200 (nginx → backend); `/ws` SockJS connects (`[ws] connected`) → live messages, Admin Team scripted demo, and Sage mood flow all work.
+5. AI: with no `GROQ_API_KEY`, responses come from the rule-based fallback; set `GROQ_API_KEY` in `.env` and re-up → Groq responses.
+6. **Persistence test:** post a message / log in, then `docker compose restart backend` → data still present (Postgres volume), and logs show `>>> Demo data already seeded, skipping.` (idempotent seeders).
+7. (If actuator added) `curl http://localhost:8081/actuator/health` via the backend container → `{"status":"UP"}`.
+8. Tests still pass on H2: `cd backend && mvn test` (default profile, no Docker) → green.
+9. Tear down: `docker compose down` (keeps volume) / `docker compose down -v` (wipes Postgres).
+
+> Portability note: this compose file runs on any Docker host (local, a VM, a server). To later put it on a specific PaaS (e.g. Render), the same Dockerfiles are reused — only a platform blueprint + `$PORT`/managed-Postgres wiring would be added; nothing here blocks that.
